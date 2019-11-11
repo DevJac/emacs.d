@@ -12,7 +12,8 @@
 (setq package-selected-packages
       '(counsel
 	gruvbox-theme
-	projectile))
+	projectile
+	restart-emacs))
 
 (load-theme 'gruvbox-dark-hard 1)
 
