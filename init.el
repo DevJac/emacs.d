@@ -10,8 +10,12 @@
 (evil-mode 1)
 
 (setq package-selected-packages
-      '(counsel
+      '(company-lsp
+	counsel
+	flycheck
 	gruvbox-theme
+	lsp-mode
+	lsp-ui
 	projectile
 	restart-emacs))
 
