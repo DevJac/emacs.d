@@ -9,6 +9,10 @@
 (require 'evil)
 (evil-mode 1)
 
-(setq package-selected-packages '(gruvbox-theme))
+(setq package-selected-packages
+      '(counsel
+	gruvbox-theme))
 
 (load-theme 'gruvbox-dark-hard 1)
+
+(ivy-mode 1)
