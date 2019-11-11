@@ -11,7 +11,8 @@
 
 (setq package-selected-packages
       '(counsel
-	gruvbox-theme))
+	gruvbox-theme
+	projectile))
 
 (load-theme 'gruvbox-dark-hard 1)
 
