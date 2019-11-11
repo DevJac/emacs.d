@@ -14,7 +14,10 @@
 	lsp-mode
 	lsp-ui
 	projectile
-	restart-emacs))
+	restart-emacs
+	rust-mode
+	whitespace
+	yasnippet))
 
 (load-theme 'gruvbox-dark-hard 1)
 
