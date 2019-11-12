@@ -11,15 +11,20 @@
 	evil
 	flycheck
 	gruvbox-theme
+	keyfreq
 	lsp-mode
 	lsp-ui
 	projectile
 	restart-emacs
 	rust-mode
+	smex
 	whitespace
 	yasnippet))
 
-(load-theme 'gruvbox-dark-hard 1)
-
 (evil-mode 1)
 (ivy-mode 1)
+(keyfreq-mode 1)
+(keyfreq-autosave-mode 1)
+
+(load-theme 'gruvbox-dark-hard 1)
+(set-face-attribute 'default nil :height 160)
