@@ -44,3 +44,20 @@
 
 (load-theme 'gruvbox-dark-hard 1)
 (set-face-attribute 'default nil :height 160)
+
+(custom-set-variables
+ '(ivy-initial-inputs-alist
+   (quote
+    ((counsel-minor . "^+")
+     (counsel-package . "^+")
+     (counsel-org-capture . "^")
+     (counsel-M-x . "")
+     (counsel-describe-function . "")
+     (counsel-describe-variable . "")
+     (org-refile . "^")
+     (org-agenda-refile . "^")
+     (org-capture-refile . "^")
+     (Man-completion-table . "^")
+     (woman . "^")))))
+(custom-set-faces
+ )
