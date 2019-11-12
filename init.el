@@ -6,7 +6,8 @@
 			 ("melpa" . "https://melpa.org/packages/")))
 
 (setq package-selected-packages
-      '(company-lsp
+      '(amx
+	company-lsp
 	counsel
 	evil
 	flycheck
@@ -17,7 +18,6 @@
 	projectile
 	restart-emacs
 	rust-mode
-	smex
 	whitespace
 	yasnippet))
 
