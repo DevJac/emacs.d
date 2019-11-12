@@ -23,8 +23,11 @@
 
 (evil-mode 1)
 (ivy-mode 1)
+
 (keyfreq-mode 1)
 (keyfreq-autosave-mode 1)
+(setq keyfreq-file "~/.emacs.d/keyfreq")
+(setq keyfreq-file-lock "~/.emacs.d/keyfreq-lock")
 
 (load-theme 'gruvbox-dark-hard 1)
 (set-face-attribute 'default nil :height 160)
