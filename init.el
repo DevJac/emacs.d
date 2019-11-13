@@ -10,6 +10,7 @@
 	company-lsp
 	counsel
 	evil
+	evil-collection     ; evil bindings for more modes
 	flycheck
 	gruvbox-theme
 	keyfreq
@@ -21,10 +22,10 @@
 	whitespace
 	yasnippet))         ; suggested requirement of lsp
 
+; evil config
+(setq evil-want-keybinding nil)
 (evil-mode 1)
-(define-key Info-mode-map (kbd "g") nil)
-(define-key Info-mode-map (kbd "n") nil)
-(evil-set-initial-state 'Info-mode 'normal)
+(evil-collection-init)
 
 ; ivy & counsel config
 (ivy-mode 1)
