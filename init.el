@@ -26,6 +26,10 @@
 (setq evil-want-keybinding nil)
 (evil-mode 1)
 (evil-collection-init)
+(setq spc-map (make-sparse-keymap))
+(define-key spc-map (kbd "TAB") #'ivy-switch-buffer)
+(define-key evil-motion-state-map (kbd "SPC") spc-map)
+(define-key evil-normal-state-map (kbd "SPC") spc-map)
 
 ; ivy & counsel config
 (ivy-mode 1)
@@ -33,10 +37,6 @@
 (setq ivy-use-virtual-buffers 1)
 (setq ivy-count-format "(%d/%d) ")
 (global-set-key (kbd "C-s") #'swiper)
-(setq spc-map (make-sparse-keymap))
-(define-key evil-normal-state-map (kbd "SPC") spc-map)
-(define-key evil-motion-state-map (kbd "SPC") spc-map)
-(define-key spc-map (kbd "TAB") #'ivy-switch-buffer)
 
 ; keyfreq config
 (keyfreq-mode 1)
