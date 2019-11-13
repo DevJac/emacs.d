@@ -22,6 +22,9 @@
 	yasnippet))
 
 (evil-mode 1)
+(define-key Info-mode-map (kbd "g") nil)
+(define-key Info-mode-map (kbd "n") nil)
+(evil-set-initial-state 'Info-mode 'normal)
 
 ; ivy config
 (ivy-mode 1)
