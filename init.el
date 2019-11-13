@@ -47,7 +47,7 @@
 (setq scroll-conservatively 10)
 
 (load-theme 'gruvbox-dark-hard 1)
-(set-face-attribute 'default nil :height 160)
+(set-face-attribute 'default nil :height 140)
 
 (custom-set-variables
  '(ivy-initial-inputs-alist
