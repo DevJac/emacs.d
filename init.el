@@ -26,15 +26,12 @@
 (define-key Info-mode-map (kbd "n") nil)
 (evil-set-initial-state 'Info-mode 'normal)
 
-; ivy config
+; ivy & counsel config
 (ivy-mode 1)
+(counsel-mode 1)
 (setq ivy-use-virtual-buffers 1)
 (setq ivy-count-format "(%d/%d) ")
 (global-set-key (kbd "C-s") #'swiper)
-(global-set-key (kbd "M-x") #'counsel-M-x)
-(global-set-key (kbd "C-x C-f") #'counsel-find-file)
-(global-set-key (kbd "C-h f") #'counsel-describe-function)
-(global-set-key (kbd "C-h v") #'counsel-describe-variable)
 (setq spc-map (make-sparse-keymap))
 (define-key evil-normal-state-map (kbd "SPC") spc-map)
 (define-key evil-motion-state-map (kbd "SPC") spc-map)
