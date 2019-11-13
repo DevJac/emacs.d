@@ -34,6 +34,7 @@
 (global-set-key (kbd "C-h v") #'counsel-describe-variable)
 (setq spc-map (make-sparse-keymap))
 (define-key evil-normal-state-map (kbd "SPC") spc-map)
+(define-key evil-motion-state-map (kbd "SPC") spc-map)
 (define-key spc-map (kbd "TAB") #'ivy-switch-buffer)
 
 ; keyfreq config
