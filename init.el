@@ -6,7 +6,7 @@
 			 ("melpa" . "https://melpa.org/packages/")))
 
 (setq package-selected-packages
-      '(amx
+      '(amx                 ; history provider for counsel
 	company-lsp
 	counsel
 	evil
@@ -19,7 +19,7 @@
 	restart-emacs
 	rust-mode
 	whitespace
-	yasnippet))
+	yasnippet))         ; suggested requirement of lsp
 
 (evil-mode 1)
 (define-key Info-mode-map (kbd "g") nil)
