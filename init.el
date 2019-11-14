@@ -17,6 +17,7 @@
 	lsp-mode
 	lsp-ui
 	projectile
+	rainbow-delimiters
 	restart-emacs
 	rust-mode
 	whitespace
@@ -48,6 +49,7 @@
 (setq scroll-conservatively 100)
 
 ; theme config
+(menu-bar-mode -1)
 (tool-bar-mode -1)
 (load-theme 'gruvbox-dark-hard 1)
 (set-face-attribute 'default nil :height 140)
