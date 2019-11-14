@@ -50,6 +50,7 @@
 (set-face-attribute 'default nil :height 140)
 
 (custom-set-variables
+ '(evil-search-module (quote evil-search))
  '(ivy-initial-inputs-alist
    (quote
     ((counsel-minor . "^+")
