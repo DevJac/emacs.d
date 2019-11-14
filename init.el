@@ -43,9 +43,12 @@
 (setq keyfreq-file "~/.emacs.d/keyfreq")
 (setq keyfreq-file-lock "~/.emacs.d/keyfreq-lock")
 
+; scroll config
 (setq scroll-margin 2)
 (setq scroll-conservatively 100)
 
+; theme config
+(tool-bar-mode -1)
 (load-theme 'gruvbox-dark-hard 1)
 (set-face-attribute 'default nil :height 140)
 
