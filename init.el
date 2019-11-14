@@ -24,6 +24,7 @@
 	yasnippet))         ; suggested requirement of lsp
 
 ; evil config
+(setq evil-search-module 'evil-search)
 (setq evil-want-keybinding nil)
 (evil-mode 1)
 (evil-collection-init)
@@ -55,7 +56,6 @@
 (set-face-attribute 'default nil :height 140)
 
 (custom-set-variables
- '(evil-search-module (quote evil-search))
  '(ivy-initial-inputs-alist
    (quote
     ((counsel-minor . "^+")
