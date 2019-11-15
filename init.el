@@ -48,17 +48,9 @@
 (setq ivy-count-format "(%d/%d) ")
 (global-set-key (kbd "C-s") #'swiper)
 (setq ivy-initial-inputs-alist
-      '((counsel-minor . "^+")
-	(counsel-package . "^+")
-	(counsel-org-capture . "^")
-	(counsel-M-x . "")
+      '((counsel-M-x . "")
 	(counsel-describe-function . "")
-	(counsel-describe-variable . "")
-	(org-refile . "^")
-	(org-agenda-refile . "^")
-	(org-capture-refile . "^")
-	(Man-completion-table . "^")
-	(woman . "^")))
+	(counsel-describe-variable . "")))
 
 ; keyfreq config
 (keyfreq-mode 1)
