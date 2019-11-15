@@ -26,8 +26,8 @@
 ; theme config
 (menu-bar-mode -1)
 (tool-bar-mode -1)
-(load-theme 'gruvbox-dark-hard 1)
 (set-face-attribute 'default nil :height 160)
+(load-theme 'gruvbox-dark-hard t)
 
 ; evil config
 (setq evil-search-module 'evil-search)
@@ -44,7 +44,7 @@
 ; ivy & counsel config
 (ivy-mode 1)
 (counsel-mode 1)
-(setq ivy-use-virtual-buffers 1)
+(setq ivy-use-virtual-buffers t)
 (setq ivy-count-format "(%d/%d) ")
 (global-set-key (kbd "C-s") #'swiper)
 (setq ivy-initial-inputs-alist
