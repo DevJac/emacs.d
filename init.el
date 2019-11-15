@@ -23,6 +23,12 @@
 	whitespace
 	yasnippet))         ; suggested requirement of lsp
 
+; theme config
+(menu-bar-mode -1)
+(tool-bar-mode -1)
+(load-theme 'gruvbox-dark-hard 1)
+(set-face-attribute 'default nil :height 160)
+
 ; evil config
 (setq evil-search-module 'evil-search)
 (setq evil-want-keybinding nil)
@@ -38,6 +44,18 @@
 (setq ivy-use-virtual-buffers 1)
 (setq ivy-count-format "(%d/%d) ")
 (global-set-key (kbd "C-s") #'swiper)
+(setq ivy-initial-inputs-alist
+      '((counsel-minor . "^+")
+	(counsel-package . "^+")
+	(counsel-org-capture . "^")
+	(counsel-M-x . "")
+	(counsel-describe-function . "")
+	(counsel-describe-variable . "")
+	(org-refile . "^")
+	(org-agenda-refile . "^")
+	(org-capture-refile . "^")
+	(Man-completion-table . "^")
+	(woman . "^")))
 
 ; keyfreq config
 (keyfreq-mode 1)
@@ -48,26 +66,4 @@
 ; scroll config
 (setq scroll-margin 2)
 (setq scroll-conservatively 100)
-
-; theme config
-(menu-bar-mode -1)
-(tool-bar-mode -1)
-(load-theme 'gruvbox-dark-hard 1)
-(set-face-attribute 'default nil :height 140)
-
-(custom-set-variables
- '(ivy-initial-inputs-alist
-   (quote
-    ((counsel-minor . "^+")
-     (counsel-package . "^+")
-     (counsel-org-capture . "^")
-     (counsel-M-x . "")
-     (counsel-describe-function . "")
-     (counsel-describe-variable . "")
-     (org-refile . "^")
-     (org-agenda-refile . "^")
-     (org-capture-refile . "^")
-     (Man-completion-table . "^")
-     (woman . "^")))))
-(custom-set-faces
- )
+(setq next-screen-context-lines 4)
