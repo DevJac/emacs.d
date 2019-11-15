@@ -34,9 +34,8 @@
 (setq evil-want-keybinding nil)
 (evil-mode 1)
 (evil-collection-init)
-(setq spc-map (make-sparse-keymap))
-(define-key evil-motion-state-map (kbd "SPC") spc-map)
-(define-key spc-map (kbd "TAB") #'ivy-switch-buffer)
+(define-key evil-motion-state-map (kbd "SPC") (make-sparse-keymap))
+(define-key evil-motion-state-map (kbd "SPC TAB") #'ivy-switch-buffer)
 
 ; ivy & counsel config
 (ivy-mode 1)
