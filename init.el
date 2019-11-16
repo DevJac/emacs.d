@@ -36,8 +36,8 @@
 (load-theme 'gruvbox-dark-hard t)
 
 ;;; evil config
-(setq evil-search-module 'evil-search)
 (setq evil-want-keybinding nil)
+(setq evil-search-module 'evil-search)
 (evil-mode 1)
 (evil-collection-init)
 (evil-define-key '(motion normal) 'global
