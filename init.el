@@ -64,5 +64,8 @@
 (setq keyfreq-file "~/.emacs.d/keyfreq")
 (setq keyfreq-file-lock "~/.emacs.d/keyfreq-lock")
 
+;;; projectile config
+(setq projectile-completion-system 'ivy)
+
 ;;; which-key config
 (which-key-mode)
