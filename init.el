@@ -1,4 +1,4 @@
-; The following line is a workaround for Emacs 26.2.
+;; The following line is a workaround for Emacs 26.2.
 (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
 
 (package-initialize)
@@ -6,7 +6,8 @@
 			 ("melpa" . "https://melpa.org/packages/")))
 
 (setq package-selected-packages
-      '(amx                 ; history provider for counsel
+      '(ag                  ; ag search support
+	amx                 ; history provider for counsel
 	company-lsp
 	counsel
 	evil
@@ -19,12 +20,13 @@
 	projectile
 	rainbow-delimiters
 	restart-emacs
+	rg                  ; rg search support
 	rust-mode
 	which-key
 	whitespace
 	yasnippet))         ; suggested requirement of lsp
 
-; theme config
+;;; theme config
 (menu-bar-mode -1)
 (tool-bar-mode -1)
 (set-face-attribute 'default nil :height 160)
@@ -33,7 +35,7 @@
 (setq next-screen-context-lines 4)
 (load-theme 'gruvbox-dark-hard t)
 
-; evil config
+;;; evil config
 (setq evil-search-module 'evil-search)
 (setq evil-want-keybinding nil)
 (evil-mode 1)
@@ -45,7 +47,7 @@
   (kbd "SPC") (make-sparse-keymap)
   (kbd "SPC SPC") (lookup-key Info-mode-map (kbd "SPC")))
 
-; ivy & counsel config
+;;; ivy & counsel config
 (ivy-mode 1)
 (counsel-mode 1)
 (setq ivy-use-virtual-buffers t)
@@ -56,11 +58,11 @@
 	(counsel-describe-function . "")
 	(counsel-describe-variable . "")))
 
-; keyfreq config
+;;; keyfreq config
 (keyfreq-mode 1)
 (keyfreq-autosave-mode 1)
 (setq keyfreq-file "~/.emacs.d/keyfreq")
 (setq keyfreq-file-lock "~/.emacs.d/keyfreq-lock")
 
-; which-key config
+;;; which-key config
 (which-key-mode)
