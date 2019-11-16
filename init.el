@@ -20,6 +20,7 @@
 	rainbow-delimiters
 	restart-emacs
 	rust-mode
+	which-key
 	whitespace
 	yasnippet))         ; suggested requirement of lsp
 
@@ -27,6 +28,9 @@
 (menu-bar-mode -1)
 (tool-bar-mode -1)
 (set-face-attribute 'default nil :height 160)
+(setq scroll-margin 2)
+(setq scroll-conservatively 100)
+(setq next-screen-context-lines 4)
 (load-theme 'gruvbox-dark-hard t)
 
 ; evil config
@@ -58,7 +62,5 @@
 (setq keyfreq-file "~/.emacs.d/keyfreq")
 (setq keyfreq-file-lock "~/.emacs.d/keyfreq-lock")
 
-; scroll config
-(setq scroll-margin 2)
-(setq scroll-conservatively 100)
-(setq next-screen-context-lines 4)
+; which-key config
+(which-key-mode)
