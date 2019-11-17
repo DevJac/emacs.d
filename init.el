@@ -46,6 +46,10 @@
 (evil-define-key '(motion normal) Info-mode-map
   (kbd "SPC") (make-sparse-keymap)
   (kbd "SPC SPC") (lookup-key Info-mode-map (kbd "SPC")))
+(evil-define-key '(motion normal) messages-buffer-mode-map
+  (kbd "SPC") (make-sparse-keymap)
+  (kbd "SPC SPC") (lookup-key messages-buffer-mode-map (kbd "SPC")))
+(with-current-buffer "*Messages*" (evil-normalize-keymaps))
 
 ;;; ivy & counsel config
 (ivy-mode 1)
