@@ -12,8 +12,11 @@
 	counsel
 	evil
 	evil-collection     ; evil bindings for more modes
+	flx                 ; used by ivy for better fuzzy search
 	flycheck
 	gruvbox-theme
+	ivy
+	ivy-hydra           ; not automatically installed by ivy
 	keyfreq
 	lsp-mode
 	lsp-ui
@@ -57,6 +60,8 @@
 (setq ivy-use-virtual-buffers t)
 (setq ivy-count-format "(%d/%d) ")
 (global-set-key (kbd "C-s") #'swiper)
+(setq ivy-re-builders-alist
+      '((t . ivy--regex-fuzzy)))
 (setq ivy-initial-inputs-alist
       '((counsel-M-x . "")
 	(counsel-describe-function . "")
