@@ -53,9 +53,18 @@
   (kbd "SPC") (make-sparse-keymap)
   (kbd "SPC SPC") (lookup-key Info-mode-map (kbd "SPC")))
 (evil-define-key '(motion normal) messages-buffer-mode-map
-  (kbd "SPC") (make-sparse-keymap)
+  ;; (kbd "SPC") (make-sparse-keymap)   ; not needed?
   (kbd "SPC SPC") (lookup-key messages-buffer-mode-map (kbd "SPC")))
 (with-current-buffer "*Messages*" (evil-normalize-keymaps))
+(evil-add-hjkl-bindings rg-mode-map '(motion normal visual)
+  ;; (kbd "SPC") (make-sparse-keymap)   ; not needed?
+  (kbd "SPC TAB") #'ivy-switch-buffer   ; will not inherit global config like other modes?
+  (kbd "SPC SPC") #'rg-menu
+  (kbd "gg") #'evil-goto-first-line
+  (kbd "?") #'evil-ex-search-backward
+  (kbd "n") #'evil-ex-search-next
+  (kbd "d") #'evil-delete)
+
 
 ;;; ivy & counsel config
 (ivy-mode 1)
