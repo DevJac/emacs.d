@@ -46,6 +46,9 @@
 (evil-define-key '(motion normal) 'global
   (kbd "SPC") (make-sparse-keymap)
   (kbd "SPC TAB") #'ivy-switch-buffer)
+(evil-define-key '(motion normal) help-mode-map
+  (kbd "SPC") (make-sparse-keymap)
+  (kbd "SPC SPC") (lookup-key help-mode-map (kbd "SPC")))
 (evil-define-key '(motion normal) Info-mode-map
   (kbd "SPC") (make-sparse-keymap)
   (kbd "SPC SPC") (lookup-key Info-mode-map (kbd "SPC")))
