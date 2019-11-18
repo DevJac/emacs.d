@@ -11,7 +11,7 @@
 	company-lsp
 	counsel
 	evil
-	evil-collection     ; evil bindings for more modes
+	;; evil-collection  ; evil bindings for more modes
 	;; flx              ; used by ivy for better fuzzy search
 	flycheck
 	gruvbox-theme
@@ -39,32 +39,22 @@
 (load-theme 'gruvbox-dark-hard t)
 
 ;;; evil config
-(setq evil-want-keybinding nil)
+(setq evil-overriding-maps nil)
+(setq evil-intercept-maps nil)
 (setq evil-search-module 'evil-search)
 (evil-mode 1)
-(evil-collection-init)
-(evil-define-key '(motion normal) 'global
-  (kbd "SPC") (make-sparse-keymap)
+(evil-define-key 'motion 'global
+  (kbd "SPC") nil
   (kbd "SPC TAB") #'ivy-switch-buffer)
-(evil-define-key '(motion normal) help-mode-map
-  (kbd "SPC") (make-sparse-keymap)
-  (kbd "SPC SPC") (lookup-key help-mode-map (kbd "SPC")))
-(evil-define-key '(motion normal) Info-mode-map
-  (kbd "SPC") (make-sparse-keymap)
+(evil-define-key 'motion Info-mode-map
+  (kbd "SPC") nil   ; don't know why this is needed here, but not in other modes?
   (kbd "SPC SPC") (lookup-key Info-mode-map (kbd "SPC")))
-(evil-define-key '(motion normal) messages-buffer-mode-map
-  ;; (kbd "SPC") (make-sparse-keymap)   ; not needed?
+(evil-define-key 'motion messages-buffer-mode-map
   (kbd "SPC SPC") (lookup-key messages-buffer-mode-map (kbd "SPC")))
+;; The *Messages* buffer is created very early during Emacs startup,
+;; so we have to help it apply these Evil keybindings, as follows:
+;; See: https://github.com/noctuid/evil-guide/issues/11
 (with-current-buffer "*Messages*" (evil-normalize-keymaps))
-(evil-add-hjkl-bindings rg-mode-map '(motion normal visual)
-  ;; (kbd "SPC") (make-sparse-keymap)   ; not needed?
-  (kbd "SPC TAB") #'ivy-switch-buffer   ; will not inherit global config like other modes?
-  (kbd "SPC SPC") #'rg-menu
-  (kbd "gg") #'evil-goto-first-line
-  (kbd "?") #'evil-ex-search-backward
-  (kbd "n") #'evil-ex-search-next
-  (kbd "d") #'evil-delete)
-
 
 ;;; ivy & counsel config
 (ivy-mode 1)
