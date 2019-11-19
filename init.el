@@ -10,6 +10,7 @@
 	amx                 ; history provider for counsel
 	company-lsp
 	counsel
+	elpy
 	evil
 	;; evil-collection  ; evil bindings for more modes
 	;; flx              ; used by ivy for better fuzzy search
