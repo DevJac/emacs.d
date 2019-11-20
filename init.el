@@ -47,9 +47,14 @@
 (evil-mode 1)
 (evil-define-key 'motion 'global
   (kbd "SPC") nil
-  (kbd "SPC TAB") #'ivy-switch-buffer)
+  (kbd "SPC TAB") #'ivy-switch-buffer
+  (kbd "SPC f") #'projectile-find-file
+  (kbd "SPC w w") #'whitespace-mode
+  (kbd "SPC w d") #'delete-trailing-whitespace
+  (kbd "SPC p p") #'rainbow-delimiters-mode
+  (kbd "SPC p h") #'show-paren-mode)
 (evil-define-key 'motion Info-mode-map
-  (kbd "SPC") nil   ; don't know why this is needed here, but not in other modes?
+  (kbd "SPC") nil   ; Why is this needed here, but not in other modes?
   (kbd "SPC SPC") (lookup-key Info-mode-map (kbd "SPC")))
 (evil-define-key 'motion messages-buffer-mode-map
   (kbd "SPC SPC") (lookup-key messages-buffer-mode-map (kbd "SPC")))
