@@ -18,6 +18,7 @@
 	gruvbox-theme
 	ivy
 	ivy-hydra           ; needed for C-o in Ivy buffers, not auto-installed
+	julia-mode
 	keyfreq
 	lsp-mode
 	lsp-ui
