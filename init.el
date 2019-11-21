@@ -12,8 +12,7 @@
 	counsel
 	elpy
 	evil
-	;; evil-collection  ; evil bindings for more modes
-	;; flx              ; used by ivy for better fuzzy search
+	expand-region
 	flycheck
 	gruvbox-theme
 	ivy
@@ -23,6 +22,7 @@
 	lsp-mode
 	lsp-ui
 	projectile
+	racket-mode
 	rainbow-delimiters
 	restart-emacs
 	rg                  ; rg search support
