@@ -46,20 +46,22 @@
 (setq evil-search-module 'evil-search)
 (evil-mode 1)
 (evil-define-key 'motion 'global
+  ;; (C-x C-f), (C-x C-b), and (C-x C-k), are basic Emacs and should used.
+  ;; This will ensure I remain somewhat comfortable in vanilla Emacs.
   (kbd "SPC") nil
   (kbd "SPC TAB") #'ivy-switch-buffer
+  ;; projectile
   (kbd "SPC f") #'projectile-find-file
+  (kbd "SPC p k") #'projectile-kill-buffers
   ;; windows
-  (kbd "SPC h") #'evil-window-left
-  (kbd "SPC j") #'evil-window-down
-  (kbd "SPC k") #'evil-window-up
-  (kbd "SPC l") #'evil-window-right
-  (kbd "SPC o") #'delete-other-windows
+  (kbd "SPC w h") #'evil-window-left
+  (kbd "SPC w j") #'evil-window-down
+  (kbd "SPC w k") #'evil-window-up
+  (kbd "SPC w l") #'evil-window-right
+  (kbd "SPC w o") #'delete-other-windows
+  (kbd "SPC w d") #'evil-window-delete
   (kbd "SPC w h") #'evil-window-split
   (kbd "SPC w v") #'evil-window-vsplit
-  ;; killing
-  (kbd "SPC d") #'evil-window-delete
-  (kbd "SPC p d") #'projectile-kill-buffers
   ;; parens
   (kbd "SPC p p") #'rainbow-delimiters-mode
   (kbd "SPC p h") #'show-paren-mode
