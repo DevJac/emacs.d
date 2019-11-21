@@ -49,6 +49,9 @@
 	" WK"))
 (setq org-ellipsis "⤵")
 
+;;; backup config
+(setq make-backup-files nil)
+
 ;;; evil config
 (setq evil-overriding-maps nil)
 (setq evil-intercept-maps nil)
