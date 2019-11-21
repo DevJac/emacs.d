@@ -26,7 +26,9 @@
 	rainbow-delimiters
 	restart-emacs
 	rg                  ; rg search support
+	rich-minority       ; hides blacklisted minor modes
 	rust-mode
+	smart-mode-line
 	which-key
 	whitespace
 	yasnippet))         ; suggested requirement of lsp
@@ -39,6 +41,12 @@
 (setq scroll-conservatively 100)
 (setq next-screen-context-lines 4)
 (load-theme 'gruvbox-dark-hard t)
+(sml/setup)
+(setq rm-blacklist
+      '(" counsel"
+	" ivy"
+	" Undo-Tree"
+	" WK"))
 
 ;;; evil config
 (setq evil-overriding-maps nil)
