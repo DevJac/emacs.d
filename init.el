@@ -62,6 +62,7 @@
   ;; This will ensure I remain somewhat comfortable in vanilla Emacs.
   (kbd "SPC") nil
   (kbd "SPC TAB") #'ivy-switch-buffer
+  (kbd "SPC v") #'er/expand-region
   ;; projectile
   (kbd "SPC f") #'projectile-find-file
   (kbd "SPC p k") #'projectile-kill-buffers
