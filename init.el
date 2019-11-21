@@ -47,6 +47,7 @@
 	" ivy"
 	" Undo-Tree"
 	" WK"))
+(setq org-ellipsis "⤵")
 
 ;;; evil config
 (setq evil-overriding-maps nil)
