@@ -49,10 +49,23 @@
   (kbd "SPC") nil
   (kbd "SPC TAB") #'ivy-switch-buffer
   (kbd "SPC f") #'projectile-find-file
-  (kbd "SPC w w") #'whitespace-mode
-  (kbd "SPC w d") #'delete-trailing-whitespace
+  ;; windows
+  (kbd "SPC h") #'evil-window-left
+  (kbd "SPC j") #'evil-window-down
+  (kbd "SPC k") #'evil-window-up
+  (kbd "SPC l") #'evil-window-right
+  (kbd "SPC o") #'delete-other-windows
+  (kbd "SPC w h") #'evil-window-split
+  (kbd "SPC w v") #'evil-window-vsplit
+  ;; killing
+  (kbd "SPC d") #'evil-window-delete
+  (kbd "SPC p d") #'projectile-kill-buffers
+  ;; parens
   (kbd "SPC p p") #'rainbow-delimiters-mode
-  (kbd "SPC p h") #'show-paren-mode)
+  (kbd "SPC p h") #'show-paren-mode
+  ;; whitespace
+  (kbd "SPC w w") #'whitespace-mode
+  (kbd "SPC w t") #'delete-trailing-whitespace)
 (evil-define-key 'motion Info-mode-map
   (kbd "SPC") nil   ; Why is this needed here, but not in other modes?
   (kbd "SPC SPC") (lookup-key Info-mode-map (kbd "SPC")))
