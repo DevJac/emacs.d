@@ -71,6 +71,7 @@
   (kbd "SPC w j") #'evil-window-down
   (kbd "SPC w k") #'evil-window-up
   (kbd "SPC w l") #'evil-window-right
+  (kbd "SPC w w") #'evil-window-next
   (kbd "SPC w o") #'delete-other-windows
   (kbd "SPC w d") #'evil-window-delete
   (kbd "SPC w s") #'evil-window-split
@@ -79,8 +80,8 @@
   (kbd "SPC p p") #'rainbow-delimiters-mode
   (kbd "SPC p h") #'show-paren-mode
   ;; whitespace
-  (kbd "SPC w w") #'whitespace-mode
-  (kbd "SPC w t") #'delete-trailing-whitespace)
+  (kbd "SPC t t") #'delete-trailing-whitespace
+  (kbd "SPC t w") #'whitespace-mode)
 (evil-define-key 'motion Info-mode-map
   (kbd "SPC") nil   ; Why is this needed here, but not in other modes?
   (kbd "SPC SPC") (lookup-key Info-mode-map (kbd "SPC")))
