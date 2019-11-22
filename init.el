@@ -73,7 +73,7 @@
   (kbd "SPC w l") #'evil-window-right
   (kbd "SPC w o") #'delete-other-windows
   (kbd "SPC w d") #'evil-window-delete
-  (kbd "SPC w h") #'evil-window-split
+  (kbd "SPC w s") #'evil-window-split
   (kbd "SPC w v") #'evil-window-vsplit
   ;; parens
   (kbd "SPC p p") #'rainbow-delimiters-mode
