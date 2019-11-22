@@ -72,6 +72,7 @@
   (kbd "SPC w k") #'evil-window-up
   (kbd "SPC w l") #'evil-window-right
   (kbd "SPC w w") #'evil-window-next
+  (kbd "SPC w r") #'evil-window-rotate-downwards
   (kbd "SPC w o") #'delete-other-windows
   (kbd "SPC w d") #'evil-window-delete
   (kbd "SPC w s") #'evil-window-split
