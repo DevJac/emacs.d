@@ -117,3 +117,8 @@
 
 ;;; which-key config
 (which-key-mode)
+
+;;; Custom
+(custom-set-faces
+ '(org-block-begin-line ((t (:background "#" :foreground "#7c6f64"))))
+ '(org-block-end-line ((t (:background "#" :foreground "#7c6f64")))))
