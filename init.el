@@ -81,6 +81,7 @@
   (kbd "SPC p p") #'rainbow-delimiters-mode
   (kbd "SPC p h") #'show-paren-mode
   ;; whitespace
+  (kbd "SPC t l") #'visual-line-mode
   (kbd "SPC t t") #'delete-trailing-whitespace
   (kbd "SPC t w") #'whitespace-mode)
 (evil-define-key 'motion Info-mode-map
