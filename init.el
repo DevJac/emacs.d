@@ -47,7 +47,25 @@
 	" ivy"
 	" Undo-Tree"
 	" WK"))
+
+;;; org config
 (setq org-ellipsis "⤵")
+;; org-mode and whitespace-mode both modify Emacs' "display tables".
+;; When leaving whitespace-mode, my custom org-ellipsis were being replaced with
+;; the standard "...". To fix this, I reapply the display table modifications
+;; made by org-mode when leaving whitespace-mode.
+;; See: https://www.gnu.org/software/emacs/manual/html_node/elisp/Display-Tables.html
+(add-hook 'whitespace-mode-hook
+	  (lambda ()
+	    (when (and (eq major-mode 'org-mode) (eq whitespace-mode nil))
+	      ;; The remainder of this function was copied from the org-mode function.
+	      (unless org-display-table
+		(setq org-display-table (make-display-table)))
+	      (set-display-table-slot
+	       org-display-table 4
+	       (vconcat (mapcar (lambda (c) (make-glyph-code c 'org-ellipsis))
+				org-ellipsis)))
+	      (setq buffer-display-table org-display-table))))
 
 ;;; backup config
 (setq make-backup-files nil)
