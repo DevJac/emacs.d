@@ -10,7 +10,6 @@
 	amx                 ; history provider for counsel
 	company-lsp
 	counsel
-	elpy
 	evil
 	expand-region
 	flycheck
@@ -29,6 +28,7 @@
 	rich-minority       ; hides blacklisted minor modes
 	rust-mode
 	smart-mode-line
+	virtualenvwrapper
 	which-key
 	whitespace
 	yasnippet))         ; suggested requirement of lsp
