@@ -20,6 +20,7 @@
 	keyfreq
 	lsp-mode
 	lsp-ui
+	org-drill
 	projectile
 	racket-mode
 	rainbow-delimiters
@@ -154,3 +155,5 @@
 (custom-set-faces
  '(org-block-begin-line ((t (:background nil :foreground "#7c6f64"))))
  '(org-block-end-line ((t (:background nil :foreground "#7c6f64")))))
+(custom-set-variables
+ '(org-modules (quote (org-drill))))
