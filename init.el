@@ -37,6 +37,7 @@
 ;;; theme config
 (menu-bar-mode -1)
 (tool-bar-mode -1)
+(setq inhibit-startup-screen t)
 (set-face-attribute 'default nil :height 160)
 (setq scroll-margin 2)
 (setq scroll-conservatively 100)
