@@ -66,6 +66,19 @@
 	       (vconcat (mapcar (lambda (c) (make-glyph-code c 'org-ellipsis))
 				org-ellipsis)))
 	      (setq buffer-display-table org-display-table))))
+;; When we scale text, we want our rendered latex fragments to scale as well.
+(defun scale-latex-fragments ()
+  (interactive)
+  (org-toggle-latex-fragment '(16))
+  (let ((scale
+	 (if (boundp 'text-scale-mode-step)
+	     (* 2.0 (expt text-scale-mode-step text-scale-mode-amount))
+	   2.0)))
+    (plist-put org-format-latex-options :scale scale))
+  (org-toggle-latex-fragment '(16)))
+(add-hook 'org-mode-hook 'scale-latex-fragments)
+(add-hook 'text-scale-mode-hook
+	  (lambda () (when (eq major-mode 'org-mode) (scale-latex-fragments))))
 
 ;;; backup config
 (setq make-backup-files nil)
