@@ -10,6 +10,7 @@
 	amx                 ; history provider for counsel
 	company-lsp
 	counsel
+	dante               ; best option for Haskell until hie matures
 	evil
 	expand-region
 	flycheck
