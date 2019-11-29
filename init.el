@@ -19,6 +19,7 @@
 	ivy-hydra           ; needed for C-o in Ivy buffers, not auto-installed
 	julia-mode
 	keyfreq
+	lsp-haskell
 	lsp-mode
 	lsp-ui
 	org-drill
@@ -50,6 +51,12 @@
 	" ivy"
 	" Undo-Tree"
 	" WK"))
+
+;;; lsp config
+(setq lsp-prefer-flymake nil)
+(require 'lsp-haskell)
+(setq lsp-haskell-process-path-hie "ghcide")
+(setq lsp-haskell-process-args-hie '())
 
 ;;; org config
 (setq org-ellipsis "⤵")
