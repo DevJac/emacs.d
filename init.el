@@ -10,7 +10,7 @@
 	amx                 ; history provider for counsel
 	company-lsp
 	counsel
-	dante               ; best option for Haskell until hie matures
+	dante               ; a backup for Haskell, in case lsp doesn't work
 	evil
 	expand-region
 	flycheck
@@ -31,7 +31,7 @@
 	rich-minority       ; hides blacklisted minor modes
 	rust-mode
 	smart-mode-line
-	virtualenvwrapper
+	virtualenvwrapper   ; must set virtualenv before lsp works
 	which-key
 	whitespace
 	yasnippet))         ; suggested requirement of lsp
@@ -51,44 +51,6 @@
 	" ivy"
 	" Undo-Tree"
 	" WK"))
-
-;;; lsp config
-(setq lsp-prefer-flymake nil)
-(require 'lsp-haskell)
-(setq lsp-haskell-process-path-hie "ghcide")
-(setq lsp-haskell-process-args-hie '())
-
-;;; org config
-(setq org-ellipsis "⤵")
-;; org-mode and whitespace-mode both modify Emacs' "display tables".
-;; When leaving whitespace-mode, my custom org-ellipsis were being replaced with
-;; the standard "...". To fix this, I reapply the display table modifications
-;; made by org-mode when leaving whitespace-mode.
-;; See: https://www.gnu.org/software/emacs/manual/html_node/elisp/Display-Tables.html
-(add-hook 'whitespace-mode-hook
-	  (lambda ()
-	    (when (and (eq major-mode 'org-mode) (eq whitespace-mode nil))
-	      ;; The remainder of this function was copied from the org-mode function.
-	      (unless org-display-table
-		(setq org-display-table (make-display-table)))
-	      (set-display-table-slot
-	       org-display-table 4
-	       (vconcat (mapcar (lambda (c) (make-glyph-code c 'org-ellipsis))
-				org-ellipsis)))
-	      (setq buffer-display-table org-display-table))))
-;; When we scale text, we want our rendered latex fragments to scale as well.
-(defun scale-latex-fragments ()
-  (interactive)
-  (org-toggle-latex-fragment '(16))
-  (let ((scale
-	 (if (boundp 'text-scale-mode-step)
-	     (* 2.0 (expt text-scale-mode-step text-scale-mode-amount))
-	   2.0)))
-    (plist-put org-format-latex-options :scale scale))
-  (org-toggle-latex-fragment '(16)))
-(add-hook 'org-mode-hook 'scale-latex-fragments)
-(add-hook 'text-scale-mode-hook
-	  (lambda () (when (eq major-mode 'org-mode) (scale-latex-fragments))))
 
 ;;; backup config
 (setq make-backup-files nil)
@@ -153,6 +115,44 @@
 (keyfreq-autosave-mode 1)
 (setq keyfreq-file "~/.emacs.d/keyfreq")
 (setq keyfreq-file-lock "~/.emacs.d/keyfreq-lock")
+
+;;; lsp config
+(setq lsp-prefer-flymake nil)
+(require 'lsp-haskell)
+(setq lsp-haskell-process-path-hie "ghcide")
+(setq lsp-haskell-process-args-hie '())
+
+;;; org config
+(setq org-ellipsis "⤵")
+;; org-mode and whitespace-mode both modify Emacs' "display tables".
+;; When leaving whitespace-mode, my custom org-ellipsis were being replaced with
+;; the standard "...". To fix this, I reapply the display table modifications
+;; made by org-mode when leaving whitespace-mode.
+;; See: https://www.gnu.org/software/emacs/manual/html_node/elisp/Display-Tables.html
+(add-hook 'whitespace-mode-hook
+	  (lambda ()
+	    (when (and (eq major-mode 'org-mode) (eq whitespace-mode nil))
+	      ;; The remainder of this function was copied from the org-mode function.
+	      (unless org-display-table
+		(setq org-display-table (make-display-table)))
+	      (set-display-table-slot
+	       org-display-table 4
+	       (vconcat (mapcar (lambda (c) (make-glyph-code c 'org-ellipsis))
+				org-ellipsis)))
+	      (setq buffer-display-table org-display-table))))
+;; When we scale text, we want our rendered latex fragments to scale as well.
+(defun scale-latex-fragments ()
+  (interactive)
+  (org-toggle-latex-fragment '(16))
+  (let ((scale
+	 (if (boundp 'text-scale-mode-step)
+	     (* 2.0 (expt text-scale-mode-step text-scale-mode-amount))
+	   2.0)))
+    (plist-put org-format-latex-options :scale scale))
+  (org-toggle-latex-fragment '(16)))
+(add-hook 'org-mode-hook 'scale-latex-fragments)
+(add-hook 'text-scale-mode-hook
+	  (lambda () (when (eq major-mode 'org-mode) (scale-latex-fragments))))
 
 ;;; projectile config
 (setq projectile-completion-system 'ivy)
