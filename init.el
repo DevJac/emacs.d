@@ -97,6 +97,11 @@
 ;; See: https://github.com/noctuid/evil-guide/issues/11
 (with-current-buffer "*Messages*" (evil-normalize-keymaps))
 
+;;; haskell config
+(setq haskell-indentation-layout-offset 4)
+(setq haskell-indentation-left-offset 4)
+(setq haskell-indentation-starter-offset 4)
+
 ;;; ivy & counsel config
 (ivy-mode 1)
 (counsel-mode 1)
