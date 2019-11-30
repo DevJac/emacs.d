@@ -60,8 +60,9 @@
 (setq evil-intercept-maps nil)
 (setq evil-search-module 'evil-search)
 (evil-mode 1)
+(evil-ex-define-cmd "q[uit]" #'kill-buffer-and-window)
 (evil-define-key 'motion 'global
-  ;; (C-x C-f), (C-x C-b), and (C-x C-k), are basic Emacs and should used.
+  ;; (C-x C-f), (C-x C-b), and (C-x k), are basic Emacs and should used.
   ;; This will ensure I remain somewhat comfortable in vanilla Emacs.
   (kbd "SPC") nil
   (kbd "SPC TAB") #'ivy-switch-buffer
