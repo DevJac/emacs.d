@@ -52,7 +52,8 @@
 	" Undo-Tree"
 	" WK"))
 
-;;; backup config
+;;; buffer & file config
+(global-auto-revert-mode 1)
 (setq make-backup-files nil)
 
 ;;; evil config
