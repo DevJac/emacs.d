@@ -87,7 +87,7 @@
   (kbd "SPC p h") #'show-paren-mode
   ;; whitespace
   (kbd "SPC t l") #'visual-line-mode
-  (kbd "SPC t t") #'delete-trailing-whitespace
+  (kbd "SPC t t") (lambda () (interactive) (message "Deleted trailing whitespace") (delete-trailing-whitespace))
   (kbd "SPC t w") #'whitespace-mode)
 (evil-define-key 'motion Info-mode-map
   (kbd "SPC") nil   ; Why is this needed here, but not in other modes?
