@@ -3,38 +3,38 @@
 
 (package-initialize)
 (setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
-			 ("melpa" . "https://melpa.org/packages/")))
+                         ("melpa" . "https://melpa.org/packages/")))
 
 (setq package-selected-packages
       '(ag                  ; ag search support
-	amx                 ; history provider for counsel
-	company-lsp
-	counsel
-	dante               ; a backup for Haskell, in case lsp doesn't work
-	evil
-	expand-region
-	flycheck
-	gruvbox-theme
-	ivy
-	ivy-hydra           ; needed for C-o in Ivy buffers, not auto-installed
-	julia-mode
-	keyfreq
-	lsp-haskell
-	lsp-mode
-	lsp-ui
-	org-drill
-	projectile
-	racket-mode
-	rainbow-delimiters
-	restart-emacs
-	rg                  ; rg search support
-	rich-minority       ; hides blacklisted minor modes
-	rust-mode
-	smart-mode-line
-	virtualenvwrapper   ; must set virtualenv before lsp works
-	which-key
-	whitespace
-	yasnippet))         ; suggested requirement of lsp
+        amx                 ; history provider for counsel
+        company-lsp
+        counsel
+        dante               ; a backup for Haskell, in case lsp doesn't work
+        evil
+        expand-region
+        flycheck
+        gruvbox-theme
+        ivy
+        ivy-hydra           ; needed for C-o in Ivy buffers, not auto-installed
+        julia-mode
+        keyfreq
+        lsp-haskell
+        lsp-mode
+        lsp-ui
+        org-drill
+        projectile
+        racket-mode
+        rainbow-delimiters
+        restart-emacs
+        rg                  ; rg search support
+        rich-minority       ; hides blacklisted minor modes
+        rust-mode
+        smart-mode-line
+        virtualenvwrapper   ; must set virtualenv before lsp works
+        which-key
+        whitespace
+        yasnippet))         ; suggested requirement of lsp
 
 ;;; theme config
 (menu-bar-mode -1)
@@ -49,9 +49,9 @@
 (sml/setup)
 (setq rm-blacklist
       '(" counsel"
-	" ivy"
-	" Undo-Tree"
-	" WK"))
+        " ivy"
+        " Undo-Tree"
+        " WK"))
 
 ;;; buffer & file config
 (global-auto-revert-mode 1)
@@ -117,8 +117,8 @@
       '((t . ivy--regex-ignore-order)))
 (setq ivy-initial-inputs-alist
       '((counsel-M-x . "")
-	(counsel-describe-function . "")
-	(counsel-describe-variable . "")))
+        (counsel-describe-function . "")
+        (counsel-describe-variable . "")))
 
 ;;; keyfreq config
 (keyfreq-mode 1)
@@ -140,29 +140,29 @@
 ;; made by org-mode when leaving whitespace-mode.
 ;; See: https://www.gnu.org/software/emacs/manual/html_node/elisp/Display-Tables.html
 (add-hook 'whitespace-mode-hook
-	  (lambda ()
-	    (when (and (eq major-mode 'org-mode) (eq whitespace-mode nil))
-	      ;; The remainder of this function was copied from the org-mode function.
-	      (unless org-display-table
-		(setq org-display-table (make-display-table)))
-	      (set-display-table-slot
-	       org-display-table 4
-	       (vconcat (mapcar (lambda (c) (make-glyph-code c 'org-ellipsis))
-				org-ellipsis)))
-	      (setq buffer-display-table org-display-table))))
+          (lambda ()
+            (when (and (eq major-mode 'org-mode) (eq whitespace-mode nil))
+              ;; The remainder of this function was copied from the org-mode function.
+              (unless org-display-table
+                (setq org-display-table (make-display-table)))
+              (set-display-table-slot
+               org-display-table 4
+               (vconcat (mapcar (lambda (c) (make-glyph-code c 'org-ellipsis))
+                                org-ellipsis)))
+              (setq buffer-display-table org-display-table))))
 ;; When we scale text, we want our rendered latex fragments to scale as well.
 (defun scale-latex-fragments ()
   (interactive)
   (org-toggle-latex-fragment '(16))
   (let ((scale
-	 (if (boundp 'text-scale-mode-step)
-	     (* 2.0 (expt text-scale-mode-step text-scale-mode-amount))
-	   2.0)))
+         (if (boundp 'text-scale-mode-step)
+             (* 2.0 (expt text-scale-mode-step text-scale-mode-amount))
+           2.0)))
     (plist-put org-format-latex-options :scale scale))
   (org-toggle-latex-fragment '(16)))
 (add-hook 'org-mode-hook 'scale-latex-fragments)
 (add-hook 'text-scale-mode-hook
-	  (lambda () (when (eq major-mode 'org-mode) (scale-latex-fragments))))
+          (lambda () (when (eq major-mode 'org-mode) (scale-latex-fragments))))
 
 ;;; projectile config
 (setq projectile-completion-system 'ivy)
