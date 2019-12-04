@@ -99,6 +99,8 @@
 ;; so we have to help it apply these Evil keybindings, as follows:
 ;; See: https://github.com/noctuid/evil-guide/issues/11
 (with-current-buffer "*Messages*" (evil-normalize-keymaps))
+(evil-define-key 'motion markdown-mode-map
+  (kbd "TAB") #'markdown-cycle)
 
 ;;; haskell config
 (setq haskell-indentation-layout-offset 4)
