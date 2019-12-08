@@ -176,4 +176,7 @@
  '(org-block-begin-line ((t (:background nil :foreground "#7c6f64"))))
  '(org-block-end-line ((t (:background nil :foreground "#7c6f64")))))
 (custom-set-variables
+ '(dante-load-flags
+   (quote
+    ("+c" "-ferror-spans" "-fdefer-typed-holes" "-Wwarn=missing-home-modules" "-fno-diagnostics-show-caret")))
  '(org-modules (quote (org-drill org-tempo))))
