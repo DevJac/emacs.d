@@ -103,9 +103,12 @@
   (kbd "TAB") #'markdown-cycle)
 
 ;;; haskell config
-(setq haskell-indentation-layout-offset 4)
-(setq haskell-indentation-left-offset 4)
-(setq haskell-indentation-starter-offset 4)
+(defun haskell-offset-4 ()
+  "Use 4 space offsets for Haskell."
+  (interactive)
+  (setq haskell-indentation-layout-offset 4)
+  (setq haskell-indentation-left-offset 4)
+  (setq haskell-indentation-starter-offset 4))
 (setq dante-mode-hook (lambda () (company-mode 1) (flycheck-mode 1)))
 
 ;;; ivy & counsel config
