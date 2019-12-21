@@ -111,6 +111,7 @@
   (setq haskell-indentation-left-offset 4)
   (setq haskell-indentation-starter-offset 4))
 (setq dante-mode-hook (lambda () (company-mode 1) (flycheck-mode 1)))
+(setq dante-flycheck-types '(("^warning" . warning) ("^splicing ") ("" . error)))
 
 ;;; ivy & counsel config
 (ivy-mode 1)
