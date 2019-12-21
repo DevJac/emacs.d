@@ -60,6 +60,7 @@
 ;;; evil config
 (setq evil-overriding-maps nil)
 (setq evil-intercept-maps nil)
+(setq evil-emacs-state-modes nil)
 (setq evil-search-module 'evil-search)
 (evil-mode 1)
 (evil-ex-define-cmd "q[uit]" #'kill-buffer-and-window)
