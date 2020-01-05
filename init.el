@@ -173,6 +173,7 @@
 ;; without it we get an error: Symbol's function definition is void: first
 (add-hook 'org-mode-hook (lambda () (require 'cl)))
 (setq org-drill-hide-item-headings-p t)
+(setq org-drill-add-random-noise-to-intervals-p t)
 
 ;;; projectile config
 (setq projectile-completion-system 'ivy)
