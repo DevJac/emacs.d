@@ -5,6 +5,7 @@
 (setq package-selected-packages
       '(ag                  ; ag search support
         amx                 ; history provider for counsel
+        cl                  ; needed for org-drill
         company-lsp
         counsel
         dante               ; a backup for Haskell, in case lsp doesn't work
@@ -166,6 +167,12 @@
 (add-hook 'org-mode-hook 'scale-latex-fragments)
 (add-hook 'text-scale-mode-hook
           (lambda () (when (eq major-mode 'org-mode) (scale-latex-fragments))))
+
+;;; org-drill config
+;; org-drill needs (require 'cl) for some reason,
+;; without it we get an error: Symbol's function definition is void: first
+(add-hook 'org-mode-hook (lambda () (require 'cl)))
+(setq org-drill-hide-item-headings-p t)
 
 ;;; projectile config
 (setq projectile-completion-system 'ivy)
