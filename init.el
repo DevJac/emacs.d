@@ -92,14 +92,14 @@
 (evil-define-key 'motion Info-mode-map
   (kbd "SPC") nil   ; Why is this needed here, but not in other modes?
   (kbd "SPC SPC") (lookup-key Info-mode-map (kbd "SPC")))
+(evil-define-key 'motion markdown-mode-map
+  (kbd "TAB") #'markdown-cycle)
 (evil-define-key 'motion messages-buffer-mode-map
   (kbd "SPC SPC") (lookup-key messages-buffer-mode-map (kbd "SPC")))
 ;; The *Messages* buffer is created very early during Emacs startup,
 ;; so we have to help it apply these Evil keybindings, as follows:
 ;; See: https://github.com/noctuid/evil-guide/issues/11
 (with-current-buffer "*Messages*" (evil-normalize-keymaps))
-(evil-define-key 'motion markdown-mode-map
-  (kbd "TAB") #'markdown-cycle)
 
 ;;; haskell config
 (defun haskell-offset-4 ()
