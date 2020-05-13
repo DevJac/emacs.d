@@ -63,7 +63,7 @@
 (evil-mode 1)
 (evil-ex-define-cmd "q[uit]" #'kill-buffer-and-window)
 (evil-define-key 'motion 'global
-  ;; (C-x C-f), (C-x C-b), and (C-x k), are basic Emacs and should used.
+  ;; (C-x C-f), (C-x C-b), and (C-x k), are basic Emacs keys and should be used.
   ;; This will ensure I remain somewhat comfortable in vanilla Emacs.
   (kbd "SPC") nil
   (kbd "SPC TAB") #'ivy-switch-buffer
