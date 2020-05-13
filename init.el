@@ -88,7 +88,13 @@
   ;; whitespace
   (kbd "SPC t l") #'visual-line-mode
   (kbd "SPC t t") #'delete-trailing-whitespace-with-message
-  (kbd "SPC t w") #'whitespace-mode)
+  (kbd "SPC t w") #'whitespace-mode
+  ;; spelling
+  (kbd "SPC t s") #'flyspell-mode
+  (kbd "SPC s s") #'flyspell-buffer
+  ;; org
+  (kbd "SPC o i") #'org-indent-mode
+  (kbd "SPC o j") #'org-insert-heading-after-current)
 (evil-define-key 'motion Info-mode-map
   (kbd "SPC") nil   ; Why is this needed here, but not in other modes?
   (kbd "SPC SPC") (lookup-key Info-mode-map (kbd "SPC")))
