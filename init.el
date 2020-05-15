@@ -87,7 +87,7 @@
   (kbd "SPC p h") #'show-paren-mode
   ;; whitespace
   (kbd "SPC t l") #'visual-line-mode
-  (kbd "SPC t t") #'delete-trailing-whitespace-with-message
+  (kbd "SPC t t") #'trim-trailing-whitespace
   (kbd "SPC t w") #'whitespace-mode
   ;; spelling
   (kbd "SPC t s") #'flyspell-mode
@@ -107,10 +107,10 @@
 ;; See: https://github.com/noctuid/evil-guide/issues/11
 (with-current-buffer "*Messages*" (evil-normalize-keymaps))
 
-(defun delete-trailing-whitespace` ()
+(defun trim-trailing-whitespace ()
   (interactive)
   (delete-trailing-whitespace)
-  (message "Deleted trailing whitespace"))
+  (message "Trimmed trailing whitespace"))
 
 ;;; haskell config
 (defun haskell-offset-4 ()
