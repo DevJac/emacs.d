@@ -1,4 +1,4 @@
-To install packages, in Emacs
+To install packages in Emacs
 run (using M-x) `package-refresh-contents`
 then run        `package-install-selected-packages`.
 
