@@ -94,7 +94,10 @@
   (kbd "SPC s s") #'flyspell-buffer
   ;; org
   (kbd "SPC o i") #'org-indent-mode
-  (kbd "SPC o j") #'org-insert-heading-after-current)
+  (kbd "SPC o h") #'org-insert-heading-promote
+  (kbd "SPC o j") #'org-insert-heading-down
+  (kbd "SPC o k") #'org-insert-heading-up
+  (kbd "SPC o l") #'org-insert-heading-demote)
 (evil-define-key 'motion Info-mode-map
   (kbd "SPC") nil   ; Why is this needed here, but not in other modes?
   (kbd "SPC SPC") (lookup-key Info-mode-map (kbd "SPC")))
@@ -107,10 +110,31 @@
 ;; See: https://github.com/noctuid/evil-guide/issues/11
 (with-current-buffer "*Messages*" (evil-normalize-keymaps))
 
+;;; key functions
 (defun trim-trailing-whitespace ()
   (interactive)
   (delete-trailing-whitespace)
   (message "Trimmed trailing whitespace"))
+(defun org-insert-heading-promote ()
+  (interactive)
+  (org-insert-heading-after-current)
+  (org-promote)
+  (evil-insert 1))
+(defun org-insert-heading-down ()
+  (interactive)
+  (org-insert-heading-after-current)
+  (evil-insert 1))
+(defun org-insert-heading-up ()
+  (interactive)
+  (org-back-to-heading)
+  (org-insert-heading)
+  (end-of-line 1)
+  (evil-insert 1))
+(defun org-insert-heading-demote ()
+  (interactive)
+  (org-insert-heading-after-current)
+  (org-demote)
+  (evil-insert 1))
 
 ;;; haskell config
 (defun haskell-offset-4 ()
