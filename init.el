@@ -180,6 +180,7 @@
 (require 'lsp-haskell)
 (setq lsp-haskell-process-path-hie "ghcide")
 (setq lsp-haskell-process-args-hie '())
+(setq lsp-rust-server 'rust-analyzer)
 
 ;;; org config
 (setq org-ellipsis "⤵")
