@@ -214,9 +214,6 @@
           (lambda () (when (eq major-mode 'org-mode) (scale-latex-fragments))))
 
 ;;; org-drill config
-;; org-drill needs (require 'cl) for some reason,
-;; without it we get an error: Symbol's function definition is void: first
-(add-hook 'org-mode-hook (lambda () (require 'cl)))
 (setq org-drill-hide-item-headings-p t)
 (setq org-drill-add-random-noise-to-intervals-p t)
 
