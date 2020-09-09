@@ -39,7 +39,6 @@
 (tool-bar-mode -1)
 (setq inhibit-startup-screen t)
 (set-face-attribute 'default nil :height 160)
-(setq indent-tabs-mode nil)
 (setq scroll-margin 2)
 (setq scroll-conservatively 100)
 (setq next-screen-context-lines 4)
@@ -235,4 +234,6 @@
  '(dante-load-flags
    (quote
     ("+c" "-ferror-spans" "-fdefer-typed-holes" "-Wwarn=missing-home-modules" "-fno-diagnostics-show-caret")))
- '(org-modules (quote (org-drill org-tempo))))
+ '(org-modules (quote (org-drill org-tempo)))
+ '(indent-tabs-mode nil)
+ '(sgml-basic-offset 4))
