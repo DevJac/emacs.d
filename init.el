@@ -20,6 +20,7 @@
         lsp-haskell
         lsp-mode
         lsp-ui
+        neotree
         org-drill
         projectile
         racket-mode
@@ -96,7 +97,12 @@
   (kbd "SPC o h") #'org-insert-heading-promote
   (kbd "SPC o j") #'org-insert-heading-down
   (kbd "SPC o k") #'org-insert-heading-up
-  (kbd "SPC o l") #'org-insert-heading-demote)
+  (kbd "SPC o l") #'org-insert-heading-demote
+  ;; neotree
+  (kbd "SPC q q") #'neotree-toggle
+  (kbd "SPC q d") #'neotree-dir)
+(evil-define-key 'motion neotree-mode-map
+  (kbd "RET") #'neotree-enter)
 (evil-define-key 'motion Info-mode-map
   (kbd "SPC") nil   ; Why is this needed here, but not in other modes?
   (kbd "SPC SPC") (lookup-key Info-mode-map (kbd "SPC")))
