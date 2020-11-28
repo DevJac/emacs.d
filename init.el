@@ -100,9 +100,9 @@
   (kbd "SPC o l") #'org-insert-heading-demote
   ;; neotree
   (kbd "SPC q q") #'neotree-toggle
-  (kbd "SPC q d") #'neotree-dir
-  (kbd "SPC q h") #'neotree-hidden-file-toggle)
-(evil-define-key 'normal neotree-mode-map  ; I should find a way to use 'motion map here.
+  (kbd "SPC q d") #'neotree-dir)
+(evil-define-key 'normal neotree-mode-map  ; We have to use 'normal map here?
+  (kbd "a") #'neotree-hidden-file-toggle
   (kbd "d") #'neotree-change-root
   (kbd "TAB") #'neotree-quick-look
   (kbd "RET") #'neotree-enter)
