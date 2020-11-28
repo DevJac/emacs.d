@@ -100,8 +100,11 @@
   (kbd "SPC o l") #'org-insert-heading-demote
   ;; neotree
   (kbd "SPC q q") #'neotree-toggle
-  (kbd "SPC q d") #'neotree-dir)
-(evil-define-key 'motion neotree-mode-map
+  (kbd "SPC q d") #'neotree-dir
+  (kbd "SPC q h") #'neotree-hidden-file-toggle)
+(evil-define-key 'normal neotree-mode-map  ; I should find a way to use 'motion map here.
+  (kbd "d") #'neotree-change-root
+  (kbd "TAB") #'neotree-quick-look
   (kbd "RET") #'neotree-enter)
 (evil-define-key 'motion Info-mode-map
   (kbd "SPC") nil   ; Why is this needed here, but not in other modes?
