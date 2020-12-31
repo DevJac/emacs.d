@@ -30,6 +30,7 @@
         rich-minority       ; hides blacklisted minor modes
         rust-mode
         smart-mode-line
+        undo-tree           ; needed for evil redo until emacs version 28
         virtualenvwrapper   ; must set virtualenv before lsp works
         which-key
         whitespace
@@ -53,6 +54,7 @@
 
 ;;; buffer & file config
 (global-auto-revert-mode 1)
+(global-undo-tree-mode 1)
 (setq make-backup-files nil)
 
 ;;; evil config
@@ -60,6 +62,7 @@
 (setq evil-intercept-maps nil)
 (setq evil-emacs-state-modes nil)
 (setq evil-search-module 'evil-search)
+(setq evil-undo-system 'undo-tree)
 (evil-mode 1)
 (evil-ex-define-cmd "q[uit]" #'kill-buffer-and-window)
 (evil-define-key 'motion 'global
