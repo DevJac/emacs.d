@@ -9,6 +9,7 @@
         company-lsp
         counsel
         dante               ; a backup for Haskell, in case lsp doesn't work
+        doom-modeline
         evil
         expand-region
         flycheck
@@ -20,6 +21,7 @@
         lsp-haskell
         lsp-mode
         lsp-ui
+        minions
         neotree
         org-drill
         projectile
@@ -27,9 +29,7 @@
         rainbow-delimiters
         restart-emacs
         rg                  ; rg search support
-        rich-minority       ; hides blacklisted minor modes
         rust-mode
-        smart-mode-line
         undo-tree           ; needed for evil redo until emacs version 28
         virtualenvwrapper   ; must set virtualenv before lsp works
         which-key
@@ -45,12 +45,12 @@
 (setq scroll-conservatively 100)
 (setq next-screen-context-lines 4)
 (load-theme 'gruvbox-dark-hard t)
-(sml/setup)
-(setq rm-blacklist
-      '(" counsel"
-        " ivy"
-        " Undo-Tree"
-        " WK"))
+
+;;; doom config
+(setq doom-modeline-minor-modes t)
+(setq doom-modeline-enable-word-count t)
+(minions-mode 1)
+(doom-modeline-mode 1)
 
 ;;; buffer & file config
 (global-auto-revert-mode 1)
@@ -65,10 +65,13 @@
 (setq evil-undo-system 'undo-tree)
 (evil-mode 1)
 (evil-ex-define-cmd "q[uit]" #'kill-buffer-and-window)
+(evil-define-key 'normal 'global
+  (kbd "Z Z") #'save-then-kill-buffer-and-window)
 (evil-define-key 'motion 'global
   ;; (C-x C-f), (C-x C-b), and (C-x k), are basic Emacs keys and should be used.
   ;; This will ensure I remain somewhat comfortable in vanilla Emacs.
   (kbd "SPC") nil
+  (kbd "Z Z") #'save-then-kill-buffer-and-window
   (kbd "SPC TAB") #'ivy-switch-buffer
   (kbd "SPC v") #'er/expand-region
   ;; projectile
@@ -121,7 +124,11 @@
 ;; See: https://github.com/noctuid/evil-guide/issues/11
 (with-current-buffer "*Messages*" (evil-normalize-keymaps))
 
-;;; key functions
+;;; functions
+(defun save-then-kill-buffer-and-window ()
+  (interactive)
+  (when (buffer-modified-p) (save_buffer))
+  (kill-buffer-and-window))
 (defun trim-trailing-whitespace ()
   (interactive)
   (delete-trailing-whitespace)
