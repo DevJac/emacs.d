@@ -5,10 +5,8 @@
 (setq package-selected-packages
       '(ag                  ; ag search support
         amx                 ; history provider for counsel
-        cl                  ; needed for org-drill
         company-lsp
         counsel
-        dante               ; a backup for Haskell, in case lsp doesn't work
         doom-modeline
         evil
         expand-region
@@ -171,8 +169,6 @@
   (setq haskell-indentation-layout-offset 4)
   (setq haskell-indentation-left-offset 4)
   (setq haskell-indentation-starter-offset 4))
-(setq dante-mode-hook (lambda () (company-mode 1) (flycheck-mode 1)))
-(setq dante-flycheck-types '(("^warning" . warning) ("^splicing ") ("" . error)))
 
 ;;; ivy & counsel config
 (ivy-mode 1)
@@ -195,9 +191,6 @@
 
 ;;; lsp config
 (setq lsp-prefer-flymake nil)
-(require 'lsp-haskell)
-(setq lsp-haskell-process-path-hie "ghcide")
-(setq lsp-haskell-process-args-hie '())
 (setq lsp-rust-server 'rust-analyzer)
 
 ;;; org config
