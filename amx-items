@@ -1,0 +1,16 @@
+
+;; ----- amx-history -----
+(
+ find-function
+ ag
+ cd
+ rg
+ 5x5
+ amx
+ arp
+)
+
+;; ----- amx-data -----
+(
+ (find-function . 1)
+)
