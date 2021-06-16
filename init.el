@@ -238,7 +238,8 @@
 ;;; Custom
 (custom-set-faces
  '(org-block-begin-line ((t (:background nil :foreground "#7c6f64"))))
- '(org-block-end-line ((t (:background nil :foreground "#7c6f64")))))
+ '(org-block-end-line ((t (:background nil :foreground "#7c6f64"))))
+ '(org-drawer ((t (:background nil :foreground "#7c6f64")))))
 (custom-set-variables
  '(dante-load-flags
    (quote
