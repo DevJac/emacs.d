@@ -20,15 +20,12 @@ Signals an error at buffer boundaries unless NOERROR is non-nil."
       (error nil)))
    (t
     (evil-signal-without-movement
-      (setq this-command (if (>= count 0)
-                             #'next-line
-                           #'previous-line))
       (let ((opoint (point)))
         (condition-case err
             (with-no-warnings
-              (if line-move-visual
-                  (line-move-visual count)
-                (funcall this-command (abs count))))
+              (cond (line-move-visual (line-move-visual count))
+                    ((>= count 0) (next-line count))
+                    (t (previous-line (abs count)))))
           ((beginning-of-buffer end-of-buffer)
            (let ((col (or goal-column
                           (if (consp temporary-goal-column)
