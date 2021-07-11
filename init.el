@@ -5,7 +5,7 @@
 (setq package-selected-packages
       '(ag                  ; ag search support
         amx                 ; history provider for counsel
-        company-lsp
+        company
         counsel
         doom-modeline
         evil
