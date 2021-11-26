@@ -102,6 +102,12 @@
   (kbd "SPC o j") #'org-insert-heading-down
   (kbd "SPC o k") #'org-insert-heading-up
   (kbd "SPC o l") #'org-insert-heading-demote
+  (kbd "SPC o c c") #'org-clock-in
+  (kbd "SPC o c o") #'org-clock-out
+  (kbd "SPC o c g") #'org-clock-goto
+  (kbd "SPC o c l") #'org-clock-last
+  (kbd "SPC o c d") #'org-clock-display
+  (kbd "SPC o c r") #'org-clock-report
   ;; neotree
   (kbd "SPC q q") #'neotree-toggle
   (kbd "SPC q d") #'neotree-dir)
