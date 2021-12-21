@@ -56,6 +56,10 @@
           (counsel-describe-variable . "")))
   (global-set-key (kbd "C-s") #'swiper)
   (ivy-mode 1))
+(use-package ivy-prescient
+  :straight t
+  :config
+  (ivy-prescient-mode 1))
 (use-package rainbow-delimiters
   :straight t
   :config
