@@ -47,7 +47,7 @@
 ;; the standard "...". To fix this, I reapply the display table modifications
 ;; made by org-mode when leaving whitespace-mode.
 ;; See: https://www.gnu.org/software/emacs/manual/html_node/elisp/Display-Tables.html
-(defun fix-org-ellipsis-after-whitespace-mode()
+(defun fix-org-ellipsis-after-whitespace-mode ()
   (when (and (eq major-mode 'org-mode) (eq whitespace-mode nil))
     ;; The remainder of this function was copied from the org-mode function.
     (unless org-display-table

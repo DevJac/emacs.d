@@ -21,26 +21,6 @@
 (setq scroll-conservatively 100)
 (setq next-screen-context-lines 4)
 
-;;; File config
-(auto-save-visited-mode 1)
-(global-auto-revert-mode 1)
-(setq make-backup-files nil)
-
-;;; Org config
-(setq org-fontify-done-headline nil)
-(setq org-fontify-todo-headline nil)
-(setq org-ellipsis "⤵")
-;; org-mode and whitespace-mode both modify Emacs' "display tables".
-;; When leaving whitespace-mode, my custom org-ellipsis were being replaced with
-;; the standard "...". To fix this, I reapply the display table modifications
-;; made by org-mode when leaving whitespace-mode.
-;; See: https://www.gnu.org/software/emacs/manual/html_node/elisp/Display-Tables.html
-(add-hook 'whitespace-mode-hook #'fix-org-ellipsis-after-whitespace-mode)
-;; When we scale text, we want our rendered latex fragments to scale as well.
-(add-hook 'org-mode-hook 'scale-latex-fragments)
-(add-hook 'text-scale-mode-hook
-          (lambda () (when (eq major-mode 'org-mode) (scale-latex-fragments))))
-
 ;;; Packages
 (straight-use-package 'use-package)
 (use-package restart-emacs ; keep first, useful in case remaining config is bad
@@ -49,6 +29,10 @@
   :straight t
   :config
   (load-theme 'gruvbox-dark-hard t))
+(use-package emacs ; keep early, special
+  :load-path "elisp"
+  :config
+  (load "defuns"))
 (use-package counsel
   :straight t
   :config
@@ -89,3 +73,23 @@
   :straight t
   :config
   (global-undo-tree-mode 1))
+
+;;; File config
+(auto-save-visited-mode 1)
+(global-auto-revert-mode 1)
+(setq make-backup-files nil)
+
+;;; Org config
+(setq org-fontify-done-headline nil)
+(setq org-fontify-todo-headline nil)
+(setq org-ellipsis "⤵")
+;; org-mode and whitespace-mode both modify Emacs' "display tables".
+;; When leaving whitespace-mode, my custom org-ellipsis were being replaced with
+;; the standard "...". To fix this, I reapply the display table modifications
+;; made by org-mode when leaving whitespace-mode.
+;; See: https://www.gnu.org/software/emacs/manual/html_node/elisp/Display-Tables.html
+(add-hook 'whitespace-mode-hook #'fix-org-ellipsis-after-whitespace-mode)
+;; When we scale text, we want our rendered latex fragments to scale as well.
+(add-hook 'org-mode-hook 'scale-latex-fragments)
+(add-hook 'text-scale-mode-hook
+          (lambda () (when (eq major-mode 'org-mode) (scale-latex-fragments))))
