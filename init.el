@@ -120,3 +120,20 @@
 (add-hook 'org-mode-hook 'scale-latex-fragments)
 (add-hook 'text-scale-mode-hook
           (lambda () (when (eq major-mode 'org-mode) (scale-latex-fragments))))
+
+;;; Custom
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(org-block-begin-line ((t (:background nil :foreground "#7c6f64"))))
+ '(org-block-end-line ((t (:background nil :foreground "#7c6f64"))))
+ '(org-drawer ((t (:background nil :foreground "#7c6f64"))))
+ '(org-code ((t (:background "#32302f" :foreground nil)))))
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(org-modules '(org-tempo)))
