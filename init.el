@@ -11,3 +11,8 @@
       (goto-char (point-max))
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
+
+;;; Packages
+(straight-use-package 'use-package)
+(use-package restart-emacs ; keep first, useful in case remaining config is bad
+  :straight t)
