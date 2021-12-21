@@ -41,14 +41,6 @@
 (minions-mode 1)
 (doom-modeline-mode 1)
 
-;;; haskell config
-(defun haskell-offset-4 ()
-  "Use 4 space offsets for Haskell."
-  (interactive)
-  (setq haskell-indentation-layout-offset 4)
-  (setq haskell-indentation-left-offset 4)
-  (setq haskell-indentation-starter-offset 4))
-
 ;;; keyfreq config
 (keyfreq-mode 1)
 (keyfreq-autosave-mode 1)
@@ -96,9 +88,6 @@
 ;;; org-drill config
 (setq org-drill-hide-item-headings-p t)
 (setq org-drill-add-random-noise-to-intervals-p t)
-
-;;; projectile config
-(setq projectile-completion-system 'ivy)
 
 ;;; which-key config
 (which-key-mode)

@@ -62,6 +62,10 @@
   :straight t
   :config
   (ivy-prescient-mode 1))
+(use-package projectile
+  :straight t
+  :config
+  (setq projectile-completion-system 'ivy))
 (use-package rainbow-delimiters
   :straight t
   :config
