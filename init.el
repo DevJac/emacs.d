@@ -22,6 +22,7 @@
 (setq next-screen-context-lines 4)
 
 ;;; File config
+(auto-save-visited-mode 1)
 (global-auto-revert-mode 1)
 (setq make-backup-files nil)
 
