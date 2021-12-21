@@ -20,6 +20,7 @@
 (setq scroll-margin 2)
 (setq scroll-conservatively 100)
 (setq next-screen-context-lines 4)
+(column-number-mode 1)
 
 ;;; Packages
 (straight-use-package 'use-package)
@@ -37,6 +38,12 @@
   :straight t
   :config
   (counsel-mode 1))
+(use-package doom-modeline
+  :straight t
+  :config
+  (setq doom-modeline-minor-modes t)
+  (setq doom-modeline-enable-word-count t)
+  (doom-modeline-mode 1))
 (use-package evil
   :straight t
   :load-path "elisp"
@@ -68,6 +75,10 @@
   (setq keyfreq-file-lock "~/.emacs.d/keyfreq-lock")
   (keyfreq-mode 1)
   (keyfreq-autosave-mode 1))
+(use-package minions
+  :straight t
+  :config
+  (minions-mode 1))
 (use-package org-drill
   :straight t
   :config

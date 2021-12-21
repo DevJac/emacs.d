@@ -35,11 +35,6 @@
         yasnippet))         ; suggested requirement of lsp
 
 
-;;; doom config
-(setq doom-modeline-minor-modes t)
-(setq doom-modeline-enable-word-count t)
-(minions-mode 1)
-(doom-modeline-mode 1)
 
 ;;; lsp config
 (setq lsp-prefer-flymake nil)
