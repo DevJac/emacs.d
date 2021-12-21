@@ -29,10 +29,29 @@
   :straight t
   :config
   (load-theme 'gruvbox-dark-hard t))
-(use-package evil
+(use-package counsel
   :straight t
   :config
+  (counsel-mode 1))
+(use-package evil
+  :straight t
+  :load-path "elisp"
+  :config
+  (load "evil-keys")
   (evil-mode 1))
+(use-package ivy
+  :straight t
+  :config
+  (setq ivy-use-virtual-buffers t)
+  (setq ivy-count-format "(%d/%d) ")
+  (setq ivy-re-builders-alist
+	'((t . ivy--regex-ignore-order)))
+  (setq ivy-initial-inputs-alist
+	'((counsel-M-x . "")
+          (counsel-describe-function . "")
+          (counsel-describe-variable . "")))
+  (global-set-key (kbd "C-s") #'swiper)
+  (ivy-mode 1))
 (use-package rainbow-delimiters
   :straight t
   :config
