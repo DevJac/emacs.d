@@ -61,6 +61,13 @@
   :straight t
   :config
   (ivy-prescient-mode 1))
+(use-package keyfreq
+  :straight t
+  :config
+  (setq keyfreq-file "~/.emacs.d/keyfreq")
+  (setq keyfreq-file-lock "~/.emacs.d/keyfreq-lock")
+  (keyfreq-mode 1)
+  (keyfreq-autosave-mode 1))
 (use-package org-drill
   :straight t
   :config

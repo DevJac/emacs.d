@@ -41,12 +41,6 @@
 (minions-mode 1)
 (doom-modeline-mode 1)
 
-;;; keyfreq config
-(keyfreq-mode 1)
-(keyfreq-autosave-mode 1)
-(setq keyfreq-file "~/.emacs.d/keyfreq")
-(setq keyfreq-file-lock "~/.emacs.d/keyfreq-lock")
-
 ;;; lsp config
 (setq lsp-prefer-flymake nil)
 (setq lsp-rust-server 'rust-analyzer)
