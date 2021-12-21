@@ -78,6 +78,10 @@
   :straight t
   :config
   (global-undo-tree-mode 1))
+(use-package which-key
+  :straight t
+  :config
+  (which-key-mode 1))
 
 ;;; File config
 (auto-save-visited-mode 1)
