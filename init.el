@@ -51,6 +51,8 @@
   (setq evil-undo-system 'undo-tree)
   (load "evil-keys")
   (evil-mode 1))
+(use-package expand-region
+  :straight t)
 (use-package ivy
   :straight t
   :config
