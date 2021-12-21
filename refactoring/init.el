@@ -42,9 +42,9 @@
 (doom-modeline-mode 1)
 
 ;;; buffer & file config
-(global-auto-revert-mode 1)
+;(global-auto-revert-mode 1)
 (global-undo-tree-mode 1)
-(setq make-backup-files nil)
+;(setq make-backup-files nil)
 
 ;;; evil config
 (setq evil-overriding-maps nil)

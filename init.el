@@ -21,6 +21,10 @@
 (setq scroll-conservatively 100)
 (setq next-screen-context-lines 4)
 
+;;; File config
+(global-auto-revert-mode 1)
+(setq make-backup-files nil)
+
 ;;; Packages
 (straight-use-package 'use-package)
 (use-package restart-emacs ; keep first, useful in case remaining config is bad
