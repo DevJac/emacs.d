@@ -40,22 +40,24 @@
   (counsel-mode 1))
 (use-package doom-modeline
   :straight t
-  :config
+  :init
   (setq doom-modeline-minor-modes t)
   (setq doom-modeline-enable-word-count t)
+  :config
   (doom-modeline-mode 1))
 (use-package evil
   :straight t
   :load-path "elisp"
-  :config
+  :init
   (setq evil-undo-system 'undo-tree)
+  :config
   (load "evil-keys")
   (evil-mode 1))
 (use-package expand-region
   :straight t)
 (use-package ivy
   :straight t
-  :config
+  :init
   (setq ivy-use-virtual-buffers t)
   (setq ivy-count-format "(%d/%d) ")
   (setq ivy-re-builders-alist
@@ -64,6 +66,7 @@
 	'((counsel-M-x . "")
           (counsel-describe-function . "")
           (counsel-describe-variable . "")))
+  :config
   (global-set-key (kbd "C-s") #'swiper)
   (ivy-mode 1))
 (use-package ivy-prescient
@@ -73,9 +76,10 @@
   (ivy-prescient-mode 1))
 (use-package keyfreq
   :straight t
-  :config
+  :init
   (setq keyfreq-file "~/.emacs.d/keyfreq")
   (setq keyfreq-file-lock "~/.emacs.d/keyfreq-lock")
+  :config
   (keyfreq-mode 1)
   (keyfreq-autosave-mode 1))
 (use-package minions
@@ -84,16 +88,16 @@
   (minions-mode 1))
 (use-package org-drill
   :straight t
-  :config
+  :init
   (setq org-drill-hide-item-headings-p t)
   (setq org-drill-add-random-noise-to-intervals-p t))
 (use-package projectile
   :straight t
-  :config
+  :init
   (setq projectile-completion-system 'ivy))
 (use-package rainbow-delimiters
   :straight t
-  :config
+  :init
   (add-hook 'emacs-lisp-mode-hook #'rainbow-delimiters-mode))
 (use-package undo-tree
   :straight t
