@@ -29,3 +29,7 @@
   :straight t
   :config
   (load-theme 'gruvbox-dark-hard t))
+(use-package evil
+  :straight t
+  :config
+  (evil-mode 1))
