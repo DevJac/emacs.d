@@ -33,3 +33,7 @@
   :straight t
   :config
   (evil-mode 1))
+(use-package rainbow-delimiters
+  :straight t
+  :config
+  (add-hook 'emacs-lisp-mode-hook #'rainbow-delimiters-mode))
