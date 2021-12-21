@@ -52,8 +52,8 @@
   (kbd "SPC o c d") #'org-clock-display
   (kbd "SPC o c r") #'org-clock-report)
 
-(evil-define-key 'motion markdown-mode-map
-  (kbd "TAB") #'markdown-cycle)
+(evil-define-key 'motion org-mode-map
+  (kbd "TAB") #'org-cycle)
 
 (evil-define-key 'motion Info-mode-map
   (kbd "SPC") nil
