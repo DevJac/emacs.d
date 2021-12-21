@@ -51,40 +51,6 @@
 (setq lsp-prefer-flymake nil)
 (setq lsp-rust-server 'rust-analyzer)
 
-;;; org config
-(setq org-ellipsis "⤵")
-(setq org-fontify-done-headline nil)
-(setq org-fontify-todo-headline nil)
-;; org-mode and whitespace-mode both modify Emacs' "display tables".
-;; When leaving whitespace-mode, my custom org-ellipsis were being replaced with
-;; the standard "...". To fix this, I reapply the display table modifications
-;; made by org-mode when leaving whitespace-mode.
-;; See: https://www.gnu.org/software/emacs/manual/html_node/elisp/Display-Tables.html
-(add-hook 'whitespace-mode-hook
-          (lambda ()
-            (when (and (eq major-mode 'org-mode) (eq whitespace-mode nil))
-              ;; The remainder of this function was copied from the org-mode function.
-              (unless org-display-table
-                (setq org-display-table (make-display-table)))
-              (set-display-table-slot
-               org-display-table 4
-               (vconcat (mapcar (lambda (c) (make-glyph-code c 'org-ellipsis))
-                                org-ellipsis)))
-              (setq buffer-display-table org-display-table))))
-;; When we scale text, we want our rendered latex fragments to scale as well.
-(defun scale-latex-fragments ()
-  (interactive)
-  (org-toggle-latex-fragment '(16))
-  (let ((scale
-         (if (boundp 'text-scale-mode-step)
-             (* 2.0 (expt text-scale-mode-step text-scale-mode-amount))
-           2.0)))
-    (plist-put org-format-latex-options :scale scale))
-  (org-toggle-latex-fragment '(16)))
-(add-hook 'org-mode-hook 'scale-latex-fragments)
-(add-hook 'text-scale-mode-hook
-          (lambda () (when (eq major-mode 'org-mode) (scale-latex-fragments))))
-
 ;;; org-drill config
 (setq org-drill-hide-item-headings-p t)
 (setq org-drill-add-random-noise-to-intervals-p t)
