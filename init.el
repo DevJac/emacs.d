@@ -69,6 +69,7 @@
 (use-package ivy-prescient
   :straight t
   :config
+  (prescient-persist-mode 1)
   (ivy-prescient-mode 1))
 (use-package keyfreq
   :straight t
