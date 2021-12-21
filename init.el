@@ -41,6 +41,7 @@
   :straight t
   :load-path "elisp"
   :config
+  (setq evil-undo-system 'undo-tree)
   (load "evil-keys")
   (evil-mode 1))
 (use-package ivy
@@ -64,3 +65,7 @@
   :straight t
   :config
   (add-hook 'emacs-lisp-mode-hook #'rainbow-delimiters-mode))
+(use-package undo-tree
+  :straight t
+  :config
+  (global-undo-tree-mode 1))

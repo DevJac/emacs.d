@@ -41,23 +41,6 @@
 (minions-mode 1)
 (doom-modeline-mode 1)
 
-;;; buffer & file config
-;(global-auto-revert-mode 1)
-(global-undo-tree-mode 1)
-;(setq make-backup-files nil)
-
-;;; evil config
-(setq evil-overriding-maps nil)
-(setq evil-intercept-maps nil)
-(setq evil-emacs-state-modes nil)
-(setq evil-search-module 'evil-search)
-(setq evil-undo-system 'undo-tree)
-(evil-mode 1)
-;; The *Messages* buffer is created very early during Emacs startup,
-;; so we have to help it apply these Evil keybindings, as follows:
-;; See: https://github.com/noctuid/evil-guide/issues/11
-(with-current-buffer "*Messages*" (evil-normalize-keymaps))
-
 ;;; haskell config
 (defun haskell-offset-4 ()
   "Use 4 space offsets for Haskell."
