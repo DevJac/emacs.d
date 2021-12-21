@@ -61,6 +61,11 @@
   :straight t
   :config
   (ivy-prescient-mode 1))
+(use-package org-drill
+  :straight t
+  :config
+  (setq org-drill-hide-item-headings-p t)
+  (setq org-drill-add-random-noise-to-intervals-p t))
 (use-package projectile
   :straight t
   :config

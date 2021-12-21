@@ -51,10 +51,6 @@
 (setq lsp-prefer-flymake nil)
 (setq lsp-rust-server 'rust-analyzer)
 
-;;; org-drill config
-(setq org-drill-hide-item-headings-p t)
-(setq org-drill-add-random-noise-to-intervals-p t)
-
 ;;; which-key config
 (which-key-mode)
 
