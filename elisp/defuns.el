@@ -68,3 +68,29 @@
            2.0)))
     (plist-put org-format-latex-options :scale scale))
   (org-toggle-latex-fragment '(16)))
+
+(defun evil-fix-eval-print-last-sexp (&optional arg)
+  (interactive "P")
+  (cl-case evil-state
+    ('normal (progn
+               (evil-append 1)
+               (eval-print-last-sexp arg)
+               (evil-normal-state)))
+    ('visual (progn
+               (evil-append 1)
+               (eval-print-last-sexp arg)
+               (evil-visual-restore)))
+    (otherwise (eval-print-last-sexp arg))))
+
+(defun evil-fix-eval-last-sexp (&optional arg)
+  (interactive "P")
+  (cl-case evil-state
+    ('normal (progn
+               (evil-append 1)
+               (eval-last-sexp arg)
+               (evil-normal-state)))
+    ('visual (progn
+               (evil-append 1)
+               (eval-last-sexp arg)
+               (evil-visual-restore)))
+    (otherwise (eval-last-sexp arg))))

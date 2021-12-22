@@ -50,7 +50,10 @@
   (kbd "SPC o c g") #'org-clock-goto
   (kbd "SPC o c l") #'org-clock-last
   (kbd "SPC o c d") #'org-clock-display
-  (kbd "SPC o c r") #'org-clock-report)
+  (kbd "SPC o c r") #'org-clock-report
+  ;; eval
+  (kbd "SPC e e") #'evil-fix-eval-last-sexp
+  (kbd "SPC e j") #'evil-fix-eval-print-last-sexp)
 
 (evil-define-key 'motion org-mode-map
   (kbd "TAB") #'org-cycle)
