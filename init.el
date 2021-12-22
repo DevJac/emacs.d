@@ -34,6 +34,8 @@
   :load-path "elisp"
   :config
   (load "defuns"))
+(use-package avy
+  :straight t)
 (use-package counsel
   :straight t
   :config
