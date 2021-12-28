@@ -116,6 +116,8 @@
 (setq make-backup-files nil)
 
 ;;; Org config
+(setq org-clock-idle-time 15)
+(setq org-clock-mode-line-total 'current)
 (setq org-fontify-done-headline nil)
 (setq org-fontify-todo-headline nil)
 (setq org-ellipsis "⤵")
