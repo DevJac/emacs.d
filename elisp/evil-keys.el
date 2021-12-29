@@ -15,9 +15,9 @@
   (kbd "Z Z") #'save-then-kill-buffer-and-window
   (kbd "SPC TAB") #'ivy-switch-buffer
   (kbd "SPC v") #'er/expand-region
-  (kbd "SPC ;") #'evil-avy-goto-char-timer
+  (kbd "SPC f") #'evil-avy-goto-char-timer
   ;; projectile
-  (kbd "SPC f") #'projectile-find-file
+  (kbd "SPC p f") #'projectile-find-file
   (kbd "SPC p k") #'projectile-kill-buffers
   ;; windows
   (kbd "SPC w h") #'evil-window-left
