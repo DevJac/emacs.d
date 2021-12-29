@@ -54,7 +54,10 @@
   (kbd "SPC o c r") #'org-clock-report
   ;; eval
   (kbd "SPC e e") #'evil-fix-eval-last-sexp
-  (kbd "SPC e j") #'evil-fix-eval-print-last-sexp)
+  (kbd "SPC e j") #'evil-fix-eval-print-last-sexp
+  ;; motion fixes
+  (kbd "g j") (lambda () (interactive) (line-move-visual 1))
+  (kbd "g k") (lambda () (interactive) (line-move-visual -1)))
 
 (evil-define-key 'motion org-mode-map
   (kbd "TAB") #'org-cycle)
