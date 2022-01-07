@@ -42,6 +42,7 @@
   (kbd "SPC t s") #'flyspell-mode
   (kbd "SPC s s") #'flyspell-buffer
   ;; org
+  (kbd "SPC o t") #'org-insert-structure-template
   (kbd "SPC o i") #'org-indent-mode
   (kbd "SPC o h") #'org-insert-heading-promote
   (kbd "SPC o j") #'org-insert-heading-down
@@ -58,7 +59,12 @@
   (kbd "SPC e j") #'evil-fix-eval-print-last-sexp
   ;; motion fixes
   (kbd "g j") (lambda () (interactive) (line-move-visual 1))
-  (kbd "g k") (lambda () (interactive) (line-move-visual -1)))
+  (kbd "g k") (lambda () (interactive) (line-move-visual -1))
+  ;; narrow
+  (kbd "SPC n w") #'widen
+  (kbd "SPC n n") #'narrow-to-region
+  (kbd "SPC n d") #'narrow-to-defun
+  (kbd "SPC n p") #'narrow-to-page)
 
 (evil-define-key 'motion org-mode-map
   (kbd "TAB") #'org-cycle)
