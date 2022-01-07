@@ -135,6 +135,9 @@
 (add-hook 'text-scale-mode-hook
           (lambda () (when (eq major-mode 'org-mode) (scale-latex-fragments))))
 
+;;; show-paren config
+(show-paren-mode 1)
+
 ;;; Custom
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -144,4 +147,5 @@
  '(org-block-begin-line ((t (:background nil :foreground "#7c6f64"))))
  '(org-block-end-line ((t (:background nil :foreground "#7c6f64"))))
  '(org-drawer ((t (:background nil :foreground "#7c6f64"))))
- '(org-code ((t (:background "#32302f" :foreground nil)))))
+ '(org-code ((t (:background "#32302f" :foreground nil))))
+ '(show-paren-match ((t (:background "#32302f" :foreground nil)))))
