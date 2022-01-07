@@ -102,6 +102,7 @@
 (use-package rainbow-delimiters
   :straight t
   :init
+  (add-hook 'org-mode-hook #'rainbow-delimiters-mode)
   (add-hook 'emacs-lisp-mode-hook #'rainbow-delimiters-mode))
 (use-package undo-tree
   :straight t
