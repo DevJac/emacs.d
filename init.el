@@ -84,6 +84,8 @@
   :config
   (keyfreq-mode 1)
   (keyfreq-autosave-mode 1))
+(use-package ledger-mode
+  :straight t)
 (use-package minions
   :straight t
   :config
