@@ -67,7 +67,10 @@
   (kbd "SPC n p") #'narrow-to-page)
 
 (evil-define-key 'motion org-mode-map
-  (kbd "TAB") #'org-cycle)
+  (kbd "TAB") #'org-cycle
+  (kbd "<C-return>") #'org-insert-heading-down)
+(evil-define-key 'insert org-mode-map
+  (kbd "<C-return>") #'org-insert-heading-down)
 
 (evil-define-key 'motion Info-mode-map
   (kbd "SPC") nil
