@@ -42,6 +42,9 @@
   (kbd "SPC t s") #'flyspell-mode
   (kbd "SPC s s") #'flyspell-buffer
   ;; org
+  (kbd "SPC o a") #'org-agenda
+  (kbd "SPC o [") #'org-agenda-file-to-front
+  (kbd "SPC o u") #'org-columns
   (kbd "SPC o t") #'org-insert-structure-template
   (kbd "SPC o i") #'org-indent-mode
   (kbd "SPC o h") #'org-insert-heading-promote
@@ -66,12 +69,14 @@
   (kbd "SPC n d") #'narrow-to-defun
   (kbd "SPC n p") #'narrow-to-page)
 
+;;; org keys
 (evil-define-key 'motion org-mode-map
   (kbd "TAB") #'org-cycle
   (kbd "<C-return>") #'org-insert-heading-down)
 (evil-define-key 'insert org-mode-map
   (kbd "<C-return>") #'org-insert-heading-down)
 
+;;; SPC rebinds
 (evil-define-key 'motion Info-mode-map
   (kbd "SPC") nil
   (kbd "SPC SPC") (lookup-key Info-mode-map (kbd "SPC")))
