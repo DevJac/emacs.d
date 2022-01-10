@@ -51,6 +51,7 @@
   :straight t
   :load-path "elisp"
   :init
+  (setq evil-search-module 'evil-search)
   (setq evil-undo-system 'undo-tree)
   :config
   (load "evil-keys")
