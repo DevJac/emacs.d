@@ -45,6 +45,7 @@
   (kbd "SPC o a") #'org-agenda
   (kbd "SPC o [") #'org-agenda-file-to-front
   (kbd "SPC o u") #'org-columns
+  (kbd "SPC o s") (lambda () (interactive) (org-time-stamp '(16)))
   (kbd "SPC o d") #'org-todo
   (kbd "SPC o t") #'org-insert-structure-template
   (kbd "SPC o i") #'org-indent-mode
