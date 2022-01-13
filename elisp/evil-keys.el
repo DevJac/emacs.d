@@ -47,6 +47,7 @@
   (kbd "SPC o u") #'org-columns
   (kbd "SPC o s") (lambda () (interactive) (org-time-stamp '(16)))
   (kbd "SPC o d") #'org-todo
+  (kbd "SPC o p") #'org-priority
   (kbd "SPC o t") #'org-insert-structure-template
   (kbd "SPC o i") #'org-indent-mode
   (kbd "SPC o h") #'org-insert-heading-promote
