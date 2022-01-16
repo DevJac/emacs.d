@@ -5,8 +5,6 @@
 ;; for our motion state key to be seen.
 (evil-define-key 'normal 'global
   (kbd "Z Z") nil)
-(evil-define-key 'motion 'global
-  (kbd "Z Z") #'save-then-kill-buffer-and-window)
 
 (evil-define-key 'motion 'global
   ;; (C-x C-f), (C-x C-b), and (C-x k), are basic Emacs keys and should be used.
