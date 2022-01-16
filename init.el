@@ -148,6 +148,6 @@
  ;; If there is more than one, they won't work right.
  '(org-block-begin-line ((t (:background nil :foreground "#7c6f64"))))
  '(org-block-end-line ((t (:background nil :foreground "#7c6f64"))))
- '(org-drawer ((t (:background nil :foreground "#7c6f64"))))
  '(org-code ((t (:background "#32302f" :foreground nil))))
+ '(org-drawer ((t (:background nil :foreground "#7c6f64"))))
  '(show-paren-match ((t (:background "#32302f" :foreground nil)))))
