@@ -51,6 +51,7 @@
   :straight t
   :load-path "elisp"
   :init
+  (setq evil-respect-visual-line-mode t)
   (setq evil-search-module 'evil-search)
   (setq evil-undo-system 'undo-tree)
   :config

@@ -62,8 +62,9 @@
   (kbd "SPC e e") #'evil-fix-eval-last-sexp
   (kbd "SPC e j") #'evil-fix-eval-print-last-sexp
   ;; motion fixes
-  (kbd "g j") (lambda () (interactive) (line-move-visual 1))
-  (kbd "g k") (lambda () (interactive) (line-move-visual -1))
+  ;; Remove if evil-respect-visual-line-mode works well
+  ;;(kbd "g j") (lambda () (interactive) (line-move-visual 1))
+  ;;(kbd "g k") (lambda () (interactive) (line-move-visual -1))
   ;; narrow
   (kbd "SPC n w") #'widen
   (kbd "SPC n n") #'narrow-to-region
