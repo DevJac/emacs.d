@@ -77,6 +77,12 @@
   (kbd "<C-return>") #'org-insert-heading-down)
 (evil-define-key 'insert org-mode-map
   (kbd "<C-return>") #'org-insert-heading-down)
+(evil-define-key 'emacs org-agenda-mode-map
+  (kbd "SPC") (lookup-key evil-motion-state-map (kbd "SPC"))
+  (kbd "j") #'evil-next-line
+  (kbd "k") #'evil-previous-line
+  (kbd "n") (lookup-key org-agenda-mode-map (kbd "j"))
+  (kbd "p") #'org-agenda-show-and-scroll-up)
 
 ;;; SPC rebinds
 (evil-define-key 'motion Info-mode-map
