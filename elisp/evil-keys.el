@@ -82,7 +82,9 @@
   (kbd "j") #'evil-next-line
   (kbd "k") #'evil-previous-line
   (kbd "n") (lookup-key org-agenda-mode-map (kbd "j"))
-  (kbd "p") #'org-agenda-show-and-scroll-up)
+  (kbd "p") #'org-agenda-show-and-scroll-up
+  (kbd "C-f") #'evil-scroll-page-down
+  (kbd "C-b") #'evil-scroll-page-up)
 
 ;;; SPC rebinds
 (evil-define-key 'motion Info-mode-map
