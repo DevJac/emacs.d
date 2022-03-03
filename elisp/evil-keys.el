@@ -86,6 +86,10 @@
   (kbd "C-f") #'evil-scroll-page-down
   (kbd "C-b") #'evil-scroll-page-up)
 
+;;; ledger keys
+(evil-define-key 'insert ledger-mode-map
+  (kbd "TAB") #'completion-at-point)
+
 ;;; SPC rebinds
 (evil-define-key 'motion Info-mode-map
   (kbd "SPC") nil
