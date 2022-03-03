@@ -121,6 +121,7 @@
 (setq make-backup-files nil)
 
 ;;; Org config
+(setq org-log-done 'time)
 (setq org-clock-idle-time 15)
 (setq org-clock-mode-line-total 'current)
 (setq org-duration-format 'h:mm)
