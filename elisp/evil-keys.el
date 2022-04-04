@@ -90,6 +90,10 @@
 (evil-define-key 'insert ledger-mode-map
   (kbd "TAB") #'completion-at-point)
 
+;;; Lisp Interaction keys
+(evil-define-key 'insert lisp-interaction-mode-map
+  (kbd "<C-return>") #'evil-fix-eval-print-last-sexp)
+
 ;;; SPC rebinds
 (evil-define-key 'motion Info-mode-map
   (kbd "SPC") nil
