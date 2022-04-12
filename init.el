@@ -52,11 +52,14 @@
   :load-path "elisp"
   :init
   (setq evil-respect-visual-line-mode t)
-  (setq evil-search-module 'evil-search)
   (setq evil-undo-system 'undo-tree)
   :config
   (load "evil-keys")
   (evil-mode 1))
+(use-package evil-anzu
+  :straight t
+  :config
+  (global-anzu-mode 1))
 (use-package expand-region
   :straight t)
 (use-package ivy
