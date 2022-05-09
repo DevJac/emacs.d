@@ -63,6 +63,8 @@
   (global-anzu-mode 1))
 (use-package expand-region
   :straight t)
+(use-package flycheck
+  :straight t)
 (use-package ivy
   :straight t
   :init
@@ -93,6 +95,12 @@
 (use-package ledger-mode
   :straight t
   :after (org))
+(use-package lsp-julia
+  :straight t)
+(use-package lsp-mode
+  :straight t)
+(use-package lsp-ui
+  :straight t)
 (use-package minions
   :straight t
   :config
