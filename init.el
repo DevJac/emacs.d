@@ -125,13 +125,15 @@
 (setq make-backup-files nil)
 
 ;;; Org config
-(setq org-log-done 'time)
 (setq org-clock-idle-time 15)
 (setq org-clock-mode-line-total 'current)
 (setq org-duration-format 'h:mm)
+(setq org-ellipsis "⤵")
 (setq org-fontify-done-headline nil)
 (setq org-fontify-todo-headline nil)
-(setq org-ellipsis "⤵")
+(setq org-log-done 'time)
+(setq org-startup-folded 'fold)
+(setq org-startup-indented t)
 ;; org-mode and whitespace-mode both modify Emacs' "display tables".
 ;; When leaving whitespace-mode, my custom org-ellipsis were being replaced with
 ;; the standard "...". To fix this, I reapply the display table modifications
