@@ -106,12 +106,16 @@
   :straight t
   :init
   (setq projectile-completion-system 'ivy))
+(use-package pyvenv
+  :straight t)
 (use-package rainbow-delimiters
   :straight t
   :init
   (add-hook 'emacs-lisp-mode-hook #'rainbow-delimiters-mode))
 (use-package undo-tree
   :straight t
+  :init
+  (setq undo-tree-history-directory-alist '(("." . "~/.emacs.d/undo-tree-histories")))
   :config
   (global-undo-tree-mode 1))
 (use-package which-key
