@@ -144,7 +144,7 @@
 (setq org-fontify-done-headline nil)
 (setq org-fontify-todo-headline nil)
 (setq org-log-done 'time)
-(setq org-startup-folded 'fold)
+(setq org-startup-folded t)
 (setq org-startup-indented t)
 ;; org-mode and whitespace-mode both modify Emacs' "display tables".
 ;; When leaving whitespace-mode, my custom org-ellipsis were being replaced with
