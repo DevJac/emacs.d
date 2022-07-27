@@ -43,7 +43,7 @@
   (kbd "SPC o a") #'org-agenda
   (kbd "SPC o [") #'org-agenda-file-to-front
   (kbd "SPC o u") #'org-columns
-  (kbd "SPC o s") (lambda () (interactive) (org-time-stamp '(16)))
+  (kbd "SPC o s") #'insert-timestamp
   (kbd "SPC o t") #'org-todo
   (kbd "SPC o p") #'org-priority
   (kbd "SPC o b") #'org-insert-structure-template

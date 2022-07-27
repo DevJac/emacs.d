@@ -18,8 +18,8 @@
   (interactive)
   (if (org-at-item-p)
       (progn
-	(evil-append-line 1)
-	(org-insert-item (org-at-item-checkbox-p)))
+        (evil-append-line 1)
+        (org-insert-item (org-at-item-checkbox-p)))
     (progn
       (org-insert-heading-after-current)
       (evil-insert 1))))
@@ -28,8 +28,8 @@
   (interactive)
   (if (org-at-item-p)
       (progn
-	(evil-beginning-of-line)
-	(org-insert-item (org-at-item-checkbox-p)))
+        (evil-beginning-of-line)
+        (org-insert-item (org-at-item-checkbox-p)))
     (progn
       (org-back-to-heading)
       (org-insert-heading)
@@ -41,6 +41,10 @@
   (org-insert-heading-after-current)
   (org-demote)
   (evil-insert 1))
+
+(defun insert-timestamp ()
+  (interactive)
+  (org-time-stamp '(16)))
 
 ;; org-mode and whitespace-mode both modify Emacs' "display tables".
 ;; When leaving whitespace-mode, my custom org-ellipsis were being replaced with
