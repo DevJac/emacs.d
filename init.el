@@ -160,6 +160,9 @@
 ;;; show-paren config
 (show-paren-mode 1)
 
+;;; Mac / Homebrew Config
+;; (add-to-list 'exec-path "/opt/homebrew/bin")
+
 ;;; Custom
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
