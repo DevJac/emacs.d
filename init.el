@@ -110,6 +110,10 @@
   :init
   (setq org-drill-hide-item-headings-p t)
   (setq org-drill-add-random-noise-to-intervals-p t))
+(use-package org-roam
+  :straight t
+  :init
+  (setq org-roam-directory "~/OrgRoam")
 (use-package projectile
   :straight t
   :init
