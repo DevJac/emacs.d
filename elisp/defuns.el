@@ -8,6 +8,10 @@
   (delete-trailing-whitespace)
   (message "Trimmed trailing whitespace"))
 
+(defun insert-timestamp ()
+  (interactive)
+  (org-time-stamp '(16)))
+
 (defun org-insert-heading-promote ()
   (interactive)
   (org-insert-heading-after-current)
