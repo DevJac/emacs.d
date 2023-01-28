@@ -47,6 +47,8 @@
   (setq doom-modeline-enable-word-count t)
   :config
   (doom-modeline-mode 1))
+(use-package eglot
+  :straight t)
 (use-package evil
   :straight t
   :load-path "elisp"
@@ -95,12 +97,6 @@
 (use-package ledger-mode
   :straight t
   :after (org))
-(use-package lsp-julia
-  :straight t)
-(use-package lsp-mode
-  :straight t)
-(use-package lsp-ui
-  :straight t)
 (use-package minions
   :straight t
   :config
