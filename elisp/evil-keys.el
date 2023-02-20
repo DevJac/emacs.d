@@ -39,6 +39,7 @@
   ;; spelling
   (kbd "SPC t s") #'flyspell-mode
   (kbd "SPC s s") #'flyspell-buffer
+  (kbd "SPC s c") #'flyspell-clear
   ;; org
   (kbd "SPC o a") #'org-agenda
   (kbd "SPC o [") #'org-agenda-file-to-front
@@ -58,6 +59,10 @@
   (kbd "SPC o c l") #'org-clock-last
   (kbd "SPC o c d") #'org-clock-display
   (kbd "SPC o c r") #'org-clock-report
+  ;; roam
+  (kbd "SPC r f") #'org-roam-node-find
+  (kbd "SPC r i") #'org-roam-node-insert
+  (kbd "SPC r c") #'org-roam-capture
   ;; eval
   (kbd "SPC e e") #'evil-fix-eval-last-sexp
   (kbd "SPC e j") #'evil-fix-eval-print-last-sexp

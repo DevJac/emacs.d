@@ -109,7 +109,9 @@
 (use-package org-roam
   :straight t
   :init
-  (setq org-roam-directory "~/OrgRoam"))
+  (setq org-roam-directory "~/OrgRoam")
+  :config
+  (org-roam-db-autosync-mode 1))
 (use-package projectile
   :straight t
   :init

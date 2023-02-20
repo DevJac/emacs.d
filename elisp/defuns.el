@@ -14,6 +14,10 @@
   (interactive)
   (org-time-stamp '(16)))
 
+(defun flyspell-clear ()
+  (interactive)
+  (flyspell-mode-off))
+
 (defun org-insert-heading-promote ()
   (interactive)
   (org-insert-heading-after-current)
@@ -47,10 +51,6 @@
   (org-insert-heading-after-current)
   (org-demote)
   (evil-insert 1))
-
-(defun insert-timestamp ()
-  (interactive)
-  (org-time-stamp '(16)))
 
 ;; org-mode and whitespace-mode both modify Emacs' "display tables".
 ;; When leaving whitespace-mode, my custom org-ellipsis were being replaced with
