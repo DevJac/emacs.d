@@ -36,6 +36,8 @@
   (load "defuns"))
 (use-package avy
   :straight t)
+(use-package company
+  :straight t)
 (use-package counsel
   :straight t
   :config
@@ -101,6 +103,14 @@
   :straight t
   :config
   (minions-mode 1))
+(use-package lsp-mode
+  :straight t)
+(use-package lsp-pyright
+  :straight t
+  :init
+  (add-hook 'python-mode-hook #'lsp))
+(use-package lsp-ui
+  :straight t)
 (use-package org-drill
   :straight t
   :init
@@ -116,6 +126,8 @@
   :straight t
   :init
   (setq projectile-completion-system 'ivy))
+(use-package py-autopep8
+  :straight t)
 (use-package pyvenv
   :straight t)
 (use-package rainbow-delimiters
