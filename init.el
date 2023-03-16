@@ -130,6 +130,8 @@
   :straight t)
 (use-package pyvenv
   :straight t)
+(use-package racket-mode
+  :straight t)
 (use-package rainbow-delimiters
   :straight t
   :init
