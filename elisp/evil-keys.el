@@ -47,6 +47,7 @@
   (kbd "SPC o s") #'insert-timestamp
   (kbd "SPC o t") #'org-todo
   (kbd "SPC o p") #'org-priority
+  (kbd "SPC o x") #'org-latex-preview
   (kbd "SPC o b") #'org-insert-structure-template
   (kbd "SPC o i") #'org-indent-mode
   (kbd "SPC o h") #'org-insert-heading-promote
