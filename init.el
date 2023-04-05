@@ -115,7 +115,9 @@
   :straight t
   :init
   (setq org-drill-hide-item-headings-p t)
-  (setq org-drill-add-random-noise-to-intervals-p t))
+  (setq org-drill-add-random-noise-to-intervals-p t)
+  :config
+  (load "overrides"))
 (use-package org-roam
   :straight t
   :init
