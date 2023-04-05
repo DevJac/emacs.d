@@ -64,6 +64,7 @@
   (kbd "SPC r i") #'org-roam-node-insert
   (kbd "SPC r c") #'org-roam-capture
   ;; eval
+  (kbd "SPC e r") #'eval-region
   (kbd "SPC e e") #'evil-fix-eval-last-sexp
   (kbd "SPC e j") #'evil-fix-eval-print-last-sexp
   ;; motion fixes
