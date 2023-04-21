@@ -47,10 +47,12 @@
   :config
   (load-theme 'gruvbox-dark-hard t))
 (use-package evil
+  :load-path "elisp"
   :init
   ;; When searching, keep search highlights visible
   (setq evil-search-module 'evil-search)
   :config
+  (load "evil-keys")
   (evil-mode 1))
 ;; evil-anzu is used to show search match count in modeline
 (use-package evil-anzu
