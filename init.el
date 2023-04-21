@@ -46,6 +46,9 @@
 (use-package gruvbox-theme
   :config
   (load-theme 'gruvbox-dark-hard t))
+(use-package poke-line
+  :config
+  (poke-line-global-mode 1))
 (use-package evil
   :load-path "elisp"
   :init
@@ -100,4 +103,5 @@
  ;; If there is more than one, they won't work right.
  '(font-lock-comment-face ((t (:foreground "#8c7f74"))))
  '(highlight ((t (:background "#403935"))))
- '(region ((t (:extend t :background "#403935" :distant-foreground nil)))))
+ '(region ((t (:background "#403935"))))
+ '(show-paren-match ((t (:foreground nil :background "#403935" :weight bold)))))
