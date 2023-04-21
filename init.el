@@ -13,6 +13,18 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 
+;;; Vanilla Emacs config
+;; 16 point font
+(set-face-attribute 'default nil :height 160)
+;; tool-bar-mode show icons, menu-bar-mode show text menu dropdowns
+(tool-bar-mode -1)
+(menu-bar-mode -1)
+(setq inhibit-startup-screen t)
+;; Remember the files we've opened recently
+(recentf-mode 1)
+;; Save minibuffer history, making frequently used commands easier to access
+(savehist-mode 1)
+
 ;;; straight integration with use-package
 ;; See: https://github.com/radian-software/straight.el#integration-with-use-package
 ;; We want all normal (use-package ...) expressions to use straight by default
