@@ -89,6 +89,7 @@
     ('visual (progn
                (evil-append 1)
                (eval-print-last-sexp arg)
+               (evil-normal-state)
                (evil-visual-restore)))
     (otherwise (eval-print-last-sexp arg))))
 
