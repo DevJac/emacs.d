@@ -24,6 +24,14 @@
 (recentf-mode 1)
 ;; Save minibuffer history, making frequently used commands easier to access
 (savehist-mode 1)
+;; Scrolling begins this many lines from edge
+(setq scroll-margin 2)
+;; Never center the point because of scrolling
+(setq scroll-conservatively 101)
+;; Number of lines of continuity when scrolling by screenfuls
+(setq next-screen-context-lines 4)
+;; Display column number on modeline
+(column-number-mode 1)
 
 ;;; straight integration with use-package
 ;; See: https://github.com/radian-software/straight.el#integration-with-use-package
@@ -39,9 +47,22 @@
   :config
   (load-theme 'gruvbox-dark-hard t))
 (use-package evil
+  :init
+  ;; When searching, keep search highlights visible
+  (setq evil-search-module 'evil-search)
   :config
   (evil-mode 1))
+;; evil-anzu is used to show search match count in modeline
+(use-package evil-anzu
+  :config
+  (global-anzu-mode 1))
 (use-package restart-emacs)
+(use-package doom-modeline
+  :init
+  ;; Select info shows word count
+  (setq doom-modeline-enable-word-count t)
+  :config
+  (doom-modeline-mode 1))
 ;; consult provides specific commands, like consult-buffer
 (use-package consult)
 ;; vertico provides the selection UI
