@@ -32,6 +32,12 @@
 (setq next-screen-context-lines 4)
 ;; Display column number on modeline
 (column-number-mode 1)
+;; Auto save to visited file instead of a backup
+(auto-save-visited-mode 1)
+;; Auto revert file when it changes from some outside source
+(global-auto-revert-mode 1)
+;; No backup files
+(setq make-backup-files nil)
 
 ;;; straight integration with use-package
 ;; See: https://github.com/radian-software/straight.el#integration-with-use-package
@@ -46,11 +52,14 @@
 (use-package gruvbox-theme
   :config
   (load-theme 'gruvbox-dark-hard t))
+;; Emacs 29 will have a restart function; maybe remove later?
+(use-package restart-emacs)
 (use-package evil
   :load-path "elisp"
   :init
   ;; When searching, keep search highlights visible
   (setq evil-search-module 'evil-search)
+  (setq evil-undo-system 'undo-tree)
   :config
   (load "evil-keys")
   (evil-mode 1))
@@ -58,7 +67,11 @@
 (use-package evil-anzu
   :config
   (global-anzu-mode 1))
-(use-package restart-emacs)
+(use-package undo-tree
+  :init
+  (setq undo-tree-history-directory-alist '(("." . "~/.emacs.d/undo-tree-histories")))
+  :config
+  (global-undo-tree-mode 1))
 (use-package poke-line
   :config
   (poke-line-global-mode 1))
@@ -85,6 +98,9 @@
 (use-package rainbow-delimiters
   :init
   (add-hook 'emacs-lisp-mode-hook #'rainbow-delimiters-mode))
+(use-package which-key
+  :config
+  (which-key-mode 1))
 
 ;;; Mac / Homebrew config
 ; (add-to-list 'exec-path "/opt/homebrew/bin")
@@ -106,5 +122,7 @@
  ;; If there is more than one, they won't work right.
  '(font-lock-comment-face ((t (:foreground "#8c7f74"))))
  '(highlight ((t (:background "#403935"))))
+ '(org-block-begin-line ((t (:foreground "#8c7f74"))))
+ '(org-block-end-line ((t (:foreground "#8c7f74"))))
  '(region ((t (:background "#403935"))))
  '(show-paren-match ((t (:foreground nil :background "#403935" :weight bold)))))

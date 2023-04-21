@@ -1,20 +1,31 @@
 * TODOs
 ** Give each buffer its own unique pokemon
 https://github.com/RyanMillerC/poke-line/pull/12
-** Setup evil-undo-system 'undo-tree
 ** Setup org
 ** Setup org-drill
 ** Setup org-roam
-** Setup which-key
-** Setup file behavior
-(auto-save-visited-mode 1)
-(global-auto-revert-mode 1)
-(setq make-backup-files nil)
 ** Custom org ellipsis
 ** Custom outline-mode ellipsis
-** Org mode keybindings
-I miss SPC o j, etc.
 ** Latex generation
 ** evil-collection
 ** Magit
 ** lsp
+** Org mode keybindings
+I miss SPC o j, etc.
+** Evil end-of-line ($) get's stuck after org ellipsis
+Especially at the end of a file
+** Tab should cycle org headings
+** Can orderless fuzzy matching be a little more fuzzy
+It matches on specific words, but can it be more fuzzy?
+* Neat configs I might use later
+** Debounce consult-buffer
+See: https://github.com/minad/consult#live-previews
+
+#+begin_src elisp
+  (use-package consult
+    :config
+    (consult-customize consult-buffer
+                       :preview-key
+                       '(:debounce 0.5 "<up>" "<down>"
+                         :debounce 1 any)))
+#+end_src
