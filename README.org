@@ -1,10 +1,8 @@
 * TODOs
 ** Give each buffer its own unique pokemon
 https://github.com/RyanMillerC/poke-line/pull/12
-** Setup org
 ** Setup org-drill
 ** Setup org-roam
-** Custom org ellipsis
 ** Custom outline-mode ellipsis
 ** Latex generation
 ** evil-collection
@@ -14,9 +12,6 @@ https://github.com/RyanMillerC/poke-line/pull/12
 I miss SPC o j, etc.
 ** Evil end-of-line ($) get's stuck after org ellipsis
 Especially at the end of a file
-** Tab should cycle org headings
-** Can orderless fuzzy matching be a little more fuzzy
-It matches on specific words, but can it be more fuzzy?
 * Neat configs I might use later
 ** Debounce consult-buffer
 See: https://github.com/minad/consult#live-previews

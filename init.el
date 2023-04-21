@@ -46,6 +46,11 @@
 ;; Before we can use normal (use-package ...) expressions, we need to get use-package
 (straight-use-package 'use-package)
 
+(add-to-list
+ 'load-path
+ (expand-file-name "elisp" user-emacs-directory))
+(load "defuns")
+
 ;;; use-package's
 ;; :init runs before the package is loaded
 ;; :config runs after the package is loaded
@@ -55,7 +60,6 @@
 ;; Emacs 29 will have a restart function; maybe remove later?
 (use-package restart-emacs)
 (use-package evil
-  :load-path "elisp"
   :init
   ;; When searching, keep search highlights visible
   (setq evil-search-module 'evil-search)
@@ -95,6 +99,18 @@
 (use-package marginalia
   :config
   (marginalia-mode 1))
+(use-package org
+  :init
+  (setq org-clock-idle-time 15)
+  (setq org-clock-mode-line-total 'current)
+  (setq org-duration-format 'h:mm)
+  (setq org-ellipsis " ▼")
+  (setq org-fontify-done-headline nil)
+  (setq org-fontify-todo-headline nil)
+  (setq org-log-done 'time)
+  (setq org-startup-folded t)
+  (setq org-startup-indented t)
+  (add-hook 'whitespace-mode-hook #'fix-org-ellipsis-after-whitespace-mode))
 (use-package rainbow-delimiters
   :init
   (add-hook 'emacs-lisp-mode-hook #'rainbow-delimiters-mode))
