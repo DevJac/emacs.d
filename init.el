@@ -78,6 +78,9 @@
   :config
   (marginalia-mode 1))
 
+;;; Mac / Homebrew config
+; (add-to-list 'exec-path "/opt/homebrew/bin")
+
 ;;; Customs
 ;; Darkened highlight and region backgrounds by #101010
 ;; Removed region distant-foreground; it was an ugly bright color
