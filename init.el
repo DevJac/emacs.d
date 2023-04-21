@@ -46,9 +46,6 @@
 (use-package gruvbox-theme
   :config
   (load-theme 'gruvbox-dark-hard t))
-(use-package poke-line
-  :config
-  (poke-line-global-mode 1))
 (use-package evil
   :load-path "elisp"
   :init
@@ -62,6 +59,9 @@
   :config
   (global-anzu-mode 1))
 (use-package restart-emacs)
+(use-package poke-line
+  :config
+  (poke-line-global-mode 1))
 (use-package doom-modeline
   :init
   ;; Select info shows word count
@@ -82,6 +82,9 @@
 (use-package marginalia
   :config
   (marginalia-mode 1))
+(use-package rainbow-delimiters
+  :init
+  (add-hook 'emacs-lisp-mode-hook #'rainbow-delimiters-mode))
 
 ;;; Mac / Homebrew config
 ; (add-to-list 'exec-path "/opt/homebrew/bin")
