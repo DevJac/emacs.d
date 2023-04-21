@@ -41,6 +41,21 @@
 (use-package evil
   :config
   (evil-mode 1))
+(use-package restart-emacs)
+;; consult provides specific commands, like consult-buffer
+(use-package consult)
+;; vertico provides the selection UI
+(use-package vertico
+  :config
+  (vertico-mode 1))
+;; orderless provides the fuzzy string matching
+(use-package orderless
+  :init
+  (setq completion-styles '(orderless basic)))
+;; marginalia provides added info in right margins
+(use-package marginalia
+  :config
+  (marginalia-mode 1))
 
 ;;; Customs
 ;; Darkened highlight and region backgrounds by #101010
