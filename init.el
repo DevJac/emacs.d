@@ -35,6 +35,9 @@
 ;;; use-package's
 ;; :init runs before the package is loaded
 ;; :config runs after the package is loaded
+(use-package gruvbox-theme
+  :config
+  (load-theme 'gruvbox-dark-hard t))
 (use-package evil
   :config
   (evil-mode 1))
