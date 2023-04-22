@@ -86,7 +86,14 @@
   :config
   (doom-modeline-mode 1))
 ;; consult provides specific commands, like consult-buffer
-(use-package consult)
+(use-package consult
+  :config
+  (use-package consult
+    :config
+    (consult-customize
+     consult-buffer
+     :preview-key
+     '(:debounce 0.5 any))))
 ;; vertico provides the selection UI
 (use-package vertico
   :config
@@ -111,6 +118,15 @@
   (setq org-startup-folded t)
   (setq org-startup-indented t)
   (add-hook 'whitespace-mode-hook #'fix-org-ellipsis-after-whitespace-mode))
+(use-package org-drill
+  :init
+  (setq org-drill-hide-item-headings-p t)
+  (setq org-drill-add-random-noise-to-intervals-p t))
+(use-package org-roam
+  :init
+  (setq org-roam-directory "~/OrgRoam")
+  :config
+  (org-roam-db-autosync-mode 1))
 (use-package rainbow-delimiters
   :init
   (add-hook 'emacs-lisp-mode-hook #'rainbow-delimiters-mode))

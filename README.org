@@ -12,15 +12,3 @@ https://github.com/RyanMillerC/poke-line/pull/12
 I miss SPC o j, etc.
 ** Evil end-of-line ($) get's stuck after org ellipsis
 Especially at the end of a file
-* Neat configs I might use later
-** Debounce consult-buffer
-See: https://github.com/minad/consult#live-previews
-
-#+begin_src elisp
-  (use-package consult
-    :config
-    (consult-customize consult-buffer
-                       :preview-key
-                       '(:debounce 0.5 "<up>" "<down>"
-                         :debounce 1 any)))
-#+end_src
