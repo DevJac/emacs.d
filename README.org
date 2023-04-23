@@ -1,14 +1,5 @@
 * TODOs
-** Give each buffer its own unique pokemon
-https://github.com/RyanMillerC/poke-line/pull/12
-** Setup org-drill
-** Setup org-roam
-** Custom outline-mode ellipsis
-** Latex generation
-** evil-collection
 ** Magit
 ** lsp
-** Org mode keybindings
-I miss SPC o j, etc.
 ** Evil end-of-line ($) get's stuck after org ellipsis
 Especially at the end of a file

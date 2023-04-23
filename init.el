@@ -21,6 +21,7 @@
 (menu-bar-mode -1)
 (setq inhibit-startup-screen t)
 ;; Remember the files we've opened recently
+(setq recentf-max-saved-items 200)
 (recentf-mode 1)
 ;; Save minibuffer history, making frequently used commands easier to access
 (savehist-mode 1)
@@ -77,6 +78,9 @@
   :config
   (global-undo-tree-mode 1))
 (use-package poke-line
+  :init
+  (make-variable-buffer-local 'poke-line-pokemon)
+  (add-hook 'poke-line-mode-hook 'poke-line-set-random-pokemon)
   :config
   (poke-line-global-mode 1))
 (use-package doom-modeline
@@ -117,11 +121,18 @@
   (setq org-log-done 'time)
   (setq org-startup-folded t)
   (setq org-startup-indented t)
-  (add-hook 'whitespace-mode-hook #'fix-org-ellipsis-after-whitespace-mode))
+  (add-hook 'whitespace-mode-hook #'fix-org-ellipsis-after-whitespace-mode)
+  (add-hook 'org-mode-hook #'scale-latex-fragments)
+  (add-hook 'text-scale-mode-hook
+            (lambda ()
+              (when (eq major-mode 'org-mode)
+                (scale-latex-fragments)))))
 (use-package org-drill
   :init
   (setq org-drill-hide-item-headings-p t)
-  (setq org-drill-add-random-noise-to-intervals-p t))
+  (setq org-drill-add-random-noise-to-intervals-p t)
+  :config
+  (load "overrides"))
 (use-package org-roam
   :init
   (setq org-roam-directory "~/OrgRoam")
@@ -130,6 +141,7 @@
 (use-package rainbow-delimiters
   :init
   (add-hook 'emacs-lisp-mode-hook #'rainbow-delimiters-mode))
+(use-package expand-region)
 (use-package which-key
   :config
   (which-key-mode 1))
@@ -156,5 +168,7 @@
  '(highlight ((t (:background "#403935"))))
  '(org-block-begin-line ((t (:foreground "#8c7f74"))))
  '(org-block-end-line ((t (:foreground "#8c7f74"))))
+ '(org-drawer ((t (:inherit org-special-keyword))))
  '(region ((t (:background "#403935"))))
+ '(shadow ((t (:foreground "#8c7f74"))))
  '(show-paren-match ((t (:foreground nil :background "#403935" :weight bold)))))
