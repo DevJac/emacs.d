@@ -110,6 +110,9 @@
 (use-package marginalia
   :config
   (marginalia-mode 1))
+(use-package corfu
+  :config
+  (global-corfu-mode))
 (use-package org
   :init
   (setq org-clock-idle-time 15)
