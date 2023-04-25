@@ -144,6 +144,7 @@
 (use-package rainbow-delimiters
   :init
   (add-hook 'emacs-lisp-mode-hook #'rainbow-delimiters-mode))
+(use-package magit)
 (use-package expand-region)
 (use-package which-key
   :config
