@@ -1,4 +1,5 @@
 ;;; straight.el bootstrap
+;; See: https://github.com/radian-software/straight.el#getting-started
 (defvar bootstrap-version)
 (let ((bootstrap-file
        (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
@@ -12,183 +13,166 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 
-;;; Theme config
-(menu-bar-mode -1)
-(tool-bar-mode -1)
-(setq inhibit-startup-screen t)
+;;; Vanilla Emacs config
+;; 16 point font
 (set-face-attribute 'default nil :height 160)
+;; tool-bar-mode show icons, menu-bar-mode show text menu dropdowns
+(tool-bar-mode -1)
+(menu-bar-mode -1)
+(setq inhibit-startup-screen t)
+;; Remember the files we've opened recently
+(setq recentf-max-saved-items 200)
+(recentf-mode 1)
+;; Save minibuffer history, making frequently used commands easier to access
+(savehist-mode 1)
+;; Scrolling begins this many lines from edge
 (setq scroll-margin 2)
-(setq scroll-conservatively 100)
+;; Never center the point because of scrolling
+(setq scroll-conservatively 101)
+;; Number of lines of continuity when scrolling by screenfuls
 (setq next-screen-context-lines 4)
+;; Display column number on modeline
 (column-number-mode 1)
+;; Auto save to visited file instead of a backup
+(auto-save-visited-mode 1)
+;; Auto revert file when it changes from some outside source
+(global-auto-revert-mode 1)
+;; No backup files
+(setq make-backup-files nil)
 
-;;; Packages
+;;; straight integration with use-package
+;; See: https://github.com/radian-software/straight.el#integration-with-use-package
+;; We want all normal (use-package ...) expressions to use straight by default
+(setq straight-use-package-by-default t)
+;; Before we can use normal (use-package ...) expressions, we need to get use-package
 (straight-use-package 'use-package)
-(use-package restart-emacs ; keep first, useful in case remaining config is bad
-  :straight t)
-(use-package gruvbox-theme ; keep early, we want to set the theme ASAP
-  :straight t
+
+(add-to-list
+ 'load-path
+ (expand-file-name "elisp" user-emacs-directory))
+(load "defuns")
+
+;;; use-package's
+;; :init runs before the package is loaded
+;; :config runs after the package is loaded
+(use-package gruvbox-theme
   :config
   (load-theme 'gruvbox-dark-hard t))
-(use-package emacs ; keep early, special
-  :load-path "elisp"
-  :config
-  (load "defuns"))
-(use-package avy
-  :straight t)
-(use-package company
-  :straight t)
-(use-package counsel
-  :straight t
-  :config
-  (counsel-mode 1))
-(use-package doom-modeline
-  :straight t
-  :init
-  (setq doom-modeline-minor-modes t)
-  (setq doom-modeline-enable-word-count t)
-  :config
-  (doom-modeline-mode 1))
-(use-package eglot
-  :straight t)
+;; Emacs 29 will have a restart function; maybe remove later?
+(use-package restart-emacs)
 (use-package evil
-  :straight t
-  :load-path "elisp"
   :init
-  (setq evil-respect-visual-line-mode t)
+  ;; When searching, keep search highlights visible
   (setq evil-search-module 'evil-search)
   (setq evil-undo-system 'undo-tree)
   :config
   (load "evil-keys")
   (evil-mode 1))
+;; evil-anzu is used to show search match count in modeline
 (use-package evil-anzu
-  :straight t
   :config
   (global-anzu-mode 1))
-(use-package expand-region
-  :straight t)
-(use-package flycheck
-  :straight t)
-(use-package ivy
-  :straight t
+(use-package undo-tree
   :init
-  (setq ivy-use-virtual-buffers t)
-  (setq ivy-count-format "(%d/%d) ")
-  (setq ivy-re-builders-alist
-        '((t . ivy--regex-ignore-order)))
-  (setq ivy-initial-inputs-alist
-        '((counsel-M-x . "")
-          (counsel-describe-function . "")
-          (counsel-describe-variable . "")))
+  (setq undo-tree-history-directory-alist '(("." . "~/.emacs.d/undo-tree-histories")))
   :config
-  (global-set-key (kbd "C-s") #'swiper)
-  (ivy-mode 1))
-(use-package ivy-prescient
-  :straight t
-  :config
-  (prescient-persist-mode 1)
-  (ivy-prescient-mode 1))
-(use-package keyfreq
-  :straight t
+  (global-undo-tree-mode 1))
+(use-package poke-line
   :init
-  (setq keyfreq-file "~/.emacs.d/keyfreq")
-  (setq keyfreq-file-lock "~/.emacs.d/keyfreq-lock")
+  (make-variable-buffer-local 'poke-line-pokemon)
+  (add-hook 'poke-line-mode-hook 'poke-line-set-random-pokemon)
   :config
-  (keyfreq-mode 1)
-  (keyfreq-autosave-mode 1))
-(use-package ledger-mode
-  :straight t
-  :after (org))
-(use-package minions
-  :straight t
-  :config
-  (minions-mode 1))
-(use-package lsp-mode
-  :straight t)
-(use-package lsp-pyright
-  :straight t
+  (poke-line-global-mode 1))
+(use-package doom-modeline
   :init
-  (add-hook 'python-mode-hook #'lsp))
-(use-package lsp-ui
-  :straight t)
+  ;; Select info shows word count
+  (setq doom-modeline-enable-word-count t)
+  :config
+  (doom-modeline-mode 1))
+;; consult provides specific commands, like consult-buffer
+(use-package consult
+  :config
+  (use-package consult
+    :config
+    (consult-customize
+     consult-buffer
+     :preview-key
+     '(:debounce 0.5 any))))
+;; vertico provides the selection UI
+(use-package vertico
+  :config
+  (vertico-mode 1))
+;; orderless provides the fuzzy string matching
+(use-package orderless
+  :init
+  (setq completion-styles '(orderless basic)))
+;; marginalia provides added info in right margins
+(use-package marginalia
+  :config
+  (marginalia-mode 1))
+(use-package corfu
+  :config
+  (global-corfu-mode))
+(use-package org
+  :init
+  (setq org-clock-idle-time 15)
+  (setq org-clock-mode-line-total 'current)
+  (setq org-duration-format 'h:mm)
+  (setq org-ellipsis " ▼")
+  (setq org-fontify-done-headline nil)
+  (setq org-fontify-todo-headline nil)
+  (setq org-log-done 'time)
+  (setq org-startup-folded t)
+  (setq org-startup-indented t)
+  (add-hook 'whitespace-mode-hook #'fix-org-ellipsis-after-whitespace-mode)
+  (add-hook 'org-mode-hook #'scale-latex-fragments)
+  (add-hook 'text-scale-mode-hook
+            (lambda ()
+              (when (eq major-mode 'org-mode)
+                (scale-latex-fragments)))))
 (use-package org-drill
-  :straight t
   :init
   (setq org-drill-hide-item-headings-p t)
   (setq org-drill-add-random-noise-to-intervals-p t)
   :config
   (load "overrides"))
 (use-package org-roam
-  :straight t
   :init
   (setq org-roam-directory "~/OrgRoam")
   :config
   (org-roam-db-autosync-mode 1))
-(use-package projectile
-  :straight t
-  :init
-  (setq projectile-completion-system 'ivy))
-(use-package py-autopep8
-  :straight t)
-(use-package pyvenv
-  :straight t)
-(use-package racket-mode
-  :straight t)
 (use-package rainbow-delimiters
-  :straight t
   :init
   (add-hook 'emacs-lisp-mode-hook #'rainbow-delimiters-mode))
-(use-package undo-tree
-  :straight t
-  :init
-  (setq undo-tree-history-directory-alist '(("." . "~/.emacs.d/undo-tree-histories")))
-  :config
-  (global-undo-tree-mode 1))
+(use-package magit)
+(use-package expand-region)
 (use-package which-key
-  :straight t
   :config
   (which-key-mode 1))
 
-;;; File config
-(auto-save-visited-mode 1)
-(global-auto-revert-mode 1)
-(setq make-backup-files nil)
+;;; Mac / Homebrew config
+; (add-to-list 'exec-path "/opt/homebrew/bin")
 
-;;; Org config
-(setq org-clock-idle-time 15)
-(setq org-clock-mode-line-total 'current)
-(setq org-duration-format 'h:mm)
-(setq org-ellipsis "⤵")
-(setq org-fontify-done-headline nil)
-(setq org-fontify-todo-headline nil)
-(setq org-log-done 'time)
-(setq org-startup-folded t)
-(setq org-startup-indented t)
-;; org-mode and whitespace-mode both modify Emacs' "display tables".
-;; When leaving whitespace-mode, my custom org-ellipsis were being replaced with
-;; the standard "...". To fix this, I reapply the display table modifications
-;; made by org-mode when leaving whitespace-mode.
-;; See: https://www.gnu.org/software/emacs/manual/html_node/elisp/Display-Tables.html
-(add-hook 'whitespace-mode-hook #'fix-org-ellipsis-after-whitespace-mode)
-;; When we scale text, we want our rendered latex fragments to scale as well.
-(add-hook 'org-mode-hook 'scale-latex-fragments)
-(add-hook 'text-scale-mode-hook
-          (lambda () (when (eq major-mode 'org-mode) (scale-latex-fragments))))
-
-;;; show-paren config
-(show-paren-mode 1)
-
-;;; Mac / Homebrew Config
-;; (add-to-list 'exec-path "/opt/homebrew/bin")
-
-;;; Custom
+;;; Customs
+;; Darkened highlight and region backgrounds by #101010
+;; Removed region distant-foreground; it was an ugly bright color
+;; Lightened comment face by #101010
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(org-block-begin-line ((t (:background nil :foreground "#7c6f64"))))
- '(org-block-end-line ((t (:background nil :foreground "#7c6f64"))))
- '(org-code ((t (:background "#32302f" :foreground nil))))
- '(org-drawer ((t (:background nil :foreground "#7c6f64"))))
- '(show-paren-match ((t (:background "#32302f" :foreground nil)))))
+ '(font-lock-comment-face ((t (:foreground "#8c7f74"))))
+ '(highlight ((t (:background "#403935"))))
+ '(org-block-begin-line ((t (:foreground "#8c7f74"))))
+ '(org-block-end-line ((t (:foreground "#8c7f74"))))
+ '(org-drawer ((t (:inherit org-special-keyword))))
+ '(region ((t (:background "#403935"))))
+ '(shadow ((t (:foreground "#8c7f74"))))
+ '(show-paren-match ((t (:foreground nil :background "#403935" :weight bold)))))

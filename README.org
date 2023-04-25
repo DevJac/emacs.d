@@ -1,0 +1,5 @@
+* TODOs
+** Magit
+** lsp
+** Evil end-of-line ($) get's stuck after org ellipsis
+Especially at the end of a file
