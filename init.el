@@ -39,6 +39,7 @@
 (global-auto-revert-mode 1)
 ;; No backup files
 (setq make-backup-files nil)
+(global-visual-line-mode 1)
 
 ;;; straight integration with use-package
 ;; See: https://github.com/radian-software/straight.el#integration-with-use-package
