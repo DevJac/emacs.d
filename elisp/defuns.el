@@ -1,8 +1,7 @@
 (defun save-then-kill-buffer-and-window ()
   (interactive)
-  (when
-      (and (buffer-modified-p) (boundp 'save_buffer))
-    (save_buffer))
+  (if (buffer-file-name)
+      (save_buffer))
   (kill-buffer-and-window))
 
 (defun trim-trailing-whitespace ()

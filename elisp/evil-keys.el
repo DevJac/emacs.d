@@ -1,5 +1,6 @@
 ;; Don't entirely close Emacs on :q, just kill buffer and window
 (evil-ex-define-cmd "q[uit]" #'kill-buffer-and-window)
+(evil-ex-define-cmd "wq" #'save-then-kill-buffer-and-window)
 
 ;;; Leader keys
 (evil-set-leader '(motion normal) (kbd "SPC"))
