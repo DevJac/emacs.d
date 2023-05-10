@@ -83,13 +83,16 @@
 ;; :config runs after package is loaded
 ;; Keep :init light.
 ;; Put as much in :config as possible; this will help with deferred loading.
-;; Emacs 29 will have a restart function; maybe remove later?
-(use-package restart-emacs)
 (use-package gruvbox-theme
   :config
   (load-theme 'gruvbox-dark-hard t))
 ;; Emacs 29 will have a restart function; maybe remove later?
 (use-package restart-emacs)
+(use-package magit)
+(use-package expand-region)
+(use-package which-key
+  :config
+  (which-key-mode 1))
 (use-package evil
   :init
   ;; When searching, keep search highlights visible
@@ -107,12 +110,6 @@
   (setq undo-tree-history-directory-alist '(("." . "~/.emacs.d/undo-tree-histories")))
   :config
   (global-undo-tree-mode 1))
-(use-package poke-line
-  :init
-  (make-variable-buffer-local 'poke-line-pokemon)
-  (add-hook 'poke-line-mode-hook #'poke-line-set-random-pokemon)
-  :config
-  (poke-line-global-mode 1))
 (use-package doom-modeline
   :init
   ;; Select info shows word count
@@ -177,11 +174,12 @@
 (use-package rainbow-delimiters
   :init
   (add-hook 'emacs-lisp-mode-hook #'rainbow-delimiters-mode))
-(use-package magit)
-(use-package expand-region)
-(use-package which-key
+(use-package poke-line
+  :init
+  (make-variable-buffer-local 'poke-line-pokemon)
+  (add-hook 'poke-line-mode-hook #'poke-line-set-random-pokemon)
   :config
-  (which-key-mode 1))
+  (poke-line-global-mode 1))
 
 ;;; Mac / Homebrew config
 ; (add-to-list 'exec-path "/opt/homebrew/bin")
