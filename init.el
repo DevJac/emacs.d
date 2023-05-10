@@ -1,17 +1,41 @@
-;;; straight.el bootstrap
-;; See: https://github.com/radian-software/straight.el#getting-started
-(defvar bootstrap-version)
-(let ((bootstrap-file
-       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-      (bootstrap-version 6))
-  (unless (file-exists-p bootstrap-file)
-    (with-current-buffer
-        (url-retrieve-synchronously
-         "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
-         'silent 'inhibit-cookies)
-      (goto-char (point-max))
-      (eval-print-last-sexp)))
-  (load bootstrap-file nil 'nomessage))
+;;; Elpaca bootstrap
+;; See: https://github.com/progfolio/elpaca
+(defvar elpaca-installer-version 0.4)
+(defvar elpaca-directory (expand-file-name "elpaca/" user-emacs-directory))
+(defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
+(defvar elpaca-repos-directory (expand-file-name "repos/" elpaca-directory))
+(defvar elpaca-order '(elpaca :repo "https://github.com/progfolio/elpaca.git"
+                              :ref nil
+                              :files (:defaults (:exclude "extensions"))
+                              :build (:not elpaca--activate-package)))
+(let* ((repo  (expand-file-name "elpaca/" elpaca-repos-directory))
+       (build (expand-file-name "elpaca/" elpaca-builds-directory))
+       (order (cdr elpaca-order))
+       (default-directory repo))
+  (add-to-list 'load-path (if (file-exists-p build) build repo))
+  (unless (file-exists-p repo)
+    (make-directory repo t)
+    (when (< emacs-major-version 28) (require 'subr-x))
+    (condition-case-unless-debug err
+        (if-let ((buffer (pop-to-buffer-same-window "*elpaca-bootstrap*"))
+                 ((zerop (call-process "git" nil buffer t "clone"
+                                       (plist-get order :repo) repo)))
+                 ((zerop (call-process "git" nil buffer t "checkout"
+                                       (or (plist-get order :ref) "--"))))
+                 (emacs (concat invocation-directory invocation-name))
+                 ((zerop (call-process emacs nil buffer nil "-Q" "-L" "." "--batch"
+                                       "--eval" "(byte-recompile-directory \".\" 0 'force)")))
+                 ((require 'elpaca))
+                 ((elpaca-generate-autoloads "elpaca" repo)))
+            (kill-buffer buffer)
+          (error "%s" (with-current-buffer buffer (buffer-string))))
+      ((error) (warn "%s" err) (delete-directory repo 'recursive))))
+  (unless (require 'elpaca-autoloads nil t)
+    (require 'elpaca)
+    (elpaca-generate-autoloads "elpaca" repo)
+    (load "./elpaca-autoloads")))
+(add-hook 'after-init-hook #'elpaca-process-queues)
+(elpaca `(,@elpaca-order))
 
 ;;; Vanilla Emacs config
 ;; 16 point font
@@ -39,14 +63,15 @@
 (global-auto-revert-mode 1)
 ;; No backup files
 (setq make-backup-files nil)
+;; Visual line mode, which turns on word-wrap by default
 (global-visual-line-mode 1)
 
-;;; straight integration with use-package
-;; See: https://github.com/radian-software/straight.el#integration-with-use-package
-;; We want all normal (use-package ...) expressions to use straight by default
-(setq straight-use-package-by-default t)
-;; Before we can use normal (use-package ...) expressions, we need to get use-package
-(straight-use-package 'use-package)
+;;; Elpaca integration with use-package
+;; See: https://github.com/progfolio/elpaca
+(elpaca elpaca-use-package
+  (elpaca-use-package-mode 1)
+  (setq elpaca-use-package-by-default t))
+(elpaca-wait)
 
 (add-to-list
  'load-path
@@ -54,8 +79,12 @@
 (load "defuns")
 
 ;;; use-package's
-;; :init runs before the package is loaded
-;; :config runs after the package is loaded
+;; :init runs before package is loaded
+;; :config runs after package is loaded
+;; Keep :init light.
+;; Put as much in :config as possible; this will help with deferred loading.
+;; Emacs 29 will have a restart function; maybe remove later?
+(use-package restart-emacs)
 (use-package gruvbox-theme
   :config
   (load-theme 'gruvbox-dark-hard t))
@@ -81,7 +110,7 @@
 (use-package poke-line
   :init
   (make-variable-buffer-local 'poke-line-pokemon)
-  (add-hook 'poke-line-mode-hook 'poke-line-set-random-pokemon)
+  (add-hook 'poke-line-mode-hook #'poke-line-set-random-pokemon)
   :config
   (poke-line-global-mode 1))
 (use-package doom-modeline
@@ -106,11 +135,14 @@
 ;; orderless provides the fuzzy string matching
 (use-package orderless
   :init
+  ;; See C-h v completion-styles
+  ;; "basic" is needed for Tramp host name completion
   (setq completion-styles '(orderless basic)))
 ;; marginalia provides added info in right margins
 (use-package marginalia
   :config
   (marginalia-mode 1))
+;; corfu is for completion-at-point
 (use-package corfu
   :config
   (global-corfu-mode))
