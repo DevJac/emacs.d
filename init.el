@@ -169,6 +169,10 @@
 (use-package org-roam
   :init
   (setq org-roam-directory "~/OrgRoam")
+  (setq org-roam-capture-templates
+        '(("d" "default" plain "%?"
+           :target (file+head "${slug}-%<%Y%m%d>.org" "#+title: ${title}")
+           :unnarrowed t)))
   :config
   (org-roam-db-autosync-mode 1))
 (use-package rainbow-delimiters
