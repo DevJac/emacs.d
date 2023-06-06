@@ -182,6 +182,7 @@
   (add-hook 'poke-line-mode-hook #'poke-line-set-random-pokemon)
   :config
   (poke-line-global-mode 1))
+(elpaca-wait)
 
 ;;; Mac / Homebrew config
 ; (add-to-list 'exec-path "/opt/homebrew/bin")
