@@ -119,12 +119,10 @@
 ;; consult provides specific commands, like consult-buffer
 (use-package consult
   :config
-  (use-package consult
-    :config
-    (consult-customize
-     consult-buffer
-     :preview-key
-     '(:debounce 0.5 any))))
+  (consult-customize
+   consult-buffer
+   :preview-key
+   '(:debounce 0.5 any)))
 ;; vertico provides the selection UI
 (use-package vertico
   :config
