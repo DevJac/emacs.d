@@ -12,6 +12,9 @@
   (kbd "<leader> t t") #'trim-trailing-whitespace
   (kbd "<leader> t w") #'whitespace-mode
   (kbd "<leader> t p") #'rainbow-delimiters-mode
+  ;;; spell checking
+  (kbd "<leader> s s") #'flyspell-buffer
+  (kbd "<leader> s c") #'flyspell-clear
   ;;; window
   (kbd "<leader> w") evil-window-map
   ;; which-key C-h needs to be free

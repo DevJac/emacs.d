@@ -9,6 +9,11 @@
   (delete-trailing-whitespace)
   (message "Trimmed trailing whitespace"))
 
+(defun flyspell-clear ()
+  (interactive)
+  (flyspell-mode 0)
+  (message "Spelling cleared"))
+
 (defun insert-timestamp ()
   (interactive)
   (org-time-stamp '(16)))
