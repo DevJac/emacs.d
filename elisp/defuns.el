@@ -69,15 +69,21 @@
     (setq buffer-display-table org-display-table)))
 
 ;; When we scale text, we want our rendered latex fragments to scale as well.
+;; C-u usually means to perform a command 4 times.
+;; Multiple C-u's result in powers of 4:
+;; C-u         = 4
+;; C-u C-u     = 16
+;; C-u C-u C-u = 64
+;; See C-h f org-latex-preview.
 (defun scale-latex-fragments ()
   (interactive)
-  (org-toggle-latex-fragment '(16))
+  (org-latex-preview '(64)) ; clear previews
   (let ((scale
          (if (boundp 'text-scale-mode-step)
              (* 2.0 (expt text-scale-mode-step text-scale-mode-amount))
            2.0)))
     (plist-put org-format-latex-options :scale scale))
-  (org-toggle-latex-fragment '(16)))
+  (org-latex-preview '(16))) ; display previews
 
 (defun evil-fix-eval-print-last-sexp (&optional arg)
   (interactive "P")
