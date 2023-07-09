@@ -79,3 +79,9 @@
 
 (evil-define-key '(motion normal) magit-process-mode-map
   (kbd "<leader> SPC") magit-process-mode-map)
+
+;;; q quits
+(evil-define-key '(motion normal) elpaca-ui-mode-map
+  (kbd "q") #'quit-window)
+(evil-define-key '(motion normal) special-mode-map
+  (kbd "q") #'quit-window)
