@@ -85,3 +85,5 @@
   (kbd "q") #'quit-window)
 (evil-define-key '(motion normal) special-mode-map
   (kbd "q") #'quit-window)
+(evil-define-key '(motion normal) image-mode-map
+  (kbd "q") #'quit-window)
