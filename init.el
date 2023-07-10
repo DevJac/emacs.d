@@ -206,9 +206,11 @@
  ;; If there is more than one, they won't work right.
  '(font-lock-comment-face ((t (:foreground "#8c7f74"))))
  '(highlight ((t (:background "#403935"))))
+ '(ledger-font-xact-highlight-face ((t (:extend t :background "#1d2021"))))
  '(org-block-begin-line ((t (:foreground "#8c7f74"))))
  '(org-block-end-line ((t (:foreground "#8c7f74"))))
  '(org-drawer ((t (:inherit org-special-keyword))))
+ '(org-table ((t (:foreground "#ebdbb2"))))
  '(region ((t (:background "#403935"))))
  '(shadow ((t (:foreground "#8c7f74"))))
  '(show-paren-match ((t (:foreground nil :background "#403935" :weight bold)))))
