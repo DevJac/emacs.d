@@ -99,6 +99,7 @@
   ;; When searching, keep search highlights visible
   (setq evil-search-module 'evil-search)
   (setq evil-undo-system 'undo-tree)
+  (setq evil-want-C-u-scroll t)
   :config
   (load "evil-keys")
   (evil-mode 1))
