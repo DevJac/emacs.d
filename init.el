@@ -90,6 +90,7 @@
 (use-package restart-emacs)
 (use-package magit)
 (use-package expand-region)
+(use-package ledger-mode)
 (use-package which-key
   :config
   (which-key-mode 1))
