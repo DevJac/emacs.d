@@ -184,6 +184,10 @@
   (add-hook 'poke-line-mode-hook #'poke-line-set-random-pokemon)
   :config
   (poke-line-global-mode 1))
+(use-package lsp-mode)
+(use-package rust-mode
+  :init
+  (add-hook 'rust-mode-hook #'lsp))
 (elpaca-wait)
 
 ;;; Mac / Homebrew config
