@@ -47,6 +47,8 @@
   (kbd "<leader> n n") #'narrow-to-region
   (kbd "<leader> n d") #'narrow-to-defun
   (kbd "<leader> n p") #'narrow-to-page
+  ;;; project
+  (kbd "<leader> p f") #'project-find-file
   ;;; roam
   (kbd "<leader> r f") #'org-roam-node-find
   (kbd "<leader> r i") #'org-roam-node-insert
