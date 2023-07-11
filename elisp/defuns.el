@@ -111,3 +111,19 @@
                (eval-last-sexp arg)
                (evil-visual-restore)))
     (otherwise (eval-last-sexp arg))))
+
+(defun smart-tab ()
+  (interactive)
+  (cond
+   ((org-table-p) (org-table-next-field))
+   ((at-beginning-of-line-or-preceded-by-whitespace-only) (insert-tab))
+   (t (completion-at-point))))
+
+(defun at-beginning-of-line-or-preceded-by-whitespace-only ()
+  "Check if point is at the beginning of a line or only preceded by whitespace."
+  (let ((current-point (point)))
+    (save-excursion
+      (beginning-of-line)
+      (if (re-search-forward "\\S-" current-point t)
+          nil
+        t))))

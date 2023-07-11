@@ -59,7 +59,7 @@
   (kbd "<leader> e j") #'evil-fix-eval-print-last-sexp)
 
 (evil-define-key 'insert 'global
-  (kbd "TAB") #'completion-at-point)
+  (kbd "TAB") #'smart-tab)
 
 (evil-define-key '(motion normal) org-mode-map
   (kbd "TAB") #'org-cycle)
