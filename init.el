@@ -185,9 +185,21 @@
   :config
   (poke-line-global-mode 1))
 (use-package lsp-mode)
+(use-package flycheck)
+(use-package wgsl-mode
+  :init
+  (add-hook 'wgsl-mode-hook (lambda ()
+			      (setq c-basic-offset 4)
+			      (c-set-offset 'arglist-close 0)
+			      (c-set-offset 'arglist-intro '+)
+			      (c-set-offset 'substatement 0))))
 (use-package rust-mode
   :init
-  (add-hook 'rust-mode-hook #'lsp))
+  (setq rust-format-on-save t)
+  (setq rust-format-show-buffer nil)
+  (add-hook 'rust-mode-hook (lambda ()
+			      (lsp)
+			      (auto-save-visited-mode 0))))
 (elpaca-wait)
 
 ;;; Mac / Homebrew config
