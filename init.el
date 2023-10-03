@@ -88,7 +88,14 @@
   (load-theme 'gruvbox-dark-hard t))
 ;; Emacs 29 will have a restart function; maybe remove later?
 (use-package restart-emacs)
-(use-package magit)
+(use-package magit
+  ;; Defining seq-keep here is a temporary workaround for an upstream bug.
+  ;; There's a fix in master, once it hits MELPA we can remove this workaround.
+  ;; See: https://github.com/magit/magit/issues/5011
+  :config
+  (defun seq-keep (function sequence)
+    "Apply FUNCTION to SEQUENCE and return the list of all the non-nil results."
+    (delq nil (seq-map function sequence))))
 (use-package expand-region)
 (use-package ledger-mode)
 (use-package which-key
