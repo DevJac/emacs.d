@@ -116,7 +116,7 @@
   (interactive)
   (cond
    ((org-table-p) (org-table-next-field))
-   ((at-beginning-of-line-or-preceded-by-whitespace-only) (insert-tab))
+   ((at-beginning-of-line-or-preceded-by-whitespace-only) (indent-for-tab-command))
    (t (completion-at-point))))
 
 (defun at-beginning-of-line-or-preceded-by-whitespace-only ()
