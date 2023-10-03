@@ -61,7 +61,7 @@
   (kbd "<leader> e j") #'evil-fix-eval-print-last-sexp)
 
 (evil-define-key 'insert 'global
-  (kbd "TAB") #'smart-tab)
+  (kbd "TAB") #'indent-for-tab-command)
 
 (evil-define-key '(motion normal) org-mode-map
   (kbd "TAB") #'org-cycle)

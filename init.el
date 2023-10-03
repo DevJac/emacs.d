@@ -65,6 +65,8 @@
 (setq make-backup-files nil)
 ;; Visual line mode, which turns on word-wrap by default
 (global-visual-line-mode 1)
+;; TAB first tries to indent, then tries to complete
+(setq tab-always-indent 'complete)
 
 ;;; Elpaca integration with use-package
 ;; See: https://github.com/progfolio/elpaca
