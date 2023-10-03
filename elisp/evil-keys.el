@@ -15,6 +15,11 @@
   ;;; spell checking
   (kbd "<leader> s s") #'flyspell-buffer
   (kbd "<leader> s c") #'flyspell-clear
+  ;;; lsp
+  (kbd "<leader> s e") #'lsp-execute-code-action
+  (kbd "<leader> s n") #'flycheck-next-error
+  (kbd "<leader> s p") #'flycheck-previous-error
+  (kbd "<leader> s l") #'flycheck-list-errors
   ;;; window
   (kbd "<leader> w") evil-window-map
   ;; which-key C-h needs to be free

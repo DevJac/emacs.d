@@ -193,7 +193,9 @@
   (add-hook 'poke-line-mode-hook #'poke-line-set-random-pokemon)
   :config
   (poke-line-global-mode 1))
-(use-package lsp-mode)
+(use-package lsp-mode
+  :init
+  (setq lsp-auto-execute-action nil))
 (use-package flycheck)
 (use-package wgsl-mode
   :init
