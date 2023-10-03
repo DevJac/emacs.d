@@ -40,11 +40,11 @@
 ;;; Vanilla Emacs config
 ;; 16 point font
 (set-face-attribute 'default nil :height 160)
-;; tool-bar-mode show icons, menu-bar-mode show text menu dropdowns
+;; tool-bar-mode shows icons, menu-bar-mode shows text menu dropdowns
 (tool-bar-mode -1)
 (menu-bar-mode -1)
 (setq inhibit-startup-screen t)
-;; Remember the files we've opened recently
+;; Remember the files opened recently
 (setq recentf-max-saved-items 200)
 (recentf-mode 1)
 ;; Save minibuffer history, making frequently used commands easier to access
@@ -109,7 +109,7 @@
   (global-anzu-mode 1))
 (use-package undo-tree
   :init
-  (setq undo-tree-history-directory-alist '(("." . "~/.emacs.d/undo-tree-histories")))
+  (setq undo-tree-history-directory-alist `(("." . ,(expand-file-name "undo-tree-history" user-emacs-directory))))
   :config
   (global-undo-tree-mode 1))
 (use-package doom-modeline
@@ -202,6 +202,7 @@
 			      (auto-save-visited-mode 0))))
 (elpaca-wait)
 
+;;; Computer specific configs
 ;;; Mac / Homebrew config
 ; (add-to-list 'exec-path "/opt/homebrew/bin")
 
