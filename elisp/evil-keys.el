@@ -20,6 +20,8 @@
   (kbd "<leader> s n") #'flycheck-next-error
   (kbd "<leader> s p") #'flycheck-previous-error
   (kbd "<leader> s l") #'flycheck-list-errors
+  (kbd "<leader> s d d") #'lsp-ui-doc-show
+  (kbd "<leader> s d x") #'lsp-ui-doc-hide
   ;;; window
   (kbd "<leader> w") evil-window-map
   ;; which-key C-h needs to be free
