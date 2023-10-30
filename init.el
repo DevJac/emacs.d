@@ -196,7 +196,9 @@
 (use-package lsp-mode
   :init
   (setq lsp-auto-execute-action nil))
-(use-package lsp-ui)
+(use-package lsp-ui
+  :init
+  (setq lsp-ui-doc-show-with-mouse nil))
 (use-package flycheck)
 (use-package wgsl-mode
   :init
