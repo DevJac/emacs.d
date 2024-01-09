@@ -23,6 +23,9 @@
   (kbd "<leader> s r") #'lsp-rename
   (kbd "<leader> s k") #'lsp-workspace-restart
   (kbd "<leader> s d") #'lsp-ui-doc-glance
+  ;;; project
+  (kbd "<leader> s f") #'project-find-file
+  (kbd "<leader> s g") #'consult-grep
   ;;; window
   (kbd "<leader> w") evil-window-map
   ;; which-key C-h needs to be free
@@ -55,8 +58,6 @@
   (kbd "<leader> n n") #'narrow-to-region
   (kbd "<leader> n d") #'narrow-to-defun
   (kbd "<leader> n p") #'narrow-to-page
-  ;;; project
-  (kbd "<leader> p f") #'project-find-file
   ;;; roam
   (kbd "<leader> r f") #'org-roam-node-find
   (kbd "<leader> r i") #'org-roam-node-insert
