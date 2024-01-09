@@ -75,6 +75,9 @@
 (evil-define-key '(motion normal) org-mode-map
   (kbd "TAB") #'org-cycle)
 
+;;; Initial states
+(evil-set-initial-state 'vterm-mode 'insert)
+
 ;;; Magit
 ;; TODO: Loop over the modes
 (evil-set-initial-state 'magit-status-mode 'motion)

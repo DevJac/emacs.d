@@ -214,6 +214,7 @@
   (add-hook 'rust-mode-hook (lambda ()
 			      (lsp)
 			      (auto-save-visited-mode 0))))
+(use-package vterm)
 (elpaca-wait)
 
 ;;; Computer specific configs
