@@ -31,12 +31,24 @@
 ;; Profile startup with use-package; run use-package-report to see results
 ;; (setq use-package-compute-statistics t)
 
+(add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
+(load "my.el")
+
 (use-package consult
   :ensure t
+  :bind
+  ("C-x b" . #'consult-buffer)
+  :bind*
+  ("C-M-i" . #'my/complete-in-minibuffer)
   :config
   (consult-customize
    consult-buffer
    :preview-key '(:debounce 0.5 any)))
+(use-package corfu
+  :ensure t
+  :config
+  (corfu-history-mode 1)
+  (global-corfu-mode 1))
 (use-package vertico
   :ensure t
   :config
