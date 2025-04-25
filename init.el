@@ -6,6 +6,7 @@
 (setq custom-file (locate-user-emacs-file "custom-sets.el"))
 (load custom-file 'noerror 'nomessage)
 ;; GUI cleanup
+(load-theme 'modus-operandi)
 (tool-bar-mode -1)
 ;; Better built-in completions; see: https://robbmann.io/posts/emacs-29-completions/
 (setq completion-auto-help 'visible)
