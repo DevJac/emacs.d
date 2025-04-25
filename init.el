@@ -44,7 +44,7 @@
   ("C-M-i" . #'my/complete-in-minibuffer)
   :config
   (consult-customize
-   consult-buffer
+   consult-buffer consult-theme
    :preview-key '(:debounce 0.5 any)))
 (use-package corfu
   :ensure t
