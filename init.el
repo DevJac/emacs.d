@@ -28,6 +28,8 @@
 (setq-default show-trailing-whitespace t)
 ;; Show match count in isearch
 (setq isearch-lazy-count t)
+;; Display keybindings
+(which-key-mode 1)
 ;; Profile startup with use-package; run use-package-report to see results
 ;; (setq use-package-compute-statistics t)
 
