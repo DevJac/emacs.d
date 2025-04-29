@@ -30,6 +30,10 @@
 (setq isearch-lazy-count t)
 ;; Display keybindings
 (which-key-mode 1)
+;; Don't indent with TABs; this is buffer local so we change the default
+(setq-default indent-tabs-mode nil)
+;; Indent 4 spaces
+(setq c-basic-offset 4)
 ;; Profile startup with use-package; run use-package-report to see results
 ;; (setq use-package-compute-statistics t)
 
