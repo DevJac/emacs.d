@@ -48,7 +48,10 @@
   ("C-M-i" . #'my/complete-in-minibuffer)
   :config
   (consult-customize
-   consult-buffer consult-theme
+   consult-buffer consult-project-buffer
+   consult-grep consult-git-grep consult-ripgrep
+   consult-find consult-fd
+   consult-theme
    :preview-key '(:debounce 0.5 any)))
 (use-package corfu
   :ensure t
