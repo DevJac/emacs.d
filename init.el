@@ -77,3 +77,8 @@
   :ensure t)
 (use-package expreg
   :ensure t)
+(use-package gptel
+  :ensure t)
+(use-package markdown-mode
+  :ensure t)
+
