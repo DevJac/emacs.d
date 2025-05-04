@@ -72,8 +72,7 @@
 (defun pur--fill-typeable-keys (map)
   "Bind typeable characters in MAP to `ignore'."
   (dotimes (i (- 127 32))
-    (let ((char (+ 32 i)))
-      (define-key map (kbd (char-to-string (+ 32 i))) #'ignore)))
+    (define-key map (char-to-string (+ 32 i)) #'ignore))
   (define-key map (kbd "RET") #'ignore))
 
 (pur--fill-typeable-keys pur-mode-map)
