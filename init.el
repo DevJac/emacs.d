@@ -85,3 +85,4 @@
 (use-package markdown-mode
   :ensure t)
 
+(global-set-key (kbd "C-c m") #'magit)
