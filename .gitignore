@@ -7,3 +7,6 @@
 /recentf
 /transient/
 /session.*
+/org-roam.db
+/bookmarks
+/.org-id-locations
