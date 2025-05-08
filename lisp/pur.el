@@ -4,6 +4,7 @@
 (define-globalized-minor-mode global-pur-mode pur-mode
   (lambda ()
     (when (apply #'derived-mode-p pur-opt-in-modes)
+      (setq show-trailing-whitespace t)
       (pur-enabled-mode 1)
       (pur-mode 1))))
 

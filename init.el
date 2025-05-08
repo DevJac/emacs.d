@@ -25,8 +25,6 @@
 (save-place-mode 1)
 ;; Automatically update buffers if the underlying file changes
 (global-auto-revert-mode 1)
-;; Highlight trailing whitespace; it's buffer local so we change the default
-(setq-default show-trailing-whitespace t)
 ;; Show match count in isearch
 (setq isearch-lazy-count t)
 ;; Display keybindings
