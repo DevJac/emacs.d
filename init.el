@@ -82,5 +82,11 @@
   :ensure t)
 (use-package markdown-mode
   :ensure t)
+(use-package org
+  :ensure t)
+(use-package org-roam
+  :ensure t
+  :init
+  (setq org-roam-directory "~/OrgRoam/"))
 
 (global-set-key (kbd "C-c m") #'magit)
