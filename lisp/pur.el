@@ -70,6 +70,25 @@
   (interactive)
   (deactivate-mark))
 
+(defun pur-select-entire-lines ()
+  "Modify the region to select entire lines."
+  (interactive)
+  (unless (region-active-p)
+    (push-mark (point)))
+  (if (< (point) (mark))
+      (progn
+        (call-interactively #'beginning-of-line)
+        (exchange-point-and-mark)
+        (call-interactively #'next-line)
+        (call-interactively #'beginning-of-line)
+        (exchange-point-and-mark))
+    (progn
+      (call-interactively #'next-line)
+      (call-interactively #'beginning-of-line)
+      (exchange-point-and-mark)
+      (call-interactively #'beginning-of-line)
+      (exchange-point-and-mark))))
+
 (defun pur--fill-typeable-keys (map)
   "Bind typeable characters in MAP to `ignore'."
   (dotimes (i (- 127 32))
@@ -91,6 +110,7 @@
 (define-key pur-mode-map (kbd "w") #'expreg-expand)
 (define-key pur-mode-map (kbd "s") #'expreg-contract)
 (define-key pur-mode-map (kbd "v") #'set-mark-command)
+(define-key pur-mode-map (kbd "V") #'pur-select-entire-lines)
 (define-key pur-mode-map (kbd "u") #'undo)
 (define-key pur-mode-map (kbd "o") #'pur-insert-below)
 (define-key pur-mode-map (kbd "O") #'pur-insert-above)
