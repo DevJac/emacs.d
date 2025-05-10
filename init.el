@@ -83,7 +83,11 @@
 (use-package markdown-mode
   :ensure t)
 (use-package org
-  :ensure t)
+  :ensure t
+  :init
+  (setq org-ellipsis " ▼")
+  (setq org-fontify-done-headline nil)
+  (setq org-fontify-todo-headline nil))
 (use-package org-roam
   :ensure t
   :init

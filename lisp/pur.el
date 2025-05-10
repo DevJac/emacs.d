@@ -117,3 +117,8 @@
 (define-key pur-mode-map (kbd "f") #'forward-word)
 (define-key pur-mode-map (kbd "b") #'backward-word)
 (define-key pur-mode-map (kbd "g") #'pur-g)
+(define-key pur-mode-map (kbd "x") #'execute-extended-command)
+(define-key pur-mode-map (kbd ":") #'eval-expression)
+(define-key pur-mode-map (kbd "[") #'backward-paragraph)
+(define-key pur-mode-map (kbd "]") #'forward-paragraph)
+(define-key pur-mode-map (kbd "SPC") mode-specific-map)
