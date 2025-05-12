@@ -92,5 +92,3 @@
   :ensure t
   :init
   (setq org-roam-directory "~/OrgRoam/"))
-
-(global-set-key (kbd "C-c m") #'magit)
