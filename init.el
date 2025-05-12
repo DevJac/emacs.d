@@ -77,7 +77,9 @@
 (use-package magit
   :ensure t)
 (use-package expreg
-  :ensure t)
+  :ensure t
+  :config
+  (load "expreg-org-table.el"))
 (use-package gptel
   :ensure t)
 (use-package markdown-mode
