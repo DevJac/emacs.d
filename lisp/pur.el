@@ -70,6 +70,12 @@
   (interactive)
   (deactivate-mark))
 
+(defun pur-org-table-change-field ()
+  "Blank the org table field then begin inserting text."
+  (interactive)
+  (org-table-blank-field)
+  (pur-exit))
+
 (defun pur-select-entire-lines ()
   "Modify the region to select entire lines."
   (interactive)
@@ -122,3 +128,4 @@
 (define-key pur-mode-map (kbd "[") #'backward-paragraph)
 (define-key pur-mode-map (kbd "]") #'forward-paragraph)
 (define-key pur-mode-map (kbd "SPC") mode-specific-map)
+(define-key pur-mode-map (kbd "SPC o t c") #'pur-org-table-change-field)
