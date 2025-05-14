@@ -70,6 +70,12 @@
   (interactive)
   (deactivate-mark))
 
+(defun pur-kill-region-if-active ()
+  "Kill region, but only if it's active."
+  (interactive)
+  (when (region-active-p)
+    (call-interactively #'kill-region)))
+
 (defun pur-org-table-change-field ()
   "Blank the org table field then begin inserting text."
   (interactive)
@@ -103,6 +109,7 @@
 
 (pur--fill-typeable-keys pur-mode-map)
 
+(define-key pur-mode-map (kbd "SPC") mode-specific-map)
 (define-key pur-mode-map (kbd "i") #'pur-exit)
 (define-key pur-mode-map (kbd "h") #'backward-char)
 (define-key pur-mode-map (kbd "j") #'next-line)
@@ -110,9 +117,13 @@
 (define-key pur-mode-map (kbd "l") #'forward-char)
 (define-key pur-mode-map (kbd "n") #'next-line)
 (define-key pur-mode-map (kbd "p") #'previous-line)
+(define-key pur-mode-map (kbd "P") #'yank)
+(define-key pur-mode-map (kbd "SPC P") #'consult-yank-from-kill-ring)
 (define-key pur-mode-map (kbd "a") #'move-beginning-of-line)
 (define-key pur-mode-map (kbd "e") #'move-end-of-line)
 (define-key pur-mode-map (kbd "c") #'pur-change)
+(define-key pur-mode-map (kbd "d") #'pur-kill-region-if-active)
+(define-key pur-mode-map (kbd "y") #'kill-ring-save)
 (define-key pur-mode-map (kbd "w") #'expreg-expand)
 (define-key pur-mode-map (kbd "s") #'expreg-contract)
 (define-key pur-mode-map (kbd "v") #'set-mark-command)
@@ -125,7 +136,7 @@
 (define-key pur-mode-map (kbd "g") #'pur-g)
 (define-key pur-mode-map (kbd "x") #'execute-extended-command)
 (define-key pur-mode-map (kbd ":") #'eval-expression)
+(define-key pur-mode-map (kbd ";") #'exchange-point-and-mark)
 (define-key pur-mode-map (kbd "[") #'backward-paragraph)
 (define-key pur-mode-map (kbd "]") #'forward-paragraph)
-(define-key pur-mode-map (kbd "SPC") mode-specific-map)
 (define-key pur-mode-map (kbd "SPC o t c") #'pur-org-table-change-field)
