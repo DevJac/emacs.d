@@ -68,12 +68,14 @@
 (defun pur-g ()
   "Deactivate the mark."
   (interactive)
-  (deactivate-mark))
+  (if (use-region-p)
+      (deactivate-mark)
+    (setq mark-active t)))
 
 (defun pur-kill-region-if-active ()
   "Kill region, but only if it's active."
   (interactive)
-  (when (region-active-p)
+  (when (use-region-p)
     (call-interactively #'kill-region)))
 
 (defun pur-org-table-change-field ()
@@ -125,7 +127,7 @@
 (define-key pur-mode-map (kbd "d") #'pur-kill-region-if-active)
 (define-key pur-mode-map (kbd "y") #'kill-ring-save)
 (define-key pur-mode-map (kbd "w") #'expreg-expand)
-(define-key pur-mode-map (kbd "s") #'expreg-contract)
+(define-key pur-mode-map (kbd "W") #'expreg-contract)
 (define-key pur-mode-map (kbd "v") #'set-mark-command)
 (define-key pur-mode-map (kbd "V") #'pur-select-entire-lines)
 (define-key pur-mode-map (kbd "u") #'undo)
