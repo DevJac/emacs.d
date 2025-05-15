@@ -61,8 +61,9 @@
 (defun pur-insert-above ()
   "Insert a new line above and exit `pur-mode'."
   (interactive)
+  (call-interactively #'beginning-of-line)
+  (call-interactively #'newline)
   (call-interactively #'previous-line)
-  (pur-insert-below)
   (pur-exit))
 
 (defun pur-g ()
