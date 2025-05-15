@@ -46,7 +46,7 @@
 (defun pur-change ()
   "Change the selected region or exit `pur-mode'."
   (interactive)
-  (if (region-active-p)
+  (if (use-region-p)
       (call-interactively #'kill-region)
     (call-interactively #'delete-char))
   (pur-exit))
@@ -87,7 +87,7 @@
 (defun pur-select-entire-lines ()
   "Modify the region to select entire lines."
   (interactive)
-  (unless (region-active-p)
+  (unless (use-region-p)
     (push-mark (point)))
   (if (< (point) (mark))
       (progn
