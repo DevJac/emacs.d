@@ -7,6 +7,7 @@
 (load custom-file 'noerror 'nomessage)
 ;; GUI cleanup
 (load-theme 'modus-operandi)
+(setq inhibit-startup-screen t)
 (menu-bar-mode -1)
 (tool-bar-mode -1)
 ;; Better built-in completions; see: https://robbmann.io/posts/emacs-29-completions/
