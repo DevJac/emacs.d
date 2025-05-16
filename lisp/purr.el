@@ -66,13 +66,6 @@
   (call-interactively #'previous-line)
   (purr-exit))
 
-(defun purr-g ()
-  "Deactivate the mark."
-  (interactive)
-  (if (use-region-p)
-      (deactivate-mark)
-    (setq mark-active t)))
-
 (defun purr-kill-region-if-active ()
   "Kill region, but only if it's active."
   (interactive)
@@ -136,7 +129,6 @@
 (define-key purr-mode-map (kbd "O") #'purr-insert-above)
 (define-key purr-mode-map (kbd "f") #'forward-word)
 (define-key purr-mode-map (kbd "b") #'backward-word)
-(define-key purr-mode-map (kbd "g") #'purr-g)
 (define-key purr-mode-map (kbd "x") #'execute-extended-command)
 (define-key purr-mode-map (kbd ":") #'eval-expression)
 (define-key purr-mode-map (kbd ";") #'exchange-point-and-mark)
