@@ -38,8 +38,8 @@
 
 (add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
 (load "my.el")
-(load "pur.el")
-(global-pur-mode 1)
+(load "purr.el")
+(global-purr-mode 1)
 
 (use-package consult
   :ensure t
