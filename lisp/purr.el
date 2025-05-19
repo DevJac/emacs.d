@@ -72,12 +72,6 @@
   (when (use-region-p)
     (call-interactively #'kill-region)))
 
-(defun purr-org-table-change-field ()
-  "Blank the org table field then begin inserting text."
-  (interactive)
-  (org-table-blank-field)
-  (purr-exit))
-
 (defun purr-select-entire-lines ()
   "Modify the region to select entire lines."
   (interactive)
@@ -138,4 +132,3 @@
 (define-key purr-mode-map (kbd ";") #'exchange-point-and-mark)
 (define-key purr-mode-map (kbd "[") #'backward-paragraph)
 (define-key purr-mode-map (kbd "]") #'forward-paragraph)
-(define-key purr-mode-map (kbd "SPC o t c") #'purr-org-table-change-field)

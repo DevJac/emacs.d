@@ -40,6 +40,7 @@
 (add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
 (load "my.el")
 (load "purr.el")
+(load "purr-more.el")
 (global-purr-mode 1)
 
 (use-package consult
