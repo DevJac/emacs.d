@@ -96,3 +96,5 @@
   :ensure t
   :init
   (setq org-roam-directory "~/OrgRoam/"))
+(use-package olivetti
+  :ensure t)
