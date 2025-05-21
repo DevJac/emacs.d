@@ -75,25 +75,23 @@
 (defun purr-select-entire-lines ()
   "Modify the region to select entire lines."
   (interactive)
-  (unless (use-region-p)
-    (push-mark (point)))
-  (if (< (point) (mark))
+  (let ((sel (lambda ()
+               ;; We're assuming point < mark
+               (call-interactively #'beginning-of-line)
+               (exchange-point-and-mark)
+               (call-interactively #'end-of-line)
+               (when (not (eobp))
+                 (call-interactively #'next-line)
+                 (call-interactively #'beginning-of-line)))))
+    (unless (use-region-p)
+      (push-mark (point)))
+    (if (< (point) (mark))
+        (progn
+          (funcall sel)
+          (exchange-point-and-mark))
       (progn
-        (call-interactively #'beginning-of-line)
         (exchange-point-and-mark)
-        (call-interactively #'end-of-line)
-        (when (not (eobp))
-          (call-interactively #'next-line)
-          (call-interactively #'beginning-of-line))
-        (exchange-point-and-mark))
-    (progn
-      (call-interactively #'end-of-line)
-      (when (not (eobp))
-        (call-interactively #'next-line)
-        (call-interactively #'beginning-of-line))
-      (exchange-point-and-mark)
-      (call-interactively #'beginning-of-line)
-      (exchange-point-and-mark))))
+        (funcall sel)))))
 
 (defun purr--fill-typeable-keys (map)
   "Bind typeable characters in MAP to `ignore'."
