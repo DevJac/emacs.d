@@ -8,4 +8,4 @@
             (end (progn (org-table-end-of-field 0) (point))))
         (list `(org-table-field . ,(cons beg end)))))))
 
-(setq-default (add-to-list 'expreg-functions #'my/expreg--org-table-field))
+(setq-default expreg-functions (add-to-list 'expreg-functions #'my/expreg--org-table-field))
