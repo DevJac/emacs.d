@@ -88,12 +88,17 @@
 (use-package org
   :ensure t
   :init
+  (setq org-directory "~/Org/")
   (setq org-ellipsis " ▼")
   (setq org-fontify-done-headline nil)
-  (setq org-fontify-todo-headline nil))
+  (setq org-fontify-todo-headline nil)
+  (setq org-log-into-drawer "LOGS")
+  (setq org-log-done 'time))
 (use-package org-roam
   :ensure t
   :init
-  (setq org-roam-directory "~/OrgRoam/"))
+  (setq org-roam-directory "~/Org/Roam/")
+  :config
+  (org-roam-db-autosync-mode 1))
 (use-package olivetti
   :ensure t)
