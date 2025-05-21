@@ -81,7 +81,7 @@
 (use-package expreg
   :ensure t
   :config
-  (load "expreg-org-table.el"))
+  (load "my-expreg-functions.el"))
 (use-package gptel
   :ensure t)
 (use-package markdown-mode

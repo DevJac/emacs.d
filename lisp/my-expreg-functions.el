@@ -1,4 +1,4 @@
-;; Add org table fields to expreg regions.
+;;; Add org table fields to expreg regions.
 
 (defun my/expreg--org-table-field ()
   "Identify org table fields for expreg."
@@ -8,7 +8,4 @@
             (end (progn (org-table-end-of-field 0) (point))))
         (list `(org-table-field . ,(cons beg end)))))))
 
-(defun my/expreg--add-org-table-field ()
-  (add-to-list 'expreg-functions #'my/expreg--org-table-field))
-
-(add-hook 'org-mode-hook #'my/expreg--add-org-table-field)
+(setq-default (add-to-list 'expreg-functions #'my/expreg--org-table-field))
