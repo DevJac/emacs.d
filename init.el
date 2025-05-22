@@ -38,9 +38,8 @@
 ;; (setq use-package-compute-statistics t)
 
 (add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
-(load "purr.el")
 (load "my.el")
-(global-purr-mode 1)
+(load "my-evil.el")
 
 (use-package consult
   :ensure t
