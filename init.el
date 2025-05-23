@@ -46,7 +46,7 @@
   :bind
   ("C-x b" . #'consult-buffer)
   :bind*
-  ("C-M-i" . #'my/complete-in-minibuffer)
+  ("C-M-i" . #'complete-in-minibuffer)
   :config
   (consult-customize
    consult-buffer consult-project-buffer
