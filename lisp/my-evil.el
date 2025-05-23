@@ -1,9 +1,16 @@
 (use-package goto-chg
   :ensure t)
+(use-package undo-tree
+  :ensure t
+  :init
+  (setq undo-tree-history-directory-alist `(("." . ,(expand-file-name "undo-tree-history" user-emacs-directory))))
+  :config
+  (global-undo-tree-mode 1))
 (use-package evil
   :ensure t
   :init
   (setq evil-search-module 'evil-search)
+  (setq evil-undo-system 'undo-tree)
   (setq evil-want-C-u-scroll t)
   :config
   (evil-mode 1))
