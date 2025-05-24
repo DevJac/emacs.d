@@ -1,12 +1,13 @@
+/.org-id-locations
 /auto-save-list/
+/bookmarks
 /custom-sets.el
 /eln-cache/
 /elpa/
 /history
+/org-roam.db
 /places
 /recentf
-/transient/
 /session.*
-/org-roam.db
-/bookmarks
-/.org-id-locations
+/transient/
+/undo-tree-history/
