@@ -40,7 +40,7 @@
 (evil-ex-define-cmd "wq" #'save-then-kill-buffer-and-window-quiet)
 (evil-define-key '(motion normal) 'global
   (kbd "ZQ") #'kill-buffer-and-window-quiet
-  (kbd "ZZ") #'save-and-then-kill-buffer-and-window-quiet)
+  (kbd "ZZ") #'save-then-kill-buffer-and-window-quiet)
 
 ;; Create a text object between |'s. This is especially useful for org tables.
 (evil-define-text-object evil-org-table-cell-inner
