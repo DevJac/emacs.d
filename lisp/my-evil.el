@@ -18,14 +18,6 @@
   :ensure t
   :config
   (global-evil-surround-mode 1))
-(use-package evil-anzu
-  :ensure t
-  :config
-  (global-anzu-mode 1))
-(use-package doom-modeline
-  :ensure t
-  :config
-  (doom-modeline-mode 1))
 
 ;;; evil keybinds
 
