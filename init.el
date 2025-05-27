@@ -39,6 +39,7 @@
 
 (add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
 (load "my.el")
+(load "my-org.el")
 (load "my-evil.el")
 ;; (load "purr.el")
 
@@ -85,14 +86,5 @@
   :ensure t)
 (use-package markdown-mode
   :ensure t)
-(use-package org
-  :ensure t
-  :init
-  (setq org-directory "~/Org/")
-  (setq org-ellipsis " ▼")
-  (setq org-fontify-done-headline nil)
-  (setq org-fontify-todo-headline nil)
-  (setq org-log-into-drawer "LOGS")
-  (setq org-log-done 'time))
 (use-package olivetti
   :ensure t)

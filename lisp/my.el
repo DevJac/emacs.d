@@ -10,3 +10,8 @@ This is helpful if you want to move a completion in the main buffer into the min
   "By default babel code blocks will ask for confirmation before evaluating. Disable that."
   (interactive)
   (setq org-confirm-babel-evaluate nil))
+
+(defun show-trailing-whitespace ()
+  "Show trailing whitespace by setting the `show-trailing-whitespace' variable."
+  (interactive)
+  (setq show-trailing-whitespace t))

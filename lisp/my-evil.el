@@ -1,3 +1,5 @@
+;;; evil config
+
 (use-package goto-chg
   :ensure t)
 (use-package undo-tree
@@ -59,3 +61,19 @@
   (evil-select-paren "\\|" "\\|" beg end type count))
 
 (define-key evil-inner-text-objects-map "|" #'evil-org-table-cell-inner)
+
+;;; leader keybinds
+
+(evil-set-leader '(motion normal) (kbd "SPC"))
+
+(evil-define-key '(motion normal) 'global
+  (kbd "<leader> v") #'expreg-expand
+  (kbd "<leader> V") #'expreg-contract
+  (kbd "<leader> t t") #'show-trailing-whitespace
+  (kbd "<leader> o s") #'insert-timestamp
+  (kbd "<leader> o h") #'org-insert-heading-promote
+  (kbd "<leader> o j") #'org-insert-heading-down
+  (kbd "<leader> o k") #'org-insert-heading-up
+  (kbd "<leader> o l") #'org-insert-heading-demote
+  (kbd "<leader> o c c") #'org-capture
+  (kbd "<leader> o c g") #'org-capture-goto-last-stored)
