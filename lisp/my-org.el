@@ -3,7 +3,7 @@
 (use-package org
   :ensure t
   :init
-  (setq org-directory "~/Org/")
+  (setq org-directory "~/Notes/")
   (setq org-ellipsis " ▼")
   (setq org-fontify-done-headline nil)
   (setq org-fontify-todo-headline nil)
@@ -18,12 +18,6 @@
            plain (file+olp+datetree "Journal.org")
            "%T\n%?"
            :empty-lines 1))))
-(use-package org-roam
-  :ensure t
-  :init
-  (setq org-roam-directory org-directory)
-  :config
-  (org-roam-db-autosync-mode 1))
 
 ;;; org related functions
 
