@@ -16,7 +16,7 @@
            "* %?")
           ("j" "Journal"
            plain (file+olp+datetree "Journal.org")
-           "%T\n%?"
+           "%T\n\n%?"
            :empty-lines 1))))
 
 ;;; org related functions
