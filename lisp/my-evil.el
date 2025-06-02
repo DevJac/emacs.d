@@ -69,6 +69,7 @@
 (evil-define-key '(motion normal) 'global
   (kbd "<leader> v") #'expreg-expand
   (kbd "<leader> V") #'expreg-contract
+  (kbd "<leader> P") #'consult-yank-from-kill-ring
   (kbd "<leader> t t") #'show-trailing-whitespace
   (kbd "<leader> o s") #'insert-timestamp
   (kbd "<leader> o h") #'org-insert-heading-promote
