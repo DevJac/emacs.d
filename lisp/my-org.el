@@ -3,7 +3,7 @@
 (use-package org
   :ensure t
   :init
-  (setq org-directory "~/Notes/")
+  (setq org-directory "~/Notes")
   (setq org-ellipsis " ▼")
   (setq org-fontify-done-headline nil)
   (setq org-fontify-todo-headline nil)
