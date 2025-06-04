@@ -34,6 +34,9 @@
 (setq-default indent-tabs-mode nil)
 ;; Indent 4 spaces
 (setq c-basic-offset 4)
+;; Scroll customizations: scroll margin and avoid recentering point
+(setq scroll-margin 2)
+(setq scroll-conservatively 101)
 ;; Profile startup with use-package; run use-package-report to see results
 ;; (setq use-package-compute-statistics t)
 
