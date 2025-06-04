@@ -37,6 +37,8 @@
 ;; Scroll customizations: scroll margin and avoid recentering point
 (setq scroll-margin 2)
 (setq scroll-conservatively 101)
+;; Start Emacs on my notes inbox
+(setq initial-buffer-choice "~/Notes/inbox.org")
 ;; Profile startup with use-package; run use-package-report to see results
 ;; (setq use-package-compute-statistics t)
 
