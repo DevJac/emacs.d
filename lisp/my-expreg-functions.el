@@ -8,4 +8,16 @@
             (end (progn (org-table-end-of-field 0) (point))))
         (list `(org-table-field . ,(cons beg end)))))))
 
-(setq-default expreg-functions (add-to-list 'expreg-functions #'my/expreg--org-table-field))
+(defun my/expreg--org-src-block ()
+  "Identify src blocks for expreg."
+  (when (and (derived-mode-p 'org-mode)
+             (org-in-src-block-p))
+    (save-mark-and-excursion
+      (org-babel-mark-block)
+      (let ((beg (region-beginning))
+            (end (region-end)))
+        (list `(org-babel-src-block . ,(cons beg end)))))))
+
+(add-to-list 'expreg-functions #'my/expreg--org-table-field)
+(add-to-list 'expreg-functions #'my/expreg--org-src-block)
+(setq-default expreg-functions expreg-functions)
