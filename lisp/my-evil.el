@@ -74,9 +74,9 @@
   (kbd "<leader> p f") #'project-find-file
   (kbd "<leader> p g") #'consult-ripgrep
   (kbd "<leader> o s") #'insert-timestamp
-  (kbd "<leader> o h") #'org-insert-heading-promote
-  (kbd "<leader> o j") #'org-insert-heading-down
-  (kbd "<leader> o k") #'org-insert-heading-up
-  (kbd "<leader> o l") #'org-insert-heading-demote
+  (kbd "<leader> o i h") #'org-insert-heading-promote
+  (kbd "<leader> o i j") #'org-insert-heading-down
+  (kbd "<leader> o i k") #'org-insert-heading-up
+  (kbd "<leader> o i l") #'org-insert-heading-demote
   (kbd "<leader> o c c") #'org-capture
   (kbd "<leader> o c g") #'org-capture-goto-last-stored)
