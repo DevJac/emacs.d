@@ -20,6 +20,7 @@
 (setq make-backup-files nil)
 ;; Remember recently opened files
 (recentf-mode 1)
+(setq recentf-max-saved-items 200)
 ;; Remember recent minibuffer entries, such as M-x commands
 (savehist-mode 1)
 ;; Remember cursor location in previously opened files
