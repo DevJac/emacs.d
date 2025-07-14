@@ -94,3 +94,7 @@
   :ensure t)
 (use-package olivetti
   :ensure t)
+
+(add-hook 'c-mode-hook
+          (lambda ()
+            (define-key c-mode-base-map (kbd "TAB") nil 'remove)))
