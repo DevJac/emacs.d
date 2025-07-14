@@ -34,6 +34,11 @@ This is helpful if you want to move a completion in the main buffer into the min
   (interactive)
   (find-file-rec (expand-file-name "~/Code")))
 
+(defun find-file-notes ()
+  "Fuzzy find on ALL files in the Notes directory."
+  (interactive)
+  (find-file-rec (expand-file-name "~/Notes")))
+
 (defun find-file-emacs ()
   "Fuzzy find on ALL files in the .emacs.d directory."
   (interactive)

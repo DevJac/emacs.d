@@ -75,6 +75,7 @@
   (kbd "<leader> p g") #'consult-ripgrep
   (kbd "<leader> p a h") #'find-file-home
   (kbd "<leader> p a c") #'find-file-code
+  (kbd "<leader> p a n") #'find-file-notes
   (kbd "<leader> p a e") #'find-file-emacs
   (kbd "<leader> o s") #'insert-timestamp
   (kbd "<leader> o i h") #'org-insert-heading-promote
