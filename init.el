@@ -46,8 +46,8 @@
 (add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
 (load "my.el")
 (load "my-org.el")
-(load "my-evil.el")
-;; (load "purr.el")
+(load "purr.el")
+;; (load "my-evil.el")
 
 (use-package consult
   :ensure t

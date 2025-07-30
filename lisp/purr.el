@@ -133,6 +133,20 @@
 (define-key purr-mode-map (kbd ";") #'exchange-point-and-mark)
 (define-key purr-mode-map (kbd "[") #'backward-paragraph)
 (define-key purr-mode-map (kbd "]") #'forward-paragraph)
+(define-key purr-mode-map (kbd "SPC t t") #'show-trailing-whitespace)
+(define-key purr-mode-map (kbd "SPC p f") #'project-find-file)
+(define-key purr-mode-map (kbd "SPC p g") #'consult-ripgrep)
+(define-key purr-mode-map (kbd "SPC p a h") #'find-file-home)
+(define-key purr-mode-map (kbd "SPC p a c") #'find-file-code)
+(define-key purr-mode-map (kbd "SPC p a n") #'find-file-notes)
+(define-key purr-mode-map (kbd "SPC p a e") #'find-file-emacs)
+(define-key purr-mode-map (kbd "SPC o s") #'insert-timestamp)
+(define-key purr-mode-map (kbd "SPC o i h") #'org-insert-heading-promote)
+(define-key purr-mode-map (kbd "SPC o i j") #'org-insert-heading-down)
+(define-key purr-mode-map (kbd "SPC o i k") #'org-insert-heading-up)
+(define-key purr-mode-map (kbd "SPC o i l") #'org-insert-heading-demote)
+(define-key purr-mode-map (kbd "SPC o c c") #'org-capture)
+(define-key purr-mode-map (kbd "SPC o c g") #'org-capture-goto-last-stored)
 
 ;;; Additional keybinds and functions
 

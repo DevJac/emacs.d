@@ -14,6 +14,7 @@ This is helpful if you want to move a completion in the main buffer into the min
 (defun show-trailing-whitespace ()
   "Show trailing whitespace by setting the `show-trailing-whitespace' variable."
   (interactive)
+  (message "Showing trailing whitespace")
   (setq show-trailing-whitespace t))
 
 (defun find-file-rec (&rest paths)
