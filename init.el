@@ -46,13 +46,14 @@
 (add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
 (load "my.el")
 (load "my-org.el")
-(load "purr.el")
-;; (load "my-evil.el")
+(load "my-evil.el")
+;; (load "purr.el")
 
 (use-package consult
   :ensure t
   :bind
   ("C-x b" . #'consult-buffer)
+  ;; :bind* overrides all minor mode bindings.
   :bind*
   ("C-M-i" . #'complete-in-minibuffer)
   :config
@@ -64,6 +65,9 @@
    :preview-key '(:debounce 0.5 any)))
 (use-package corfu
   :ensure t
+  ;; :bind (:map corfu-map
+  ;;             ("C-n" . corfu-next)
+  ;;             ("C-p" . corfu-previous))
   :config
   (corfu-history-mode 1)
   (global-corfu-mode 1))
@@ -95,6 +99,8 @@
 (use-package olivetti
   :ensure t)
 
+;; cc-mode had its own TAB behavior, but we don't want it.
+;; We want TAB to behave the same as everywhere else.
 (add-hook 'c-mode-hook
           (lambda ()
             (define-key c-mode-base-map (kbd "TAB") nil 'remove)))
