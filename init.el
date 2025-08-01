@@ -65,9 +65,6 @@
    :preview-key '(:debounce 0.5 any)))
 (use-package corfu
   :ensure t
-  ;; :bind (:map corfu-map
-  ;;             ("C-n" . corfu-next)
-  ;;             ("C-p" . corfu-previous))
   :config
   (corfu-history-mode 1)
   (global-corfu-mode 1))
