@@ -20,6 +20,8 @@
   :ensure t
   :config
   (global-evil-surround-mode 1))
+(use-package evil-visualstar
+  :ensure t)
 (use-package anzu
   :ensure t
   :config
