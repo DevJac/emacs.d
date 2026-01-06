@@ -18,3 +18,6 @@ If an error occurs, log it, and then continue."
        (unless noninteractive
 	 (sit-for 2)) ;; give myself extra time to see the error
        nil))))
+
+(dolist (file '("lisp/config-evil.el"))
+  (dj/load-init-file file))
