@@ -18,8 +18,6 @@ If an error occurs, log it, and then continue."
        (message "[init] Error loading %s: %s"
                 file
                 (error-message-string err))
-       (unless noninteractive
-         (sit-for 2)) ;; give myself extra time to see the error
        nil))))
 
 (dolist (file '("lisp/config-emacs.el"
