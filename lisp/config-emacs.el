@@ -1,15 +1,19 @@
 ;; Emacs customizations
 
 ;; Store customizations in another file to keep init.el clean
-;; See variable: custom-file
+;; The custom-file variable is not a variable I created
+;; See `C-h v custom-file`
 (setq custom-file (locate-user-emacs-file "custom-sets.el"))
 (load custom-file 'noerror 'nomessage)
 ;; GUI cleanup
-;; (load-theme 'modus-operandi)
 (setq inhibit-startup-screen t)
 (menu-bar-mode -1)
 (tool-bar-mode -1)
-;; Better built-in completions; see: https://robbmann.io/posts/emacs-29-completions/
+(set-face-attribute 'default nil
+                    :family "Fira Mono"
+                    :height 130)
+;; Better built-in completions
+;; See: https://robbmann.io/posts/emacs-29-completions/
 (setq completion-auto-help 'visible)
 (setq completion-auto-select 'second-tab)
 ;; TAB first tries to indent, then tries to complete
