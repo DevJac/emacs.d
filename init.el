@@ -21,6 +21,10 @@ If an error occurs, log it, and then continue."
        nil))))
 
 (dolist (file '("lisp/config-emacs.el"
+                "lisp/config-theme.el"
+                "lisp/config-my.el"
+                "lisp/config-org.el"
                 "lisp/config-consult.el"
-                "lisp/config-evil.el"))
+                "lisp/config-evil.el"
+                "lisp/config-evil-keys.el"))
   (dj/load-init-file file))
