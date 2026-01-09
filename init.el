@@ -1,8 +1,3 @@
-;; MELPA has more up-to-date packages
-;; See: https://melpa.org/#/getting-started
-(require 'package)
-(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
-
 ;; Profile startup with use-package; run use-package-report to see results
 ;; (setq use-package-compute-statistics t)
 
@@ -20,11 +15,13 @@ If an error occurs, log it, and then continue."
                 (error-message-string err))
        nil))))
 
-(dolist (file '("lisp/config-emacs.el"
+(dolist (file '("lisp/config-melpa.el"
+                "lisp/config-emacs.el"
                 "lisp/config-theme.el"
                 "lisp/config-my.el"
                 "lisp/config-org.el"
                 "lisp/config-consult.el"
                 "lisp/config-evil.el"
+                "lisp/config-expreg.el"
                 "lisp/config-evil-keys.el"))
   (dj/load-init-file file))
