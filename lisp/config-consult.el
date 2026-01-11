@@ -42,3 +42,9 @@ This is helpful if you want to move a completion in the main buffer into the min
   :ensure t
   :config
   (marginalia-mode 1))
+(use-package embark
+  :ensure t
+  :bind
+  ("C-c c" . #'embark-act))
+(use-package embark-consult
+  :ensure t)
