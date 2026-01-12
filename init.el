@@ -23,5 +23,6 @@ If an error occurs, log it, and then continue."
                 "lisp/config-consult.el"
                 "lisp/config-evil.el"
                 "lisp/config-expreg.el"
-                "lisp/config-evil-keys.el"))
+                "lisp/config-evil-keys.el"
+                "lisp/config-other-packages.el"))
   (dj/load-init-file file))
