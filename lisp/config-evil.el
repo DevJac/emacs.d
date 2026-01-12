@@ -21,7 +21,7 @@
 (use-package evil-collection
   :ensure t
   :config
-  (evil-collection-init 'dired))
+  (evil-collection-init '(dired)))
 (use-package evil-surround
   :ensure t
   :config
