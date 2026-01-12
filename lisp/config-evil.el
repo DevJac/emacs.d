@@ -1,3 +1,5 @@
+;;; evil packages
+
 (use-package goto-chg
   :ensure t)
 (use-package undo-tree
@@ -39,7 +41,7 @@
   :config
   (doom-modeline-mode 1))
 
-;;; evil keybinds
+;;; evil commands
 
 (defun kill-buffer-and-window-quiet ()
   "Kill current buffer, and kill window if there is more than one."
