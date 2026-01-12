@@ -39,3 +39,5 @@
 (setq scroll-conservatively 101)
 ;; Don't indent with TABs; this is buffer local so we change the default
 (setq-default indent-tabs-mode nil)
+;; Enable transient repeat-maps; `spc v spc v` becomes `spc v v`
+(repeat-mode 1)
