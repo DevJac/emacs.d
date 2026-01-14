@@ -41,3 +41,5 @@
 (setq-default indent-tabs-mode nil)
 ;; Enable transient repeat-maps; `spc v spc v` becomes `spc v v`
 (repeat-mode 1)
+;; Show column number of point
+(column-number-mode 1)

@@ -39,6 +39,7 @@
 (use-package doom-modeline
   :ensure t
   :config
+  (setq doom-modeline-enable-word-count t)
   (doom-modeline-mode 1))
 
 ;;; evil commands
