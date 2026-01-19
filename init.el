@@ -26,5 +26,6 @@ If an error occurs, log it, and then continue."
                 "lisp/config-evil-keys.el"
                 "lisp/config-other-packages.el"
                 "lisp/config-gptel.el"
-                "lisp/config-c-mode.el"))
+                "lisp/config-c-mode.el"
+                "lisp/config-initial-buffer.el"))
   (dj/load-init-file file))
