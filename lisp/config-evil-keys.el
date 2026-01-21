@@ -6,7 +6,7 @@
   (kbd "<leader> v") #'expreg-expand
   (kbd "<leader> V") #'expreg-contract
   (kbd "<leader> P") #'consult-yank-from-kill-ring
-  (kbd "<leader> t t") #'toggle-trailing-whitespace
+  (kbd "<leader> t t") #'whitespace-mode
   (kbd "<leader> p b") #'consult-project-buffer
   (kbd "<leader> p f") #'project-find-file
   (kbd "<leader> p g") #'consult-ripgrep

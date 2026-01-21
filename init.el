@@ -27,5 +27,6 @@ If an error occurs, log it, and then continue."
                 "lisp/config-other-packages.el"
                 "lisp/config-gptel.el"
                 "lisp/config-c-mode.el"
-                "lisp/config-initial-buffer.el"))
+                "lisp/config-initial-buffer.el"
+                "lisp/config-whitespace-mode.el"))
   (dj/load-init-file file))
