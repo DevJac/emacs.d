@@ -16,7 +16,7 @@
                   whitespace-hspace
                   whitespace-newline))
     (set-face-attribute face nil
-                        :background nil))
+                        :background 'unspecified))
 
   (face-spec-reset-face 'whitespace-trailing)
   (set-face-attribute 'whitespace-trailing nil
