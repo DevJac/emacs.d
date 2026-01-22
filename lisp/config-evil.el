@@ -16,6 +16,7 @@
   (setq evil-search-module 'evil-search)
   (setq evil-undo-system 'undo-tree)
   (setq evil-want-C-u-scroll t)
+  (setq evil-want-C-i-jump nil)
   :config
   (evil-mode 1))
 (use-package evil-collection

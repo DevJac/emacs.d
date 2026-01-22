@@ -3,6 +3,7 @@
 (evil-set-leader '(motion normal) (kbd "SPC"))
 
 (evil-define-key '(motion normal) 'global
+  (kbd "M-o") #'evil-jump-forward
   (kbd "<leader> v") #'expreg-expand
   (kbd "<leader> V") #'expreg-contract
   (kbd "<leader> P") #'consult-yank-from-kill-ring
