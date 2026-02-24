@@ -18,3 +18,11 @@
   (kbd "<leader> o i l") #'org-insert-heading-demote
   (kbd "<leader> o c c") #'org-capture
   (kbd "<leader> o c g") #'org-capture-goto-last-stored)
+
+;; Make q quit in *Messages* buffer.
+(evil-define-key '(motion normal) special-mode-map
+  (kbd "q") #'quit-window)
+
+;; The *Messages* buffer loads very early during Emacs startup.
+;; To make sure our keybinds work in this buffer we do the following:
+(with-current-buffer "*Messages*" (evil-normalize-keymaps))
