@@ -12,6 +12,8 @@
   :ensure t
   :init
   (setq evil-want-keybinding nil)
+  ;; evil-collection assumes evil-overriding-maps is nil.
+  ;; evil-overriding-maps is nil by default, but we'll make sure.
   (setq evil-overriding-maps nil)
   (setq evil-search-module 'evil-search)
   (setq evil-undo-system 'undo-tree)
