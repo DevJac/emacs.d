@@ -23,6 +23,8 @@
   (evil-mode 1))
 (use-package evil-collection
   :ensure t
+  :init
+  (setq evil-collection-key-blacklist '("SPC"))
   :config
   (evil-collection-init '(dired)))
 (use-package evil-surround
