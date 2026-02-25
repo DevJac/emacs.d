@@ -3,7 +3,7 @@
 
 ;; I want to break my config into many files. If there is an error in
 ;; one file I want to continue trying to load other files.
-(defun dj/load-init-file (file)
+(defun my/load-init-file (file)
   "Load FILE from `user-emacs-directory'.
 If an error occurs, log it, and then continue."
   (let ((full-file (expand-file-name file user-emacs-directory)))
@@ -29,4 +29,4 @@ If an error occurs, log it, and then continue."
                 "lisp/config-c-mode.el"
                 "lisp/config-initial-buffer.el"
                 "lisp/config-whitespace-mode.el"))
-  (dj/load-init-file file))
+  (my/load-init-file file))
