@@ -26,7 +26,7 @@
   :init
   (setq evil-collection-key-blacklist '("SPC"))
   :config
-  (evil-collection-init '(dired)))
+  (evil-collection-init '(dired magit)))
 (use-package evil-surround
   :ensure t
   :config
