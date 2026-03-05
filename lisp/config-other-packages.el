@@ -4,3 +4,5 @@
   :ensure t)
 (use-package olivetti
   :ensure t)
+(use-package visual-fill-column
+  :ensure t)
