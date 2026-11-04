@@ -41,7 +41,7 @@
   (interactive)
   (if (org-at-item-p)
       (progn
-        (evil-beginning-of-line)
+        (evil-insert-line 1)
         (org-insert-item (org-at-item-checkbox-p)))
     (progn
       (org-back-to-heading)
