@@ -13,7 +13,8 @@ If an error occurs, report it and continue."
        nil))))
 
 (let ((errors 0))
-  (dolist (file '())
+  (dolist (file '("config/melpa.el"
+		  "config/evil.el"))
     (unless (my/load-init-file file)
       (cl-incf errors)))
   (if (zerop errors)
