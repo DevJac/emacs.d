@@ -12,8 +12,15 @@ If an error occurs, report it and continue."
         :error)
        nil))))
 
+;; Store customizations in another file to keep init.el clean
+;; The custom-file variable is not a variable I created
+;; See `C-h v custom-file`
+(setq custom-file (locate-user-emacs-file "custom-sets.el"))
+(load custom-file 'noerror 'nomessage)
+
 (let ((errors 0))
   (dolist (file '("config/melpa.el"
+		  "config/emacs.el"
 		  "config/evil.el"))
     (unless (my/load-init-file file)
       (cl-incf errors)))
