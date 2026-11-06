@@ -1,5 +1,6 @@
 *.elc
 *.eld
+/.cache/
 /auto-save-list/
 /auto-saves/
 /backups/
@@ -7,6 +8,7 @@
 /eln-cache/
 /elpa/
 /history
-/user-lisp/.user-lisp-autoloads.el
-/undo-tree-history/
 /transient/
+/undo-tree-history/
+/url/
+/user-lisp/.user-lisp-autoloads.el
