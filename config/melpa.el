@@ -1,4 +1,4 @@
-;;; -*- lexical-binding: t; -*-
+;; -*- lexical-binding: t; -*-
 
 ;; MELPA has more up-to-date packages
 ;; See: https://melpa.org/#/getting-started

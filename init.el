@@ -1,4 +1,4 @@
-;;; -*- lexical-binding: t; -*-
+;; -*- lexical-binding: t; -*-
 
 (defun my/load-init-file (file)
   "Load FILE from `user-emacs-directory'.

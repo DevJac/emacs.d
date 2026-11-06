@@ -1,4 +1,4 @@
-;;; -*- lexical-binding: t; -*-
+;; -*- lexical-binding: t; -*-
 
 (declare-function org-time-stamp "org")
 (declare-function org-insert-heading "org")
