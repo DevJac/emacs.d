@@ -66,3 +66,6 @@
 
 ;; Show column number of point
 (column-number-mode 1)
+
+;; Start at Notes/inbox.org
+(setq initial-buffer-choice "~/Notes/inbox.org")
