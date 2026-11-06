@@ -41,4 +41,5 @@
 (use-package embark
   :ensure t
   :bind
-  ("C-." . #'embark-act))
+  ("C-." . #'embark-act)
+  ("C-c c" . #'embark-act))
