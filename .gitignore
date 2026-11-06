@@ -1,0 +1,10 @@
+*.elc
+*.eld
+/auto-save-list/
+/auto-saves/
+/backups/
+/custom-sets.el
+/eln-cache/
+/elpa/
+/history
+/user-lisp/.user-lisp-autoloads.el
