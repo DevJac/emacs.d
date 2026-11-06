@@ -23,7 +23,9 @@ If an error occurs, report it and continue."
 (let ((errors 0))
   (dolist (file '("config/melpa.el"
 		  "config/emacs.el"
+                  "config/theme.el"
 		  "config/evil.el"
+                  "config/evil-keys.el"
                   "config/consult.el"
                   "config/org.el"
                   "config/other-packages.el"))
