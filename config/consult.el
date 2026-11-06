@@ -36,9 +36,9 @@
   :ensure t
   :config
   (marginalia-mode 1))
+(use-package embark-consult
+  :ensure t)
 (use-package embark
   :ensure t
   :bind
   ("C-." . #'embark-act))
-(use-package embark-consult
-  :ensure t)

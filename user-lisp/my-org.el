@@ -9,6 +9,9 @@
 (declare-function org-insert-item "org-list")
 (declare-function org-at-item-p "org-list")
 (declare-function org-at-item-checkbox-p "org-list")
+(declare-function evil-append-line "evil-commands")
+(declare-function evil-insert-line "evil-commands")
+(declare-function evil-insert-state "evil-states")
 
 ;;;###autoload
 (defun org-insert-heading-promote ()
