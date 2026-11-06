@@ -21,7 +21,8 @@ If an error occurs, report it and continue."
 (let ((errors 0))
   (dolist (file '("config/melpa.el"
 		  "config/emacs.el"
-		  "config/evil.el"))
+		  "config/evil.el"
+                  "config/consult.el"))
     (unless (my/load-init-file file)
       (cl-incf errors)))
   (if (zerop errors)
