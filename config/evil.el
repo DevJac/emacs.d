@@ -33,6 +33,12 @@
   :ensure t
   :config
   (global-evil-visualstar-mode 1))
+(use-package evil-anzu
+  :ensure t)
+(use-package anzu
+  :ensure t
+  :config
+  (global-anzu-mode 1))
 (use-package doom-modeline
   :ensure t
   :config
