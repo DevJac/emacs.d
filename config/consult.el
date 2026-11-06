@@ -1,3 +1,5 @@
+;;; -*- lexical-binding: t; -*-
+
 (use-package consult
   :ensure t
   :bind

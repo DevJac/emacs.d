@@ -1,3 +1,5 @@
+;;; -*- lexical-binding: t; -*-
+
 ;; Emacs customizations
 
 ;; GUI cleanup
