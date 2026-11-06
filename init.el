@@ -27,9 +27,10 @@ If an error occurs, report it and continue."
 		  "config/evil.el"
                   "config/evil-keys.el"
                   "config/consult.el"
-                  "config/org.el"
                   "config/expreg.el"
-                  "config/other-packages.el"))
+                  "config/org.el"
+                  "config/other-packages.el"
+                  "config/whitespace.el"))
     (unless (my/load-init-file file)
       (cl-incf errors)))
   (if (zerop errors)
