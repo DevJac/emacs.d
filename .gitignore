@@ -8,3 +8,4 @@
 /elpa/
 /history
 /user-lisp/.user-lisp-autoloads.el
+/undo-tree-history/
