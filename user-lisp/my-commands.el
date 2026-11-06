@@ -11,3 +11,12 @@
   (setq-local show-trailing-whitespace (not show-trailing-whitespace))
   (message "Trailing whitespace %s"
            (if show-trailing-whitespace "shown" "hidden")))
+
+;;;###autoload
+(defun complete-in-minibuffer ()
+  "Override the current `completion-in-region-function' and use `consult-completion-in-region'.
+This is helpful if you want to move a completion in the main buffer into the minibuffer."
+  (interactive)
+  (require 'consult)
+  (let ((completion-in-region-function #'consult-completion-in-region))
+    (completion-at-point)))
