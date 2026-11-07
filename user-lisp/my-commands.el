@@ -26,3 +26,9 @@ into the minibuffer."
   (require 'consult)
   (let ((completion-in-region-function #'consult-completion-in-region))
     (completion-at-point)))
+
+;;;###autoload
+(defun insert-file-path ()
+  "Prompt for a filesystem path and insert it at point."
+  (interactive)
+  (insert (read-file-name "Path: ")))
