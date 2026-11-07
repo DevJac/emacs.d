@@ -52,6 +52,11 @@
   (kbd "ZQ") #'kill-buffer-and-window-quiet
   (kbd "ZZ") #'save-then-kill-buffer-and-window-quiet)
 
-;; Create a text object between |'s. This is especially useful for org tables.
 (require 'my-evil)
+
+;; These help when navigating display overlays.
+(advice-add 'evil-next-line :around #'my/evil-next-line-advice)
+(advice-add 'evil-previous-line :around #'my/evil-previous-line-advice)
+
+;; Create a text object between |'s. This is especially useful for org tables.
 (define-key evil-inner-text-objects-map "|" #'evil-org-table-cell-inner)
