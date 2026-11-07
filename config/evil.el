@@ -53,5 +53,8 @@
   (kbd "ZZ") #'save-then-kill-buffer-and-window-quiet)
 
 ;; Create a text object between |'s. This is especially useful for org tables.
-(require 'my-evil)
+(evil-define-text-object evil-org-table-cell-inner (count &optional beg end type)
+  "Select the contents of an org-mode table cell, excluding the | delimiters."
+  (evil-select-paren "|" "|" beg end type count))
+
 (define-key evil-inner-text-objects-map "|" #'evil-org-table-cell-inner)
