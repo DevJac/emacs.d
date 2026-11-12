@@ -22,16 +22,17 @@ If an error occurs, report it and continue."
 
 (let ((errors 0))
   (dolist (file '("config/melpa.el"
-		  "config/emacs.el"
+                  "config/emacs.el"
                   "config/theme.el"
-		  "config/evil.el"
-                  "config/evil-keys.el"
+                  "config/evil.el"
                   "config/ai.el"
+                  "config/annotate.el"
                   "config/consult.el"
                   "config/expreg.el"
                   "config/org.el"
                   "config/other-packages.el"
-                  "config/whitespace.el"))
+                  "config/whitespace.el"
+                  "config/evil-keys.el"))
     (unless (my/load-init-file file)
       (cl-incf errors)))
   (if (zerop errors)
