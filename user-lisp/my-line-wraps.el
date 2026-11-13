@@ -1,5 +1,7 @@
 ;; -*- lexical-binding: t; -*-
 
+(declare-function visual-fill-column-mode "visual-fill-column")
+
 ;;;###autoload
 (defun my/line-wrap-reset ()
   "Reset wrapping modes."
