@@ -7,4 +7,6 @@
 (use-package olivetti
   :ensure t)
 (use-package visual-fill-column
-  :ensure t)
+  :ensure t
+  :init
+  (setq visual-fill-column-fringes-outside-margins nil))
