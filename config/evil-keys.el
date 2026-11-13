@@ -23,7 +23,12 @@
   (kbd "<leader> o i k") #'org-insert-heading-up
   (kbd "<leader> o i l") #'org-insert-heading-demote
   (kbd "<leader> o c c") #'org-capture
-  (kbd "<leader> o c g") #'org-capture-goto-last-stored)
+  (kbd "<leader> o c g") #'org-capture-goto-last-stored
+  (kbd "<leader> t w 1") #'my/line-wrap-truncate
+  (kbd "<leader> t w 2") #'my/line-wrap-character
+  (kbd "<leader> t w 3") #'my/line-wrap-word
+  (kbd "<leader> t w 4") #'my/line-wrap-narrow
+  (kbd "<leader> t w 5") #'my/line-wrap-center)
 
 ;; Make q quit in *Messages* buffer.
 (evil-define-key '(motion normal) special-mode-map
