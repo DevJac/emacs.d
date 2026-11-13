@@ -31,6 +31,7 @@ If an error occurs, report it and continue."
                   "config/expreg.el"
                   "config/org.el"
                   "config/other-packages.el"
+                  "config/total-review.el"
                   "config/whitespace.el"
                   "config/evil-keys.el"))
     (unless (my/load-init-file file)
