@@ -34,4 +34,4 @@
                       :foreground
                       (color-lighten-name
                        (face-attribute 'font-lock-comment-face :foreground)
-                       30)))
+                       25)))
