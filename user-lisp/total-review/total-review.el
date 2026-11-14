@@ -1,6 +1,6 @@
 ;;; total-review.el --- Track line review coverage using diffs  -*- lexical-binding: t; -*-
 
-;; Version: 0.2.2
+;; Version: 0.2.6
 ;; Package-Requires: ((emacs "29.1"))
 ;; Keywords: tools, convenience
 
@@ -12,7 +12,7 @@
 ;; New and modified lines become unreviewed.  The source is never edited
 ;; or saved by this package.
 ;;
-;; Database profiles: `default' or `(named "first-pass")'.  Each profile
+;; Database profiles: "default" or a string such as "first-pass".  Each profile
 ;; has an independent database for each `project.el' project, plus a
 ;; shared fallback database for files outside projects.  No data is
 ;; stored in source repositories.
@@ -26,7 +26,8 @@
 (require 'color)
 (require 'diff)
 (require 'project)
-(require 'subr-x)
+
+(declare-function dired-get-marked-files "dired")
 
 (defgroup total-review nil
   "Track coverage of code you have reviewed."
@@ -38,17 +39,17 @@
   :type 'directory
   :group 'total-review)
 
-(defcustom total-review-profile 'default
-  "Active review profile: `default' or (named NAME).
-Each profile contains one database per project and a global fallback."
-  :type '(choice (const :tag "Default" default)
-                 (list :tag "Named profile" (const named) string))
+(defcustom total-review-profile "default"
+  "Name of the active review profile.
+Each profile contains one database per project and a global fallback.
+Use the default profile name or any other valid string name."
+  :type 'string
   :group 'total-review)
 
 (defun total-review--pending-face ()
   "Return the face for lines awaiting review.
 Use `total-review-pending-face' if it exists.  Otherwise, draw
-subtle overlines and underlines derived from the theme background,
+a subtle underline derived from the theme background,
 without changing syntax highlighting or the text background."
   (if (facep 'total-review-pending-face)
       'total-review-pending-face
@@ -61,9 +62,9 @@ without changing syntax highlighting or the text background."
                   (color-lighten-name background 20)
                 (color-darken-name background 20)))))
       (if line-color
-          `(:overline ,line-color :underline ,line-color)
+          `(:underline ,line-color)
         ;; Colorless terminals (or an unspecified background).
-        '(:overline t :underline t)))))
+        '(:underline t)))))
 
 (defvar total-review-mode nil)
 (defvar global-total-review-mode nil)
@@ -91,21 +92,19 @@ without changing syntax highlighting or the text background."
 
 (defun total-review--profile-root ()
   "Return the root directory for the active review profile."
-  (pcase total-review-profile
-    ('default (expand-file-name "default/" total-review-directory))
-    (`(named ,name)
-     (unless (and (stringp name)
-                  (string-match-p "\\`[[:alnum:]][[:alnum:]_.-]*\\'" name))
-       (error "Invalid Total Review profile name: %S" name))
-     (expand-file-name (concat "named/" name "/")
-                       total-review-directory))
-    (_ (error "Invalid Total Review profile: %S" total-review-profile))))
+  (let ((name total-review-profile))
+    (unless (and (stringp name)
+                 (string-match-p "\\`[[:alnum:]][[:alnum:]_.-]*\\'" name))
+      (error "Invalid Total Review profile name: %S" name))
+    (expand-file-name
+     (if (equal name "default")
+         "default/"
+       (concat "named/" name "/"))
+     total-review-directory)))
 
 (defun total-review--profile-label ()
   "Return a readable name for the active profile."
-  (if (eq total-review-profile 'default)
-      "default"
-    (cadr total-review-profile)))
+  total-review-profile)
 
 (defun total-review--scope (&optional location)
   "Return review scope for LOCATION, or the current file or directory.
@@ -148,7 +147,7 @@ or directory; its containing project determines the database."
   (let* ((state (with-temp-buffer
                   (insert-file-contents file)
                   (goto-char (point-min))
-                  (let ((read-eval nil)) (read (current-buffer)))))
+                  (read (current-buffer))))
          (path (plist-get state :path)))
     (unless (and (listp state)
                  (equal (plist-get state :version) 1)
@@ -436,7 +435,8 @@ Use a visiting buffer when available, preserving its unsaved changes."
                path (make-string (total-review--line-count) ?0)
                nil t directory))
           (with-temp-buffer
-            (setq buffer-file-name path)
+            ;; This buffer is not visiting PATH: assigning `buffer-file-name'
+            ;; would prompt to save when the modified temp buffer is killed.
             (insert-file-contents path)
             (total-review--save
              path (make-string (total-review--line-count) ?0)
@@ -721,9 +721,11 @@ buffer loads the file from disk without visiting it permanently."
             (when total-review-mode (total-review--draw flags))
             flags))
       (with-temp-buffer
-        (setq buffer-file-name path)
         (insert-file-contents path)
-        (total-review--sync)))))
+        ;; `total-review--sync' expects a visiting filename.  Bind it only
+        ;; during the call so cleanup cannot prompt to kill a modified buffer.
+        (let ((buffer-file-name path))
+          (total-review--sync))))))
 
 (defun total-review--collect (directory)
   "Collect project/global progress information from DIRECTORY.
@@ -817,15 +819,19 @@ Synchronizes all tracked files, including live unsaved buffers."
                         (total-review--profile-label)))
         (insert (format "Scope: %s\nDatabase: %s\n\n"
                         (or root "Global (files outside projects)") dir))
-        (insert (format "Reviewed %d / %d lines (%.1f%%), %d pending\n"
+        (insert (format "Tracked files: %d\n" (length entries)))
+        (insert (format "Reviewed %d / %d lines (%.1f%%), %d pending\n\n"
                         reviewed total
                         (if (zerop total) 100.0
                           (* 100.0 (/ (float reviewed) total)))
                         (plist-get stats :pending)))
-        (insert (format "Readable tracked files: %d\n\n" (length entries)))
         (when errors
           (insert (format "WARNING: %d file(s) could not be processed; totals exclude them.\n\n"
-                          (length errors))))
+                          (length errors)))
+          (insert "Errors (not counted as reviewed):\n")
+          (dolist (error-message errors)
+            (insert "  " error-message "\n"))
+          (insert "\n"))
         (insert (format "%-9s %-9s %-9s %s\n"
                         "Reviewed" "Pending" "Total" "File"))
         (insert (make-string 65 ?-) "\n")
@@ -839,9 +845,9 @@ Synchronizes all tracked files, including live unsaved buffers."
              'total-review-file path
              'action #'total-review--report-visit)
             (insert "\n")))
-        (when errors
-          (insert "\nErrors (not counted as reviewed):\n")
-          (dolist (message errors) (insert "  " message "\n")))
+        (insert (make-string 65 ?-) "\n")
+        (insert (format "%-9d %-9d %-9d %s\n"
+                        reviewed (plist-get stats :pending) total "Totals"))
         (goto-char (point-min))
         (special-mode)))
     (pop-to-buffer out)))
@@ -874,57 +880,18 @@ Synchronizes all tracked files, including live unsaved buffers."
 ;;;###autoload
 (defun total-review-switch-profile (name)
   "Switch to review profile NAME, updating already open review buffers.
-NAME is `default` or a name such as `first-pass`.  New names are
-created when tracking the first file.  Each named profile maintains
-its own databases per project and for non-project files."
+NAME is a string, for example default or first-pass.  New names are
+created when tracking the first file.  Each profile maintains its own
+databases per project and for non-project files."
   (interactive
    (list (completing-read "Total Review profile (default or name): "
                           (total-review--known-profiles) nil nil nil nil
                           (total-review--profile-label))))
-  (let ((profile (if (equal name "default")
-                     'default
-                   (list 'named name))))
-    (let ((total-review-profile profile)) (total-review--profile-root))
-    (setq total-review-profile profile)
-    (total-review--refresh-open-buffers)
-    (message "Total Review profile: %s" (total-review--profile-label))))
-
-;;;###autoload
-(defun total-review-import-review-lines (old-directory)
-  "Copy data from Review Lines 0.1 in OLD-DIRECTORY into active databases.
-Do not overwrite files already tracked in Total Review.  The original
-Review Lines database remains untouched.  Imported snapshots are kept
-as-is, so they can be diffed on the next refresh."
-  (interactive
-   (list (read-directory-name "Review Lines 0.1 database: "
-                              (locate-user-emacs-file "review-lines/"))))
-  (let ((added 0) (skipped 0))
-    (dolist (file (directory-files old-directory t "\\.el\\'" t))
-      (let* ((state (total-review--read-state-file file old-directory))
-             (path (plist-get state :path))
-             (directory (total-review--database path)))
-        (if (total-review--load path directory)
-            (cl-incf skipped)
-          (make-directory directory t)
-          (let* ((new (make-temp-file
-                       (expand-file-name (concat (total-review--id path) "-")
-                                         directory) nil ".snapshot"))
-                 (committed nil))
-            (unwind-protect
-                (progn
-                  (copy-file (total-review--snapshot-path state old-directory)
-                             new t)
-                  (total-review--write-state
-                   path (list :version 1 :path path
-                              :snapshot (file-name-nondirectory new)
-                              :flags (plist-get state :flags))
-                   directory)
-                  (setq committed t)
-                  (cl-incf added))
-              (when (and (not committed) (file-exists-p new))
-                (delete-file new)))))))
-    (total-review--refresh-open-buffers)
-    (message "Total Review import: %d added, %d already tracked" added skipped)))
+  (let ((total-review-profile name))
+    (total-review--profile-root))
+  (setq total-review-profile name)
+  (total-review--refresh-open-buffers)
+  (message "Total Review profile: %s" (total-review--profile-label)))
 
 (provide 'total-review)
 ;;; total-review.el ends here

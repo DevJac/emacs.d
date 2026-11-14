@@ -1,4 +1,4 @@
-# Total Review 0.2.2 (experimental)
+# Total Review 0.2.6 (experimental)
 
 Total Review tracks which lines you've examined in source files, without adding annotations or altering the source. It uses a **plain-text snapshot** plus **review flags** for each file. On refresh, Emacs runs a **zero-context unified diff** against the current buffer and carries review status forward across unchanged lines. Inserted or modified lines become unreviewed.
 
@@ -55,28 +55,31 @@ The global mode does not track every file; it enables the local display mode onl
 | `total-review-refresh` | Reconcile snapshot and current source using `diff` |
 | `total-review-show-diff` | Inspect the raw `-U0` diff without synchronizing |
 | `total-review-switch-profile` | Change to default or a named review profile and refresh open buffers |
-| `total-review-import-review-lines` | Import data from the old Review Lines 0.1 prototype |
 
 ### Workflow
 
 1. In a project, `M-x total-review-track-project`. Emacs asks for confirmation and shows how many files will be excluded; if any are skipped, `*Total Review Skipped*` lists their names and reasons.
-2. `M-x global-total-review-mode` once (or enable it in your init file). Pending lines receive an overline and underline.
+2. `M-x global-total-review-mode` once (or enable it in your init file). Pending lines receive an underline.
 3. Select lines with Evil Visual mode (or an ordinary active region), then `M-x total-review-mark`.
 4. `M-x total-review-random-project` picks a **pending line**, uniformly over all pending lines across tracked files in the current scope.
-5. `M-x total-review-report` gives an overall progress breakdown, with source-file links.
+5. `M-x total-review-report` gives an overall progress breakdown, with source-file links, a tracked-file count, and a totals row below the per-file table.
 6. Edit any source. Temporary highlights clear until save, refresh, marking, or navigation. Saving and these commands re-diff the source to carry status across unchanged lines.
+
+Temporary source buffers used for bulk tracking and project-wide progress
+collection are not treated as visiting modified files, so they do not trigger
+a save/kill confirmation.
 
 To bulk-track just a selection, mark files in Dired and invoke `M-x total-review-track-dired`. Explicit file tracking does not apply the automatic binary/size filter.
 
 ## Pending-line appearance
 
-Unreviewed lines are marked with **both an overline and an underline**;
-reviewed lines are left alone.  By default, the line color is derived from
+Unreviewed lines are marked with **an underline**;
+reviewed lines are left alone.  By default, the underline color is derived from
 the current theme's `default` background: it is lightened by 20% on dark
-themes, or darkened by 20% on light themes.  This affects the lines only;
+themes, or darkened by 20% on light themes.  This affects the underline only;
 syntax highlighting, the text foreground, and the text background are not
 changed.  If a terminal does not provide a usable background color, the
-lines instead use the foreground color.  Changing themes recolors existing
+underline instead uses the foreground color.  Changing themes recolors existing
 pending overlays without modifying review state.
 
 **Optional face override:** If you define the face
@@ -87,23 +90,23 @@ this in your init file **before** loading Total Review:
 
 ```elisp
 (defface total-review-pending-face
-  '((t (:overline "#fabd2f" :underline "#fabd2f")))
+  '((t (:underline "#fabd2f")))
   "Custom appearance of pending Total Review lines.")
 ```
 
 After adding or removing a face override, `M-x total-review-refresh`
-updates the pending overlays.  If you have loaded an older Total Review
-version that defined this face automatically, restart Emacs after installing
-0.2.2 to remove the old face definition before trying the fallback.
+updates the pending overlays.
 
 ## Database profiles and location
 
-`total-review-profile` is one of:
+`total-review-profile` is a plain string, defaulting to `"default"`:
 
 ```elisp
-(setq total-review-profile 'default)
-(setq total-review-profile '(named "first-pass"))
+(setq total-review-profile "default")
+(setq total-review-profile "first-pass")
 ```
+
+If your configuration previously set the profile using a symbol or a `(named ...)` list, update it to a string. The database directory layout has **not** changed, so existing profile data stays in place.
 
 Use `M-x total-review-switch-profile` for an **interactive, immediate switch** that also updates highlighted open buffers. Existing named profiles are suggested; typing a new name is allowed. Profile names accept letters, numbers, underscores, periods, and hyphens, beginning with a letter or number.
 
@@ -123,16 +126,6 @@ By default, data is stored under `(locate-user-emacs-file "total-review/")`, for
 ```
 
 Each database contains `<hash-of-source-path>.el` metadata files and `<hash-of-source-path>-<random>.snapshot` snapshots. This is usually outside the project being reviewed. If your **Emacs configuration itself is a Git repository**, you may want to add `/total-review/` to its `.gitignore`. Automatic tracking explicitly excludes the Total Review database directory to prevent recursively tracking its own snapshots. To relocate the database root (not the selection strategy), set `total-review-directory`.
-
-### Import the original Review Lines prototype
-
-If you previously used `review-lines.el`, remove its mode/configuration so the two packages don't both highlight buffers. Then run:
-
-```text
-M-x total-review-import-review-lines
-```
-
-It prompts for the old database directory (default `~/.config/emacs/review-lines/` if that is your `user-emacs-directory`), copies the snapshots and flags to the selected project's/default or named databases **without modifying or deleting your old data**, and skips files already tracked in Total Review. The next refresh will diff imported snapshots against current files.
 
 ## Automatic project tracking filter
 

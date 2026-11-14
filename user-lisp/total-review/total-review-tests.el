@@ -8,7 +8,7 @@
   "Execute BODY with a fresh Total Review database and source directory."
   (declare (indent 0) (debug t))
   `(let* ((total-review-directory (make-temp-file "total-review-db-" t))
-          (total-review-profile 'default)
+          (total-review-profile "default")
           (total-review-tests--sources (make-temp-file "total-review-src-" t)))
      (unwind-protect
          (progn ,@body)
@@ -105,10 +105,25 @@
         (should-not (equal (total-review--database file-a)
                            (total-review--database file-c)))
         (let ((default-dir (total-review--database file-a)))
-          (setq total-review-profile '(named "first-pass"))
+          (setq total-review-profile "first-pass")
           (should-not (equal default-dir (total-review--database file-a)))
           (should (equal (total-review--database file-a)
                          (total-review--database file-b))))))))
+
+(ert-deftest total-review-profile-is-a-string ()
+  "Profile settings use a plain string and retain existing database paths."
+  (total-review-tests--sandbox
+    (should (equal total-review-profile "default"))
+    (should (eq (get 'total-review-profile 'custom-type) 'string))
+    (should (equal (total-review--profile-root)
+                   (expand-file-name "default/" total-review-directory)))
+    (setq total-review-profile "first-pass")
+    (should (equal (total-review--profile-root)
+                   (expand-file-name "named/first-pass/" total-review-directory)))
+    (should (equal (total-review--profile-label) "first-pass"))
+    (dolist (bad '("" "../escape" "nested/name" default (named "old-style")))
+      (let ((total-review-profile bad))
+        (should-error (total-review--profile-root))))))
 
 (ert-deftest total-review-profiles-independent ()
   (total-review-tests--sandbox
@@ -122,10 +137,12 @@
             (total-review-mark)
             (should (equal (total-review--sync) "10"))
             (total-review-switch-profile "second-pass")
+            (should (equal total-review-profile "second-pass"))
             (should-not (total-review--load (total-review--path)))
             (total-review-track)
             (should (equal (total-review--sync) "00"))
             (total-review-switch-profile "default")
+            (should (equal total-review-profile "default"))
             (should (equal (total-review--sync) "10")))
         (when (buffer-live-p buffer) (kill-buffer buffer))))))
 
@@ -304,6 +321,45 @@
           (should (= (plist-get stats :pending) 3))
           (should (= (plist-get stats :total) 3)))))))
 
+(ert-deftest total-review-project-tracking-does-not-prompt-for-temp-buffers ()
+  "Bulk tracking and progress collection must not kill a temp visiting a file.
+A modified temp buffer visiting a file triggers a save/kill confirmation."
+  (total-review-tests--sandbox
+    (let* ((root (file-name-as-directory
+                  (expand-file-name "project" total-review-tests--sources)))
+           (one (total-review-tests--write
+                 (expand-file-name "one.el" root) "one\n"))
+           (two (total-review-tests--write
+                 (expand-file-name "two.el" root) "two\n"))
+           (default-directory root)
+           (original-kill-buffer (symbol-function 'kill-buffer))
+           (temp-kills 0))
+      (cl-letf (((symbol-function 'project-current)
+                 (lambda (&rest _) 'fake-project))
+                ((symbol-function 'project-root)
+                 (lambda (&rest _) root))
+                ((symbol-function 'project-files)
+                 (lambda (&rest _) (list one two)))
+                ((symbol-function 'y-or-n-p) (lambda (&rest _) t))
+                ((symbol-function 'kill-buffer)
+                 (lambda (&optional buffer-or-name)
+                   (let ((target (get-buffer (or buffer-or-name
+                                                 (current-buffer)))))
+                     (when (and target
+                                (string-prefix-p " *temp" (buffer-name target)))
+                       (cl-incf temp-kills)
+                       (should-not (buffer-local-value 'buffer-file-name
+                                                       target))))
+                   (funcall original-kill-buffer buffer-or-name))))
+        (total-review-track-project)
+        (should (total-review--load one))
+        (should (total-review--load two))
+        ;; Also exercise the temporary buffer used by `--sync-path'.
+        (should (= (plist-get (total-review--collect
+                               (total-review--database one)) :total)
+                   2))
+        (should (>= temp-kills 4))))))
+
 (ert-deftest total-review-overlays-highlight-pending ()
   (total-review-tests--sandbox
     (let* ((path (total-review-tests--write
@@ -366,28 +422,6 @@
         (dolist (buffer (list buf1 buf2))
           (when (buffer-live-p buffer) (kill-buffer buffer)))))))
 
-(ert-deftest total-review-import-legacy-state ()
-  (total-review-tests--sandbox
-    (let* ((old (make-temp-file "old-review-lines-" t))
-           (path (total-review-tests--write
-                  (expand-file-name "sample.el" total-review-tests--sources)
-                  "a\nb\n"))
-           (canonical (file-truename path))
-           (id (total-review--id canonical))
-           (old-snapshot (concat id "-test.snapshot")))
-      (unwind-protect
-          (progn
-            (copy-file path (expand-file-name old-snapshot old))
-            (with-temp-file (expand-file-name (concat id ".el") old)
-              (prin1 (list :version 1 :path canonical
-                           :snapshot old-snapshot :flags "10")
-                     (current-buffer)))
-            (total-review-import-review-lines old)
-            (should (equal (plist-get (total-review--load canonical) :flags)
-                           "10"))
-            (should (file-exists-p (expand-file-name old-snapshot old))))
-        (delete-directory old t)))))
-
 ;;; Pending-line face tests
 
 (ert-deftest total-review-pending-face-custom-override ()
@@ -398,7 +432,7 @@
                 'total-review-pending-face))))
 
 (ert-deftest total-review-pending-face-dark-theme ()
-  "Dark backgrounds are lightened to draw both lines."
+  "Dark backgrounds are lightened for the pending underline."
   (cl-letf (((symbol-function 'facep) (lambda (&rest _) nil))
             ((symbol-function 'face-background)
              (lambda (&rest _) "#202020"))
@@ -410,10 +444,10 @@
                (should (= percent 20))
                "#444444")))
     (should (equal (total-review--pending-face)
-                   '(:overline "#444444" :underline "#444444")))))
+                   '(:underline "#444444")))))
 
 (ert-deftest total-review-pending-face-light-theme ()
-  "Light backgrounds are darkened to draw both lines."
+  "Light backgrounds are darkened for the pending underline."
   (cl-letf (((symbol-function 'facep) (lambda (&rest _) nil))
             ((symbol-function 'face-background)
              (lambda (&rest _) "#eeeeee"))
@@ -425,21 +459,21 @@
                (should (= percent 20))
                "#cccccc")))
     (should (equal (total-review--pending-face)
-                   '(:overline "#cccccc" :underline "#cccccc")))))
+                   '(:underline "#cccccc")))))
 
 (ert-deftest total-review-pending-face-no-color ()
-  "Unknown backgrounds fall back to foreground-colored lines."
+  "Unknown backgrounds fall back to a foreground-colored underline."
   (cl-letf (((symbol-function 'facep) (lambda (&rest _) nil))
             ((symbol-function 'face-background) (lambda (&rest _) nil)))
     (should (equal (total-review--pending-face)
-                   '(:overline t :underline t)))))
+                   '(:underline t)))))
 
 (ert-deftest total-review-pending-face-draws-every-run ()
   "All pending runs share the computed face and retain overlay identity."
   (with-temp-buffer
     (insert "one\ntwo\nthree\n")
     (let ((total-review-mode t)
-          (face '(:overline "#444444" :underline "#444444")))
+          (face '(:underline "#444444")))
       (cl-letf (((symbol-function 'total-review--pending-face)
                  (lambda () face)))
         (total-review--draw "010"))
@@ -459,17 +493,17 @@
           (insert "unreviewed\n")
           (setq-local total-review-mode t)
           (cl-letf (((symbol-function 'total-review--pending-face)
-                     (lambda () '(:overline "#222222" :underline "#222222"))))
+                     (lambda () '(:underline "#222222"))))
             (total-review--draw "0"))
           (let ((overlay (car (overlays-in (point-min) (point-max)))))
             (should overlay)
             (cl-letf (((symbol-function 'total-review--pending-face)
-                       (lambda () '(:overline "#eeeeee" :underline "#eeeeee"))))
+                       (lambda () '(:underline "#eeeeee"))))
               (total-review--refresh-pending-faces 'changed-theme))
             (should (eq overlay
                         (car (overlays-in (point-min) (point-max)))))
             (should (equal (overlay-get overlay 'face)
-                           '(:overline "#eeeeee" :underline "#eeeeee")))))
+                           '(:underline "#eeeeee")))))
       (kill-buffer buffer))))
 
 (ert-deftest total-review-pending-face-theme-refresh-after-edit ()
@@ -480,12 +514,55 @@
           (insert "unreviewed\n")
           (setq-local total-review-mode t)
           (cl-letf (((symbol-function 'total-review--pending-face)
-                     (lambda () '(:overline t :underline t))))
+                     (lambda () '(:underline t))))
             (total-review--draw "0"))
           (total-review--after-edit)
           (total-review--refresh-pending-faces 'changed-theme)
           (should-not (overlays-in (point-min) (point-max))))
       (kill-buffer buffer))))
+
+(ert-deftest total-review-report-layout-and-totals ()
+  "Show tracked-file count first and a percentage-free totals row last."
+  (let ((report (get-buffer-create "*Total Review Report*")))
+    (unwind-protect
+        (cl-letf (((symbol-function 'total-review--scope)
+                   (lambda (&optional _location)
+                     (list :directory "/tmp/total-review-report-test/"
+                           :kind 'global :root nil)))
+                  ((symbol-function 'total-review--collect)
+                   (lambda (_directory)
+                     (list :entries '(("/tmp/one.el" 2 1 3)
+                                      ("/tmp/two.el" 0 1 1))
+                           :errors '("/tmp/missing.el: unreadable")
+                           :reviewed 2 :pending 2 :total 4)))
+                  ((symbol-function 'pop-to-buffer)
+                   (lambda (buffer &rest _) buffer)))
+          (total-review-report)
+          (with-current-buffer report
+            (let* ((body (buffer-string))
+                   (tracked (string-match "Tracked files: 2" body))
+                   (summary (string-match
+                             (regexp-quote
+                              "Reviewed 2 / 4 lines (50.0%), 2 pending")
+                             body))
+                   (table (string-match "Reviewed  Pending" body))
+                   (footer (concat
+                            (make-string 65 ?-) "\n"
+                            (format "%-9d %-9d %-9d %s\n"
+                                    2 2 4 "Totals"))))
+              (should tracked)
+              (should summary)
+              (should table)
+              (should (< tracked summary))
+              (should (< summary table))
+              (should (string-match-p
+                       (regexp-quote "Errors (not counted as reviewed):")
+                       body))
+              (should-not (string-match-p "Readable tracked files" body))
+              (should (string-suffix-p footer body))
+              (should-not (string-match-p "%" footer)))))
+      (when (buffer-live-p report)
+        (kill-buffer report)))))
 
 (provide 'total-review-tests)
 ;;; total-review-tests.el ends here
