@@ -22,9 +22,16 @@
 
 (load-theme 'gruvbox-dark-hard 'noconfirm)
 
+;;; gruvbox-dark-hard customizations
+
 (when (member 'gruvbox-dark-hard custom-enabled-themes)
   (set-face-attribute 'highlight nil
                       :background
                       (color-darken-name
                        (face-attribute 'highlight :background)
-                       40)))
+                       40))
+  (set-face-attribute 'font-lock-comment-face nil
+                      :foreground
+                      (color-lighten-name
+                       (face-attribute 'font-lock-comment-face :foreground)
+                       30)))
