@@ -1,6 +1,5 @@
 ;; -*- lexical-binding: t; -*-
 
-(declare-function org-time-stamp "org")
 (declare-function org-insert-heading "org")
 (declare-function org-insert-heading-after-current "org")
 (declare-function org-back-to-heading "org")
@@ -50,8 +49,3 @@
   (org-insert-heading-after-current)
   (org-demote)
   (evil-insert-state 1))
-
-;;;###autoload
-(defun insert-timestamp ()
-  (interactive)
-  (org-time-stamp '(16)))

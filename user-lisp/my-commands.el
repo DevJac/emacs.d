@@ -1,6 +1,7 @@
 ;; -*- lexical-binding: t; -*-
 
 (declare-function consult-completion-in-region "consult")
+(declare-function org-time-stamp "org")
 
 ;;;###autoload
 (defun enable-babel-evaluate ()
@@ -32,3 +33,15 @@ into the minibuffer."
   "Prompt for a filesystem path and insert it at point."
   (interactive)
   (insert (read-file-name "Path: ")))
+
+;;;###autoload
+(defun insert-timestamp ()
+  (interactive)
+  (org-time-stamp '(16)))
+
+;;;###autoload
+(defun insert-literal-tab ()
+  "Insert a literal TAB character."
+  (interactive)
+  (insert ?\t)
+  (message "C-q TAB will also insert a TAB"))
