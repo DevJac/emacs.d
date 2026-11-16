@@ -18,6 +18,7 @@
 (use-package corfu
   :ensure t
   :config
+  ;; Save completion history and use it to enhance future completions
   (corfu-history-mode 1)
   (global-corfu-mode 1))
 (use-package vertico
@@ -41,5 +42,4 @@
 (use-package embark
   :ensure t
   :bind
-  ("C-." . #'embark-act)
   ("C-c c" . #'embark-act))
