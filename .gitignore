@@ -2,9 +2,9 @@
 *.eld
 /.cache/
 /auto-save-list/
-/auto-saves/
-/backups/
-/custom-sets.el
+/auto-save/
+/backup/
+/custom-set.el
 /eln-cache/
 /elpa/
 /history

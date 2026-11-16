@@ -17,7 +17,7 @@ If an error occurs, report it and continue."
 ;; Store customizations in another file to keep init.el clean
 ;; The custom-file variable is not a variable I created
 ;; See `C-h v custom-file`
-(setq custom-file (locate-user-emacs-file "custom-sets.el"))
+(setq custom-file (locate-user-emacs-file "custom-set.el"))
 (load custom-file 'noerror 'nomessage)
 
 (let ((errors 0))

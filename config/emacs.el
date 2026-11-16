@@ -26,8 +26,8 @@
 (setq tab-always-indent 'complete)
 
 ;; Keep backups and auto-saves outside working directories.
-(let ((backup-dir (locate-user-emacs-file "backups/"))
-      (auto-save-dir (locate-user-emacs-file "auto-saves/")))
+(let ((backup-dir (locate-user-emacs-file "backup/"))
+      (auto-save-dir (locate-user-emacs-file "auto-save/")))
   (make-directory backup-dir t)
   (make-directory auto-save-dir t)
   (setq backup-directory-alist
