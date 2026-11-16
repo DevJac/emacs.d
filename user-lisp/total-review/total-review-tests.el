@@ -82,6 +82,120 @@
           (with-current-buffer buffer (set-buffer-modified-p nil))
           (kill-buffer buffer))))))
 
+(ert-deftest total-review-untrack-deletes-review-data-not-source ()
+  "Untracking removes metadata, snapshot, and highlights, but not the file."
+  (total-review-tests--sandbox
+    (let* ((text "alpha\nbeta\n")
+           (path (total-review-tests--write
+                  (expand-file-name "sample.el" total-review-tests--sources)
+                  text))
+           (buffer (find-file-noselect path))
+           (confirmations 0))
+      (unwind-protect
+          (with-current-buffer buffer
+            (total-review-track)
+            (total-review-mode 1)
+            (total-review-mark)
+            (let* ((canonical (total-review--path))
+                   (directory (total-review--database canonical))
+                   (state (total-review--load canonical directory))
+                   (metadata (total-review--state-path canonical directory))
+                   (snapshot (total-review--snapshot-path state directory)))
+              (should (file-exists-p metadata))
+              (should (file-exists-p snapshot))
+              (should total-review-mode)
+              (should (equal (plist-get state :flags) "10"))
+              (cl-letf (((symbol-function 'yes-or-no-p)
+                         (lambda (&rest _)
+                           (cl-incf confirmations)
+                           t)))
+                (should (total-review-untrack)))
+              (should (= confirmations 1))
+              (should-not (file-exists-p metadata))
+              (should-not (file-exists-p snapshot))
+              (should-not (total-review--load canonical directory))
+              (should-not total-review-mode)
+              (should-not total-review--wanted)
+              (should-not total-review--status)
+              (should-not
+               (cl-some (lambda (ov) (overlay-get ov 'total-review-overlay))
+                        (overlays-in (point-min) (point-max))))
+              (should (equal (with-temp-buffer
+                               (insert-file-contents-literally path)
+                               (buffer-string))
+                             text))))
+        (when (buffer-live-p buffer) (kill-buffer buffer))))))
+
+(ert-deftest total-review-untrack-cancel-preserves-everything ()
+  "Declining confirmation leaves tracking and highlighting unchanged."
+  (total-review-tests--sandbox
+    (let* ((path (total-review-tests--write
+                  (expand-file-name "sample.el" total-review-tests--sources)
+                  "alpha\nbeta\n"))
+           (buffer (find-file-noselect path)))
+      (unwind-protect
+          (with-current-buffer buffer
+            (total-review-track)
+            (total-review-mode 1)
+            (let* ((canonical (total-review--path))
+                   (directory (total-review--database canonical))
+                   (state (total-review--load canonical directory))
+                   (metadata (total-review--state-path canonical directory))
+                   (snapshot (total-review--snapshot-path state directory)))
+              (cl-letf (((symbol-function 'yes-or-no-p) (lambda (&rest _) nil)))
+                (should-not (total-review-untrack)))
+              (should (file-exists-p metadata))
+              (should (file-exists-p snapshot))
+              (should (total-review--load canonical directory))
+              (should total-review-mode)
+              (should (cl-some
+                       (lambda (ov) (overlay-get ov 'total-review-overlay))
+                       (overlays-in (point-min) (point-max))))))
+        (when (buffer-live-p buffer) (kill-buffer buffer))))))
+
+(ert-deftest total-review-untrack-untracked-file-errors ()
+  "An untracked file cannot be accidentally removed by this command."
+  (total-review-tests--sandbox
+    (let* ((path (total-review-tests--write
+                  (expand-file-name "sample.el" total-review-tests--sources)
+                  "alpha\n"))
+           (buffer (find-file-noselect path)))
+      (unwind-protect
+          (with-current-buffer buffer
+            (cl-letf (((symbol-function 'yes-or-no-p)
+                       (lambda (&rest _)
+                         (ert-fail "Should not prompt for an untracked file"))))
+              (should-error (total-review-untrack) :type 'user-error))
+            (should (file-exists-p path)))
+        (when (buffer-live-p buffer) (kill-buffer buffer))))))
+
+(ert-deftest total-review-untrack-preserves-other-profiles ()
+  "Untracking in one profile does not delete another profile's data."
+  (total-review-tests--sandbox
+    (let* ((path (total-review-tests--write
+                  (expand-file-name "sample.el" total-review-tests--sources)
+                  "alpha\nbeta\n"))
+           (buffer (find-file-noselect path)))
+      (unwind-protect
+          (with-current-buffer buffer
+            (total-review-track)
+            (total-review-mark)
+            (let* ((canonical (total-review--path))
+                   (default-directory-path (total-review--database canonical))
+                   (default-state (total-review--load canonical)))
+              (let ((total-review-profile "second-pass"))
+                (total-review-track)
+                (should (equal (plist-get (total-review--load canonical) :flags)
+                               "00"))
+                (cl-letf (((symbol-function 'yes-or-no-p) (lambda (&rest _) t)))
+                  (total-review-untrack))
+                (should-not (total-review--load canonical)))
+              (should (equal (total-review--database canonical)
+                             default-directory-path))
+              (should (equal (total-review--load canonical) default-state))
+              (should (equal (total-review--sync) "10"))))
+        (when (buffer-live-p buffer) (kill-buffer buffer))))))
+
 (ert-deftest total-review-project-and-global-scopes ()
   "Project roots partition databases, and unprojected files share global."
   (total-review-tests--sandbox

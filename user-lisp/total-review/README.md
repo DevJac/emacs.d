@@ -1,4 +1,4 @@
-# Total Review 0.2.6 (experimental)
+# Total Review 0.2.7 (experimental)
 
 Total Review tracks which lines you've examined in source files, without adding annotations or altering the source. It uses a **plain-text snapshot** plus **review flags** for each file. On refresh, Emacs runs a **zero-context unified diff** against the current buffer and carries review status forward across unchanged lines. Inserted or modified lines become unreviewed.
 
@@ -40,6 +40,7 @@ The global mode does not track every file; it enables the local display mode onl
 | Command | Function |
 |---|---|
 | `total-review-track` | Track current file, initially all pending |
+| `total-review-untrack` | Stop tracking current file, discarding its review data after confirmation |
 | `total-review-track-project` | Discover project files using `project-files`, confirm bulk tracking, and display skipped files and reasons |
 | `total-review-track-dired` | Track files marked in Dired (or file at point) |
 | `total-review-list-skipped-project-files` | Show which project files the automatic filter skips, and why, without tracking anything |
@@ -53,7 +54,6 @@ The global mode does not track every file; it enables the local display mode onl
 | `total-review-progress` | Current-file review percentage |
 | `total-review-report` | Full project/global report, with clickable filenames |
 | `total-review-refresh` | Reconcile snapshot and current source using `diff` |
-| `total-review-show-diff` | Inspect the raw `-U0` diff without synchronizing |
 | `total-review-switch-profile` | Change to default or a named review profile and refresh open buffers |
 
 ### Workflow
@@ -70,6 +70,8 @@ collection are not treated as visiting modified files, so they do not trigger
 a save/kill confirmation.
 
 To bulk-track just a selection, mark files in Dired and invoke `M-x total-review-track-dired`. Explicit file tracking does not apply the automatic binary/size filter.
+
+To stop tracking a file, visit it and run `M-x total-review-untrack`. After an explicit confirmation, the active profile's review flags and snapshot for that file are deleted. Pending-line highlighting is turned off. The source file and other profiles' review data are not changed. You can use `total-review-track` later to start over, with every line pending.
 
 ## Pending-line appearance
 
@@ -179,4 +181,4 @@ Or, in Emacs:
 (ert-run-tests-interactively "^total-review-")
 ```
 
-If an ERT test fails, copy its backtrace and the output to investigate. `total-review-show-diff` is useful when you're curious about exactly how `diff` matched changed lines.
+If an ERT test fails, copy its backtrace and the output to investigate.

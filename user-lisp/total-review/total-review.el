@@ -1,6 +1,6 @@
 ;;; total-review.el --- Track line review coverage using diffs  -*- lexical-binding: t; -*-
 
-;; Version: 0.2.6
+;; Version: 0.2.7
 ;; Package-Requires: ((emacs "29.1"))
 ;; Keywords: tools, convenience
 
@@ -455,6 +455,34 @@ Use a visiting buffer when available, preserving its unsaved changes."
     (when total-review-mode (total-review-refresh))))
 
 ;;;###autoload
+(defun total-review-untrack ()
+  "Stop tracking the current file in the active review profile.
+After confirmation, delete its review state and snapshot, but never
+modify the source file or data belonging to other profiles."
+  (interactive)
+  (let* ((path (total-review--path))
+         (directory (total-review--database path))
+         (state (total-review--load path directory)))
+    (unless state
+      (user-error "File is not tracked in profile %s"
+                  (total-review--profile-label)))
+    (when (yes-or-no-p
+           (format "Discard Total Review progress for %s in profile %s? "
+                   (abbreviate-file-name path)
+                   (total-review--profile-label)))
+      ;; Remove metadata first: if snapshot deletion fails, we leave an
+      ;; orphaned snapshot rather than metadata pointing at a missing file.
+      (delete-file (total-review--state-path path directory))
+      (delete-file (total-review--snapshot-path state directory))
+      (when total-review-mode
+        (total-review-mode -1))
+      (setq total-review--wanted nil
+            total-review--status nil)
+      (total-review--clear-highlights)
+      (message "Total Review: stopped tracking %s" path)
+      t)))
+
+;;;###autoload
 (defun total-review-track-dired ()
   "Track Dired's marked regular files, or the file at point.
 Explicitly selected files bypass the automatic project-file filter."
@@ -680,20 +708,6 @@ Show the skipped file names and reasons in a separate buffer."
     (message "Total Review: %d/%d lines reviewed (%.1f%%)"
              reviewed total
              (if (zerop total) 100.0 (* 100.0 (/ (float reviewed) total))))))
-
-;;;###autoload
-(defun total-review-show-diff ()
-  "Show the raw unified diff against the snapshot, without syncing."
-  (interactive)
-  (let* ((path (total-review--path))
-         (directory (total-review--database path))
-         (state (or (total-review--load path directory)
-                    (user-error "File is not tracked")))
-         (diff-entire-buffers t))
-    (display-buffer
-     (diff-no-select (total-review--snapshot-path state directory)
-                     (current-buffer) "-U0" t
-                     (get-buffer-create "*Total Review Diff*")))))
 
 (defun total-review--enumerate (directory)
   "Return (PATHS . ERRORS) for database DIRECTORY.
