@@ -8,7 +8,7 @@
   (setq org-ellipsis " ▼")
   (setq org-fontify-done-headline nil)
   (setq org-fontify-todo-headline nil)
-  (setq org-log-into-drawer "LOGS")
+  (setq org-log-into-drawer t)
   (setq org-log-done 'time)
   (setq org-capture-templates
         '(("c" "Capture"
