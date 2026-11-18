@@ -1,5 +1,8 @@
 ;; -*- lexical-binding: t; -*-
 
+;; See: https://github.com/emacs-evil/evil
+
+;; goto-chg is required for goto-last-change, etc; bound to g; and g,
 (use-package goto-chg
   :ensure t)
 (use-package undo-tree
@@ -12,10 +15,12 @@
 (use-package evil
   :ensure t
   :init
+  ;; evil-collection assumes evil-want-keybinding is nil
   (setq evil-want-keybinding nil)
   (setq evil-search-module 'evil-search)
   (setq evil-undo-system 'undo-tree)
   (setq evil-want-C-u-scroll t)
+  ;; TAB and C-i are the same; this prevents TAB from jumping:
   (setq evil-want-C-i-jump nil)
   :config
   (evil-mode 1))
@@ -25,6 +30,15 @@
   (setq evil-collection-key-blacklist '("SPC"))
   :config
   (evil-collection-init '(dired magit)))
+;; This unusual evil-org config comes from the README.
+;; See: https://github.com/Somelauw/evil-org-mode
+(use-package evil-org
+  :ensure t
+  :after org
+  :hook (org-mode . (lambda () (evil-org-mode)))
+  :config
+  (require 'evil-org-agenda)
+  (evil-org-agenda-set-keys))
 (use-package evil-surround
   :ensure t
   :config
@@ -57,6 +71,3 @@
 ;; These help when navigating display overlays.
 (advice-add 'evil-next-line :around #'my/evil-next-line-advice)
 (advice-add 'evil-previous-line :around #'my/evil-previous-line-advice)
-
-;; Create a text object between |'s. This is especially useful for org tables.
-(define-key evil-inner-text-objects-map "|" #'evil-org-table-cell-inner)
