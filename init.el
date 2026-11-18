@@ -14,8 +14,8 @@ If an error occurs, report it and continue."
         :error)
        nil))))
 
-;; Store customizations in another file to keep init.el clean
-;; The custom-file variable is not a variable I created
+;; Store customizations in another file to keep init.el clean.
+;; The custom-file variable is not a variable I created.
 ;; See `C-h v custom-file`
 (setq custom-file (locate-user-emacs-file "custom-set.el"))
 (load custom-file 'noerror 'nomessage)
@@ -31,6 +31,7 @@ If an error occurs, report it and continue."
                   "config/org.el"
                   "config/other-packages.el"
                   "config/total-review.el"
+                  "config/undo-hl.el"
                   "config/whitespace.el"
                   "config/evil-keys.el"))
     (unless (my/load-init-file file)
