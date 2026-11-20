@@ -196,6 +196,151 @@
               (should (equal (total-review--sync) "10"))))
         (when (buffer-live-p buffer) (kill-buffer buffer))))))
 
+(ert-deftest total-review-deleted-file-forgotten-on-collect ()
+  "A missing file is removed from the active database on the next scan."
+  (total-review-tests--sandbox
+    (let* ((missing (total-review-tests--write
+                     (expand-file-name "missing.el" total-review-tests--sources)
+                     "one\ntwo\n"))
+           (survivor (total-review-tests--write
+                      (expand-file-name "survivor.el" total-review-tests--sources)
+                      "three\n")))
+      (total-review--track-path missing)
+      (total-review--track-path survivor)
+      (let* ((directory (total-review--database missing))
+             (state (total-review--load missing directory))
+             (metadata (total-review--state-path missing directory))
+             (snapshot (total-review--snapshot-path state directory)))
+        (delete-file missing)
+        (let ((stats (total-review--collect directory)))
+          (should (= (plist-get stats :forgotten) 1))
+          (should (= (plist-get stats :total) 1))
+          (should (= (length (plist-get stats :entries)) 1))
+          (should-not (plist-get stats :errors)))
+        (should-not (file-exists-p metadata))
+        (should-not (file-exists-p snapshot))
+        (should (total-review--load survivor directory))
+        (should (= (plist-get (total-review--collect directory) :forgotten) 0))))))
+
+(ert-deftest total-review-deleted-file-preserves-other-profile ()
+  "Missing file cleanup only touches the profile being scanned."
+  (total-review-tests--sandbox
+    (let ((path (total-review-tests--write
+                 (expand-file-name "vanished.el" total-review-tests--sources)
+                 "value\n")))
+      (total-review--track-path path)
+      (let ((second-profile-state
+             (let ((total-review-profile "second-pass"))
+               (total-review--track-path path)
+               (total-review--state-path path))))
+        (delete-file path)
+        (should (= (plist-get (total-review--collect
+                              (total-review--database path)) :forgotten) 1))
+        (should (file-exists-p second-profile-state))
+        (let ((total-review-profile "second-pass"))
+          (should (= (plist-get (total-review--collect
+                                (total-review--database path)) :forgotten) 1)))
+        (should-not (file-exists-p second-profile-state))))))
+
+(ert-deftest total-review-deleted-file-with-inaccessible-parent-kept ()
+  "A missing path without an accessible parent is not pruned."
+  (total-review-tests--sandbox
+    (let ((path (total-review-tests--write
+                 (expand-file-name "unavailable.el" total-review-tests--sources)
+                 "value\n")))
+      (total-review--track-path path)
+      (let ((metadata (total-review--state-path path)))
+        (delete-file path)
+        (cl-letf (((symbol-function 'file-accessible-directory-p)
+                   (lambda (&rest _) nil)))
+          (let ((stats (total-review--collect (total-review--database path))))
+            (should (= (plist-get stats :forgotten) 0))
+            (should (= (length (plist-get stats :errors)) 1))))
+        (should (file-exists-p metadata))))))
+
+(ert-deftest total-review-deleted-file-disables-visiting-highlights ()
+  "A deleted tracked file is forgotten even if its buffer is still open."
+  (total-review-tests--sandbox
+    (let* ((path (total-review-tests--write
+                  (expand-file-name "opened.el" total-review-tests--sources)
+                  "value\n"))
+           (buffer (find-file-noselect path)))
+      (unwind-protect
+          (with-current-buffer buffer
+            (total-review-track)
+            (total-review-mode 1)
+            (should total-review-mode)
+            (delete-file path)
+            (should (= (plist-get (total-review--collect
+                                   (total-review--database path)) :forgotten)
+                       1))
+            (should-not total-review-mode)
+            (should-not total-review--wanted)
+            (should-not
+             (cl-some (lambda (ov) (overlay-get ov 'total-review-overlay))
+                      (overlays-in (point-min) (point-max)))))
+        (when (buffer-live-p buffer)
+          (with-current-buffer buffer (set-buffer-modified-p nil))
+          (kill-buffer buffer))))))
+
+(ert-deftest total-review-empty-file-is-not-forgotten ()
+  "An existing zero-line file must remain tracked."
+  (total-review-tests--sandbox
+    (let ((path (total-review-tests--write
+                 (expand-file-name "empty.el" total-review-tests--sources)
+                 "value\n")))
+      (total-review--track-path path)
+      (total-review-tests--write path "")
+      (let ((stats (total-review--collect (total-review--database path))))
+        (should (= (plist-get stats :forgotten) 0))
+        (should (= (plist-get stats :total) 0))
+        (should (total-review--load path))))))
+
+(ert-deftest total-review-untrack-dired-marked-files ()
+  "Bulk untrack confirms once and only deletes marked tracked metadata."
+  (total-review-tests--sandbox
+    (let* ((one (total-review-tests--write
+                 (expand-file-name "one.el" total-review-tests--sources)
+                 "one\n"))
+           (two (total-review-tests--write
+                 (expand-file-name "two.el" total-review-tests--sources)
+                 "two\n"))
+           (extra (total-review-tests--write
+                   (expand-file-name "extra.el" total-review-tests--sources)
+                   "extra\n"))
+           (confirmations 0))
+      (mapc #'total-review--track-path (list one two extra))
+      (require 'dired)
+      (cl-letf (((symbol-function 'derived-mode-p) (lambda (&rest _) t))
+                ((symbol-function 'dired-get-marked-files)
+                 (lambda (&rest _) (list one two one)))
+                ((symbol-function 'yes-or-no-p)
+                 (lambda (&rest _)
+                   (cl-incf confirmations)
+                   t)))
+        (total-review-untrack-dired))
+      (should (= confirmations 1))
+      (should-not (total-review--load one))
+      (should-not (total-review--load two))
+      (should (total-review--load extra))
+      (should (file-exists-p one))
+      (should (file-exists-p two)))))
+
+(ert-deftest total-review-untrack-dired-declined ()
+  "Bulk untrack cancellation never removes progress."
+  (total-review-tests--sandbox
+    (let ((path (total-review-tests--write
+                 (expand-file-name "one.el" total-review-tests--sources)
+                 "one\n")))
+      (total-review--track-path path)
+      (require 'dired)
+      (cl-letf (((symbol-function 'derived-mode-p) (lambda (&rest _) t))
+                ((symbol-function 'dired-get-marked-files)
+                 (lambda (&rest _) (list path)))
+                ((symbol-function 'yes-or-no-p) (lambda (&rest _) nil)))
+        (total-review-untrack-dired))
+      (should (total-review--load path)))))
+
 (ert-deftest total-review-project-and-global-scopes ()
   "Project roots partition databases, and unprojected files share global."
   (total-review-tests--sandbox
@@ -434,6 +579,29 @@
           (should (= (length entries) 2))
           (should (= (plist-get stats :pending) 3))
           (should (= (plist-get stats :total) 3)))))))
+
+(ert-deftest total-review-track-project-forgets-missing-files ()
+  "Project tracking scans its database even when no new files are added."
+  (total-review-tests--sandbox
+    (let* ((root (file-name-as-directory
+                  (expand-file-name "project" total-review-tests--sources)))
+           (old (total-review-tests--write (expand-file-name "old.el" root)
+                                           "old\n"))
+           (current (total-review-tests--write
+                     (expand-file-name "current.el" root) "current\n"))
+           (default-directory root))
+      (cl-letf (((symbol-function 'project-current)
+                 (lambda (&rest _) 'fake-project))
+                ((symbol-function 'project-root) (lambda (&rest _) root))
+                ((symbol-function 'project-files)
+                 (lambda (&rest _) (list current)))
+                ((symbol-function 'y-or-n-p) (lambda (&rest _) t)))
+        (total-review--track-path old)
+        (total-review--track-path current)
+        (delete-file old)
+        (total-review-track-project)
+        (should-not (total-review--load old))
+        (should (total-review--load current))))))
 
 (ert-deftest total-review-project-tracking-does-not-prompt-for-temp-buffers ()
   "Bulk tracking and progress collection must not kill a temp visiting a file.
@@ -677,6 +845,321 @@ A modified temp buffer visiting a file triggers a save/kill confirmation."
               (should-not (string-match-p "%" footer)))))
       (when (buffer-live-p report)
         (kill-buffer report)))))
+
+
+;;; Git-backed review tests
+
+(defun total-review-tests--git (root &rest args)
+  "Invoke Git with ARGS in ROOT; fail the test on an error."
+  (with-temp-buffer
+    (let ((status (apply #'process-file "git" nil t nil "-C" root args)))
+      (unless (eq status 0)
+        (ert-fail (format "Git %S failed (%S): %s" args status (buffer-string))))
+      (buffer-string))))
+
+(defun total-review-tests--git-repo ()
+  "Create a small Git repository inside the sandbox sources."
+  (unless (executable-find "git") (ert-skip "Git is unavailable"))
+  (let ((root (expand-file-name "git-repo" total-review-tests--sources)))
+    (make-directory root t)
+    (total-review-tests--git root "init" "-q")
+    root))
+
+(defun total-review-tests--git-commit (root message)
+  "Commit the current index and worktree changes in ROOT."
+  (total-review-tests--git root "add" "--all")
+  (total-review-tests--git root "-c" "user.name=Total Review Tests"
+                           "-c" "user.email=total-review@example.invalid"
+                           "-c" "commit.gpgsign=false"
+                           "commit" "-q" "-m" message))
+
+(ert-deftest total-review-git-lines-based-on-head-not-working-tree ()
+  "Unsaved edits never change Git review bits or the baseline line count."
+  (total-review-tests--sandbox
+    (let* ((root (total-review-tests--git-repo))
+           (path (total-review-tests--write
+                  (expand-file-name "sample.el" root) "alpha\nbeta\ngamma\n"))
+           buffer)
+      (total-review-tests--git-commit root "initial")
+      (setq buffer (find-file-noselect path))
+      (unwind-protect
+          (with-current-buffer buffer
+            (total-review-track)
+            (let ((state (total-review--load (total-review--path))))
+              (should (eq (plist-get state :backend) 'git))
+              (should (equal (plist-get state :active)
+                             (plist-get (total-review--git-info path) :blob)))
+              (should (equal (plist-get (car (plist-get state :versions)) :flags)
+                             "000")))
+            (total-review-mark)
+            (should (equal total-review--base-flags "100"))
+            (goto-char (point-min))
+            (insert "new\n")
+            (should (equal (total-review--sync) "-100"))
+            (should (equal total-review--base-flags "100"))
+            (should (equal (append total-review--mapping nil)
+                           '(nil 0 1 2)))
+            (goto-char (point-min))
+            (should-error (total-review-mark) :type 'user-error)
+            (should (equal total-review--base-flags "100"))
+            (should (equal (plist-get
+                            (total-review--git-version
+                             (total-review--load (total-review--path))
+                             (plist-get (total-review--git-info path) :blob))
+                            :flags)
+                           "100")))
+        (when (buffer-live-p buffer)
+          (with-current-buffer buffer (set-buffer-modified-p nil))
+          (kill-buffer buffer))))))
+
+(ert-deftest total-review-git-erasing-and-restoring-buffer-keeps-progress ()
+  "Erase/save/reinsert cannot destroy the stored committed review bits."
+  (total-review-tests--sandbox
+    (let* ((root (total-review-tests--git-repo))
+           (text "one\ntwo\nthree\n")
+           (path (total-review-tests--write
+                  (expand-file-name "sample.el" root) text))
+           buffer)
+      (total-review-tests--git-commit root "initial")
+      (setq buffer (find-file-noselect path))
+      (unwind-protect
+          (with-current-buffer buffer
+            (total-review-track)
+            (forward-line 1)
+            (total-review-mark)
+            (should (equal (total-review--sync) "010"))
+            (erase-buffer)
+            (save-buffer)
+            (should (equal (total-review--sync) ""))
+            (should (equal total-review--base-flags "010"))
+            (insert text)
+            (save-buffer)
+            (should (equal (total-review--sync) "010"))
+            (should (= (length (plist-get
+                                (total-review--load (total-review--path))
+                                :versions)) 1)))
+        (when (buffer-live-p buffer)
+          (with-current-buffer buffer (set-buffer-modified-p nil))
+          (kill-buffer buffer))))))
+
+(ert-deftest total-review-git-new-commit-transfers-only-unchanged-lines ()
+  "A new commit creates version bits, preserving unchanged reviewed lines."
+  (total-review-tests--sandbox
+    (let* ((root (total-review-tests--git-repo))
+           (path (total-review-tests--write
+                  (expand-file-name "sample.el" root) "one\ntwo\nthree\n"))
+           buffer)
+      (total-review-tests--git-commit root "initial")
+      (setq buffer (find-file-noselect path))
+      (unwind-protect
+          (with-current-buffer buffer
+            (total-review-track)
+            (total-review-mark)
+            (forward-line 2)
+            (total-review-mark)
+            (should (equal (total-review--sync) "101"))
+            (goto-char (point-min))
+            (delete-region (line-beginning-position) (line-end-position))
+            (insert "modified")
+            (save-buffer)
+            (should (equal (total-review--sync) "-01"))
+            (should (equal total-review--base-flags "101"))
+            (total-review-tests--git-commit root "change first line")
+            (should (equal (total-review--sync) "001"))
+            (should (equal total-review--base-flags "001"))
+            (let ((state (total-review--load (total-review--path))))
+              (should (= (length (plist-get state :versions)) 2))
+              (should (eq (plist-get state :backend) 'git))))
+        (when (buffer-live-p buffer)
+          (with-current-buffer buffer (set-buffer-modified-p nil))
+          (kill-buffer buffer))))))
+
+(ert-deftest total-review-git-switch-branches-restores-versions ()
+  "Previously visited committed versions retain separate review progress."
+  (total-review-tests--sandbox
+    (let* ((root (total-review-tests--git-repo))
+           (path (total-review-tests--write
+                  (expand-file-name "sample.el" root) "first\nsecond\nthird\n"))
+           buffer)
+      (total-review-tests--git-commit root "initial")
+      (setq buffer (find-file-noselect path))
+      (unwind-protect
+          (with-current-buffer buffer
+            (total-review-track)
+            (total-review-mark)
+            (should (equal (total-review--sync) "100"))
+            (total-review-tests--git root "switch" "-q" "-c" "feature")
+            (goto-char (point-min))
+            (forward-line 1)
+            (delete-region (line-beginning-position) (line-end-position))
+            (insert "feature-change")
+            (save-buffer)
+            (total-review-tests--git-commit root "feature")
+            (should (equal (total-review--sync) "100"))
+            (goto-char (point-max))
+            (forward-line -1)
+            (total-review-mark)
+            (should (equal total-review--base-flags "101"))
+            (total-review-tests--git root "switch" "-q" "-")
+            (revert-buffer :ignore-auto :noconfirm)
+            (should (equal (total-review--sync) "100"))
+            (total-review-tests--git root "switch" "-q" "feature")
+            (revert-buffer :ignore-auto :noconfirm)
+            (should (equal (total-review--sync) "101"))
+            (should (= (length (plist-get
+                                (total-review--load (total-review--path))
+                                :versions)) 2)))
+        (when (buffer-live-p buffer)
+          (with-current-buffer buffer (set-buffer-modified-p nil))
+          (kill-buffer buffer))))))
+
+(ert-deftest total-review-git-untracked-file-falls-back-and-converts ()
+  "An uncommitted file uses snapshots until its first commit."
+  (total-review-tests--sandbox
+    (let* ((root (total-review-tests--git-repo))
+           path buffer)
+      (total-review-tests--write (expand-file-name "anchor" root) "anchor\n")
+      (total-review-tests--git-commit root "initial")
+      (setq path (total-review-tests--write
+                  (expand-file-name "new.el" root) "first\nsecond\n"))
+      (setq buffer (find-file-noselect path))
+      (unwind-protect
+          (with-current-buffer buffer
+            (total-review-track)
+            (should (eq (plist-get (total-review--load (total-review--path))
+                                   :backend) 'snapshot))
+            (total-review-mark)
+            (should (equal (total-review--sync) "10"))
+            (total-review-tests--git-commit root "first appearance of new.el")
+            (should (equal (total-review--sync) "10"))
+            (let ((state (total-review--load (total-review--path))))
+              (should (eq (plist-get state :backend) 'git))
+              (should (equal (plist-get (car (plist-get state :versions)) :flags)
+                             "10"))))
+        (when (buffer-live-p buffer) (kill-buffer buffer))))))
+
+(ert-deftest total-review-git-missing-working-file-preserves-state ()
+  "Missing Git-backed paths aren't auto-untracked by the database scan."
+  (total-review-tests--sandbox
+    (let* ((root (total-review-tests--git-repo))
+           (path (total-review-tests--write
+                  (expand-file-name "sample.el" root) "value\n")))
+      (total-review-tests--git-commit root "initial")
+      (total-review--track-path path)
+      (let ((metadata (total-review--state-path path)))
+        (delete-file path)
+        (let ((stats (total-review--collect (total-review--database path))))
+          (should (= (plist-get stats :forgotten) 0))
+          (should (= (length (plist-get stats :errors)) 1)))
+        (should (file-exists-p metadata))))))
+
+(ert-deftest total-review-git-progress-messages-consistent ()
+  "Progress, mark and refresh messages use the same baseline summary."
+  (total-review-tests--sandbox
+    (let* ((root (total-review-tests--git-repo))
+           (path (total-review-tests--write
+                  (expand-file-name "sample.el" root) "one\ntwo\n"))
+           buffer log)
+      (total-review-tests--git-commit root "initial")
+      (setq buffer (find-file-noselect path))
+      (unwind-protect
+          (with-current-buffer buffer
+            (total-review-track)
+            (cl-letf (((symbol-function 'message)
+                       (lambda (format-string &rest args)
+                         (push (apply #'format format-string args) log))))
+              (total-review-mark)
+              (total-review-progress)
+              (total-review-refresh))
+            (should (= (length log) 2))
+            ;; `refresh' only prints progress when called interactively.
+            (should (equal (car log) (cadr log)))
+            (should (string-match-p
+                     "Reviewed 1 / 2 lines (50.0%), 1 pending" (car log))))
+        (when (buffer-live-p buffer) (kill-buffer buffer))))))
+
+(ert-deftest total-review-line-map-keeps-only-unchanged-lines ()
+  (should (equal (append (total-review--line-map 3 4 '((1 0 2 1))) nil)
+                 '(0 nil 1 2)))
+  (should (equal (append (total-review--line-map 3 3 '((2 1 2 1))) nil)
+                 '(0 nil 2)))
+  (should (equal (append (total-review--line-map 3 0 '((1 3 0 0))) nil)
+                 nil)))
+
+
+(ert-deftest total-review-git-commit-while-emacs-not-running ()
+  "A commit made while a review buffer is closed is detected on reopening."
+  (total-review-tests--sandbox
+    (let* ((root (total-review-tests--git-repo))
+           (path (total-review-tests--write
+                  (expand-file-name "sample.el" root) "one\ntwo\n"))
+           buffer)
+      (total-review-tests--git-commit root "initial")
+      (setq buffer (find-file-noselect path))
+      (with-current-buffer buffer
+        (total-review-track)
+        (total-review-mark))
+      (kill-buffer buffer)
+      (total-review-tests--write path "one\ntwo\nthree\n")
+      (total-review-tests--git-commit root "external commit")
+      (setq buffer (find-file-noselect path))
+      (unwind-protect
+          (with-current-buffer buffer
+            (should (equal (total-review--sync) "100"))
+            (should (= (length (plist-get
+                                (total-review--load (total-review--path))
+                                :versions)) 2)))
+        (when (buffer-live-p buffer) (kill-buffer buffer))))))
+
+(ert-deftest total-review-git-commit-with-unchanged-blob-reuses-bits ()
+  "A commit touching another file doesn't duplicate this file's versions."
+  (total-review-tests--sandbox
+    (let* ((root (total-review-tests--git-repo))
+           (path (total-review-tests--write
+                  (expand-file-name "sample.el" root) "one\ntwo\n"))
+           buffer)
+      (total-review-tests--git-commit root "initial")
+      (setq buffer (find-file-noselect path))
+      (unwind-protect
+          (with-current-buffer buffer
+            (total-review-track)
+            (total-review-mark)
+            (total-review-tests--write (expand-file-name "other" root) "other\n")
+            (total-review-tests--git-commit root "unrelated file")
+            (should (equal (total-review--sync) "10"))
+            (should (= (length (plist-get
+                                (total-review--load (total-review--path))
+                                :versions)) 1)))
+        (when (buffer-live-p buffer) (kill-buffer buffer))))))
+
+(ert-deftest total-review-git-selection-with-changed-lines-is-atomic ()
+  "Marking a region with changed lines must not modify any committed bits."
+  (total-review-tests--sandbox
+    (let* ((root (total-review-tests--git-repo))
+           (path (total-review-tests--write
+                  (expand-file-name "sample.el" root) "a\nb\nc\n"))
+           buffer)
+      (total-review-tests--git-commit root "initial")
+      (setq buffer (find-file-noselect path))
+      (unwind-protect
+          (with-current-buffer buffer
+            (total-review-track)
+            (goto-char (point-min))
+            (insert "new\n")
+            (goto-char (point-min))
+            (set-mark (point))
+            (goto-char (point-max))
+            (activate-mark)
+            (should-error (total-review-mark) :type 'user-error)
+            (should (equal total-review--base-flags "000"))
+            (should (equal (plist-get
+                            (total-review--git-version
+                             (total-review--load (total-review--path))
+                             (plist-get (total-review--git-info path) :blob))
+                            :flags) "000")))
+        (when (buffer-live-p buffer)
+          (with-current-buffer buffer (set-buffer-modified-p nil))
+          (kill-buffer buffer))))))
 
 (provide 'total-review-tests)
 ;;; total-review-tests.el ends here

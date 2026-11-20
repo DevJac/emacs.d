@@ -1,24 +1,21 @@
-;;; total-review.el --- Track line review coverage using diffs  -*- lexical-binding: t; -*-
+;;; total-review.el --- Track line review coverage against committed or saved text  -*- lexical-binding: t; -*-
 
-;; Version: 0.2.7
+;; Version: 0.3.0
 ;; Package-Requires: ((emacs "29.1"))
 ;; Keywords: tools, convenience
 
 ;;; Commentary:
 ;;
-;; Total Review stores a plain-text snapshot and a string of 0/1 review
-;; flags for each tracked local file.  GNU diff, through `diff-no-select',
-;; carries flags over unchanged lines whenever the source changes.
-;; New and modified lines become unreviewed.  The source is never edited
-;; or saved by this package.
+;; For Git-committed files, Total Review tracks review status per committed
+;; file version and maps those bits onto unchanged lines in the live buffer.
+;; Editing, saving and undoing cannot change the committed baseline.  Separate
+;; states for multiple committed versions allow branch-switch restoration.
+;; Files not present in HEAD use the earlier snapshot-based approach.
+;; Source files and the Git repository are never modified by Total Review.
 ;;
-;; Database profiles: "default" or a string such as "first-pass".  Each profile
-;; has an independent database for each `project.el' project, plus a
-;; shared fallback database for files outside projects.  No data is
-;; stored in source repositories.
-;;
-;; A local GNU-compatible `diff' executable is required.  This is an
-;; experimental package; back up review data while testing it.
+;; The database is central, per profile and project.  Git and GNU diff are
+;; required for Git-backed tracking.  This is an experimental package; back
+;; up review data while testing it.  Version 1 databases are not migrated.
 
 ;;; Code:
 
@@ -70,7 +67,13 @@ without changing syntax highlighting or the text background."
 (defvar global-total-review-mode nil)
 
 (defvar-local total-review--status nil
-  "Status flags last loaded for this buffer.")
+  "Flags for working-buffer lines: 1 reviewed, 0 pending, - changed.")
+
+(defvar-local total-review--base-flags nil
+  "Review bits for the committed baseline, or snapshot for non-Git files.")
+
+(defvar-local total-review--mapping nil
+  "Vector mapping working-line indices to committed-line indices, or nil.")
 
 (defvar-local total-review--wanted nil
   "Non-nil if highlighting was requested, even if a profile lacks this file.")
@@ -130,7 +133,7 @@ or directory; its containing project determines the database."
 
 (defun total-review--state-path (path &optional directory)
   "Return metadata path for canonical PATH in DIRECTORY."
-  (expand-file-name (concat (total-review--id path) ".el")
+  (expand-file-name (concat (total-review--id path) ".state")
                     (or directory (total-review--database path))))
 
 (defun total-review--snapshot-path (state directory)
@@ -143,20 +146,43 @@ or directory; its containing project determines the database."
     (expand-file-name name directory)))
 
 (defun total-review--read-state-file (file directory)
-  "Read and validate FILE in DIRECTORY, returning its state plist."
+  "Read and validate a version 2 review state from FILE in DIRECTORY."
   (let* ((state (with-temp-buffer
                   (insert-file-contents file)
                   (goto-char (point-min))
                   (read (current-buffer))))
-         (path (plist-get state :path)))
+         (path (plist-get state :path))
+         (backend (plist-get state :backend)))
     (unless (and (listp state)
-                 (equal (plist-get state :version) 1)
+                 (equal (plist-get state :version) 2)
                  (stringp path) (file-name-absolute-p path)
                  (equal (file-name-nondirectory file)
-                        (concat (total-review--id path) ".el"))
-                 (stringp (plist-get state :flags))
-                 (string-match-p "\\`[01]*\\'" (plist-get state :flags))
-                 (file-regular-p (total-review--snapshot-path state directory)))
+                        (concat (total-review--id path) ".state"))
+                 (pcase backend
+                   ('snapshot
+                    (and (stringp (plist-get state :flags))
+                         (string-match-p "\\`[01]*\\'" (plist-get state :flags))
+                         (file-regular-p
+                          (total-review--snapshot-path state directory))))
+                   ('git
+                    (and (stringp (plist-get state :git-root))
+                         (stringp (plist-get state :git-path))
+                         (stringp (plist-get state :active))
+                         (consp (plist-get state :versions))
+                         (cl-some
+                          (lambda (version)
+                            (equal (plist-get version :blob)
+                                   (plist-get state :active)))
+                          (plist-get state :versions))
+                         (cl-every
+                          (lambda (version)
+                            (and (stringp (plist-get version :blob))
+                                 (stringp (plist-get version :commit))
+                                 (stringp (plist-get version :flags))
+                                 (string-match-p
+                                  "\\`[01]*\\'" (plist-get version :flags))))
+                          (plist-get state :versions))))
+                   (_ nil)))
       (error "Invalid or incomplete Total Review state: %s" file))
     state))
 
@@ -182,7 +208,7 @@ or directory; its containing project determines the database."
     (unwind-protect
         (progn
           (with-temp-file tmp
-            (insert ";; Total Review state, version 1.\n")
+            (insert ";; Total Review state, version 2.\n")
             (let ((print-length nil) (print-level nil))
               (prin1 state (current-buffer)))
             (insert "\n"))
@@ -213,7 +239,7 @@ committing the state.  DIRECTORY overrides the resolved database."
               (widen)
               (write-region (point-min) (point-max) new nil 'silent)))
           (total-review--write-state
-           path (list :version 1 :path path
+           path (list :version 2 :backend 'snapshot :path path
                       :snapshot (file-name-nondirectory snapshot)
                       :flags flags)
            dir)
@@ -222,6 +248,204 @@ committing the state.  DIRECTORY overrides the resolved database."
             (ignore-errors (delete-file old))))
       (when (and new (not committed) (file-exists-p new))
         (delete-file new)))))
+
+(defun total-review--git-output (directory &rest args)
+  "Return Git standard output in DIRECTORY for successful ARGS, else nil."
+  (when (executable-find "git")
+    (with-temp-buffer
+      (when (eq 0 (apply #'process-file
+                         "git" nil t nil "-C" directory args))
+        (replace-regexp-in-string "\n\\'" "" (buffer-string))))))
+
+(defun total-review--git-info (path)
+  "Return HEAD's committed file identity for PATH, or nil.
+The index and working tree are deliberately ignored."
+  (let* ((directory (file-name-directory path))
+         (root (total-review--git-output directory "rev-parse" "--show-toplevel")))
+    (when root
+      (let* ((root (file-name-as-directory (file-truename root)))
+             (relative (file-relative-name path root))
+             (head (total-review--git-output root "rev-parse" "--verify" "HEAD"))
+             (blob (and head
+                        (not (string-prefix-p "../" relative))
+                        (total-review--git-output
+                         root "rev-parse" "--verify" (concat "HEAD:" relative)))))
+        (when (and blob (equal (total-review--git-output root "cat-file" "-t" blob)
+                               "blob"))
+          (list :root root :relative relative :head head :blob blob))))))
+
+(defun total-review--git-blob-buffer (root blob)
+  "Return a temporary buffer containing BLOB from Git repository ROOT.
+Signal an error when Git cannot read the historical object."
+  (let ((buffer (generate-new-buffer " *total-review-git-blob*")))
+    (condition-case err
+        (progn
+          (with-current-buffer buffer
+            (unless (eq 0 (process-file "git" nil t nil
+                                        "-C" root "cat-file" "blob" blob))
+              (error "Git object %s is unavailable" blob))
+            (set-buffer-modified-p nil))
+          buffer)
+      (error
+       (kill-buffer buffer)
+       (signal (car err) (cdr err))))))
+
+(defun total-review--git-state (path info flags)
+  "Construct initial Git review state for PATH and committed INFO using FLAGS."
+  (list :version 2 :backend 'git :path path
+        :git-root (plist-get info :root)
+        :git-path (plist-get info :relative)
+        :active (plist-get info :blob)
+        :versions (list (list :blob (plist-get info :blob)
+                              :commit (plist-get info :head)
+                              :flags flags))))
+
+(defun total-review--git-version (state blob)
+  "Return the saved review version in STATE for BLOB, or nil."
+  (cl-find blob (plist-get state :versions)
+           :key (lambda (entry) (plist-get entry :blob)) :test #'equal))
+
+(defun total-review--git-ancestor-distance (root older newer)
+  "Return commit distance from OLDER to NEWER in ROOT if ancestor, else nil."
+  (when (eq 0 (process-file "git" nil nil nil "-C" root
+                            "merge-base" "--is-ancestor" older newer))
+    (let ((count (total-review--git-output
+                  root "rev-list" "--count" (concat older ".." newer))))
+      (and count (string-to-number count)))))
+
+(defun total-review--git-inheritance-source (state info)
+  "Find a saved version from which to inherit review progress for INFO.
+Prefer the closest known ancestor; if none survives, use the last active
+version, conservatively re-diffing it against the new committed content."
+  (let ((versions (plist-get state :versions))
+        (root (plist-get info :root))
+        (head (plist-get info :head))
+        chosen distance)
+    (dolist (entry versions)
+      (let ((n (total-review--git-ancestor-distance
+                root (plist-get entry :commit) head)))
+        (when (and n (or (not distance) (< n distance)))
+          (setq chosen entry distance n))))
+    (or chosen (total-review--git-version state (plist-get state :active))
+        (car versions))))
+
+(defun total-review--git-transfer (root old-blob old-flags new-blob)
+  "Transfer OLD-FLAGS from OLD-BLOB to NEW-BLOB in ROOT.
+If the historical source object has been garbage-collected, return all
+pending flags rather than incorrectly guessing reviewed lines."
+  (let ((new-buffer (total-review--git-blob-buffer root new-blob))
+        old-buffer)
+    (unwind-protect
+        (let ((new-count (with-current-buffer new-buffer
+                           (total-review--line-count))))
+          (condition-case nil
+              (setq old-buffer (total-review--git-blob-buffer root old-blob))
+            (error nil))
+          (if (not old-buffer)
+              (make-string new-count ?0)
+            (unless (= (length old-flags)
+                       (with-current-buffer old-buffer (total-review--line-count)))
+              (error "Stored Git review bits disagree with their baseline"))
+            (with-current-buffer new-buffer
+              (total-review--transfer
+               old-flags new-count (total-review--hunks old-buffer)))))
+      (when (buffer-live-p new-buffer) (kill-buffer new-buffer))
+      (when (buffer-live-p old-buffer) (kill-buffer old-buffer)))))
+
+(defun total-review--snapshot-to-git (path state info directory)
+  "Convert a snapshot STATE to Git baseline INFO without keeping old formats.
+The old snapshot is deleted only after new state metadata is written."
+  (let* ((snapshot (total-review--snapshot-path state directory))
+         (flags (plist-get state :flags))
+         (committed (total-review--git-blob-buffer
+                     (plist-get info :root) (plist-get info :blob)))
+         new-flags)
+    (unwind-protect
+        (with-current-buffer committed
+          (setq new-flags
+                (total-review--transfer flags (total-review--line-count)
+                                        (total-review--hunks snapshot))))
+      (when (buffer-live-p committed) (kill-buffer committed)))
+    (total-review--write-state path (total-review--git-state path info new-flags)
+                               directory)
+    (ignore-errors (delete-file snapshot))))
+
+(defun total-review--line-map (old-count new-count hunks)
+  "Map unchanged lines of NEW to their OLD zero-based indices.
+Changed lines have nil mappings.  OLD-COUNT and NEW-COUNT are line counts."
+  (let ((mapping (make-vector new-count nil))
+        (old-position 0) (new-position 0))
+    (dolist (hunk hunks)
+      (pcase-let ((`(,old-start ,old-size ,new-start ,new-size) hunk))
+        (let* ((old-before (if (zerop old-size) old-start (1- old-start)))
+               (new-before (if (zerop new-size) new-start (1- new-start)))
+               (old-gap (- old-before old-position))
+               (new-gap (- new-before new-position)))
+          (unless (and (>= old-gap 0) (= old-gap new-gap)
+                       (<= (+ old-before old-size) old-count)
+                       (<= (+ new-before new-size) new-count))
+            (error "Inconsistent diff hunk: %S" hunk))
+          (dotimes (i old-gap)
+            (aset mapping (+ new-position i) (+ old-position i)))
+          (setq old-position (+ old-before old-size)
+                new-position (+ new-before new-size)))))
+    (unless (= (- old-count old-position) (- new-count new-position))
+      (error "Diff did not account for all lines"))
+    (dotimes (i (- new-count new-position))
+      (aset mapping (+ new-position i) (+ old-position i)))
+    mapping))
+
+(defun total-review--git-sync (path state directory info)
+  "Reconcile Git STATE with current committed INFO and working buffer."
+  (unless (and info
+               (equal (plist-get state :git-root) (plist-get info :root))
+               (equal (plist-get state :git-path) (plist-get info :relative)))
+    (user-error "Git file not present at its original path in HEAD; review state kept"))
+  (let* ((blob (plist-get info :blob))
+         (version (total-review--git-version state blob))
+         (changed nil))
+    (unless version
+      (let* ((from (total-review--git-inheritance-source state info))
+             (flags (if from
+                        (total-review--git-transfer
+                         (plist-get info :root) (plist-get from :blob)
+                         (plist-get from :flags) blob)
+                      (let ((committed (total-review--git-blob-buffer
+                                        (plist-get info :root) blob)))
+                        (unwind-protect
+                            (with-current-buffer committed
+                              (make-string (total-review--line-count) ?0))
+                          (kill-buffer committed))))))
+        (setq version (list :blob blob :commit (plist-get info :head)
+                            :flags flags))
+        (setq state (plist-put state :versions
+                               (cons version (plist-get state :versions))))
+        (setq changed t)))
+    (unless (equal (plist-get state :active) blob)
+      (setq state (plist-put state :active blob)
+            changed t))
+    (when changed
+      (total-review--write-state path state directory))
+    (let ((committed (total-review--git-blob-buffer
+                      (plist-get info :root) blob)))
+      (unwind-protect
+          (let* ((flags (plist-get version :flags))
+                 (base-count (with-current-buffer committed
+                               (total-review--line-count)))
+                 (work-count (total-review--line-count))
+                 (hunks (total-review--hunks committed))
+                 (mapping (total-review--line-map base-count work-count hunks))
+                 (working (make-string work-count ?-)))
+            (unless (= base-count (length flags))
+              (error "Stored Git flags disagree with committed baseline"))
+            (dotimes (i work-count)
+              (let ((old (aref mapping i)))
+                (when old (aset working i (aref flags old)))))
+            (setq total-review--status working
+                  total-review--base-flags flags
+                  total-review--mapping mapping)
+            working)
+        (kill-buffer committed)))))
 
 (defun total-review--hunks (snapshot)
   "Return zero-context diff hunks from SNAPSHOT to current buffer.
@@ -290,32 +514,50 @@ Only unchanged lines keep their review status."
     new-flags))
 
 (defun total-review--sync ()
-  "Synchronize current buffer with its saved snapshot; return flags.
-Unsaved buffer changes are included in the new snapshot if diffed.
-The source file itself is never saved."
+  "Reconcile the current buffer with its review baseline; return working flags.
+Git baselines are immutable committed versions; snapshot baselines are
+updated to match the buffer as before.  Changed Git lines are marked ?-."
   (let* ((path (total-review--path))
          (directory (total-review--database path))
          (state (total-review--load path directory)))
     (unless state
       (user-error "File is not tracked in profile %s" (total-review--profile-label)))
-    (let* ((snapshot (total-review--snapshot-path state directory))
-           (old-flags (plist-get state :flags))
-           (new-count (total-review--line-count))
-           (old-count (with-temp-buffer
-                        (insert-file-contents snapshot)
-                        (total-review--line-count))))
-      (unless (= (length old-flags) old-count)
-        (error "Review snapshot and flags disagree; refusing to overwrite"))
-      (let* ((hunks (total-review--hunks snapshot))
-             (flags (if hunks
-                        (total-review--transfer old-flags new-count hunks)
-                      old-flags)))
-        (unless (= (length flags) new-count)
-          (error "Review status length does not match current buffer"))
-        (when hunks
-          (total-review--save path flags state t directory))
-        (setq total-review--status flags)
-        flags))))
+    (let ((info (total-review--git-info path)))
+      (when (and (eq (plist-get state :backend) 'snapshot) info)
+        (total-review--snapshot-to-git path state info directory)
+        (setq state (total-review--load path directory)))
+      (if (eq (plist-get state :backend) 'git)
+          (total-review--git-sync path state directory info)
+        (let* ((snapshot (total-review--snapshot-path state directory))
+               (old-flags (plist-get state :flags))
+               (new-count (total-review--line-count))
+               (old-count (with-temp-buffer
+                            (insert-file-contents snapshot)
+                            (total-review--line-count))))
+          (unless (= (length old-flags) old-count)
+            (error "Review snapshot and flags disagree; refusing to overwrite"))
+          (let* ((hunks (total-review--hunks snapshot))
+                 (flags (if hunks
+                            (total-review--transfer old-flags new-count hunks)
+                          old-flags)))
+            (unless (= (length flags) new-count)
+              (error "Review status length does not match current buffer"))
+            (when hunks (total-review--save path flags state t directory))
+            (setq total-review--status flags
+                  total-review--base-flags flags
+                  total-review--mapping nil)
+            flags))))))
+
+(defun total-review--format-progress-counts (reviewed total)
+  "Format REVIEWED / TOTAL baseline progress consistently."
+  (format "Reviewed %d / %d lines (%.1f%%), %d pending"
+          reviewed total
+          (if (zerop total) 100.0 (* 100.0 (/ (float reviewed) total)))
+          (- total reviewed)))
+
+(defun total-review--format-progress (flags)
+  "Format review progress for baseline FLAGS consistently."
+  (total-review--format-progress-counts (cl-count ?1 flags) (length flags)))
 
 (defun total-review--clear-highlights ()
   "Remove only Total Review's overlays."
@@ -368,7 +610,9 @@ Preserve overlays cleared by edits; do not synchronize review data."
 
 (defun total-review--after-edit (&rest _)
   "Clear stale overlays after edits, until the next refresh or save."
-  (setq total-review--status nil)
+  (setq total-review--status nil
+        total-review--base-flags nil
+        total-review--mapping nil)
   (total-review--clear-highlights))
 
 (defun total-review--after-save ()
@@ -397,7 +641,9 @@ Highlights are cleared after edits and rebuilt on save or refresh."
     (remove-hook 'after-save-hook #'total-review--after-save t)
     (unless total-review--switching-profile
       (setq total-review--wanted nil))
-    (setq total-review--status nil)
+    (setq total-review--status nil
+          total-review--base-flags nil
+          total-review--mapping nil)
     (total-review--clear-highlights)))
 
 (defun total-review--turn-on ()
@@ -423,24 +669,33 @@ Highlights are cleared after edits and rebuilt on save or refresh."
           (total-review-mode 1))))))
 
 (defun total-review--track-path (file)
-  "Track local FILE if not already tracked.  Return t if newly added.
-Use a visiting buffer when available, preserving its unsaved changes."
+  "Track local FILE if not tracked, using HEAD when available.
+A file not committed in Git uses a private snapshot fallback."
   (let* ((path (total-review--path file))
          (directory (total-review--database path)))
     (unless (total-review--load path directory)
-      (let ((buffer (find-buffer-visiting path)))
-        (if buffer
-            (with-current-buffer buffer
-              (total-review--save
-               path (make-string (total-review--line-count) ?0)
-               nil t directory))
-          (with-temp-buffer
-            ;; This buffer is not visiting PATH: assigning `buffer-file-name'
-            ;; would prompt to save when the modified temp buffer is killed.
-            (insert-file-contents path)
-            (total-review--save
-             path (make-string (total-review--line-count) ?0)
-             nil t directory))))
+      (let ((info (total-review--git-info path)))
+        (if info
+            (let ((committed (total-review--git-blob-buffer
+                              (plist-get info :root) (plist-get info :blob))))
+              (unwind-protect
+                  (total-review--write-state
+                   path (total-review--git-state
+                         path info (with-current-buffer committed
+                                     (make-string (total-review--line-count) ?0)))
+                   directory)
+                (kill-buffer committed)))
+          (let ((buffer (find-buffer-visiting path)))
+            (if buffer
+                (with-current-buffer buffer
+                  (total-review--save
+                   path (make-string (total-review--line-count) ?0)
+                   nil t directory))
+              (with-temp-buffer
+                (insert-file-contents path)
+                (total-review--save
+                 path (make-string (total-review--line-count) ?0)
+                 nil t directory))))))
       (total-review--activate-file path)
       t)))
 
@@ -453,6 +708,25 @@ Use a visiting buffer when available, preserving its unsaved changes."
         (message "Total Review: tracking %s" path)
       (message "Total Review: already tracking %s" path))
     (when total-review-mode (total-review-refresh))))
+
+(defun total-review--forget-state (path state directory)
+  "Discard review STATE for PATH in DIRECTORY, without changing the source.
+Also turn off pending-line highlighting in any buffer visiting PATH."
+  ;; Delete metadata first so a failed snapshot deletion can only leave an
+  ;; orphaned snapshot, not metadata pointing at a missing snapshot.
+  (delete-file (total-review--state-path path directory))
+  (when (eq (plist-get state :backend) 'snapshot)
+    (delete-file (total-review--snapshot-path state directory)))
+  (let ((buffer (find-buffer-visiting path)))
+    (when buffer
+      (with-current-buffer buffer
+        (when total-review-mode
+          (total-review-mode -1))
+        (setq total-review--wanted nil
+              total-review--status nil
+              total-review--base-flags nil
+              total-review--mapping nil)
+        (total-review--clear-highlights)))))
 
 ;;;###autoload
 (defun total-review-untrack ()
@@ -470,15 +744,7 @@ modify the source file or data belonging to other profiles."
            (format "Discard Total Review progress for %s in profile %s? "
                    (abbreviate-file-name path)
                    (total-review--profile-label)))
-      ;; Remove metadata first: if snapshot deletion fails, we leave an
-      ;; orphaned snapshot rather than metadata pointing at a missing file.
-      (delete-file (total-review--state-path path directory))
-      (delete-file (total-review--snapshot-path state directory))
-      (when total-review-mode
-        (total-review-mode -1))
-      (setq total-review--wanted nil
-            total-review--status nil)
-      (total-review--clear-highlights)
+      (total-review--forget-state path state directory)
       (message "Total Review: stopped tracking %s" path)
       t)))
 
@@ -498,6 +764,36 @@ Explicitly selected files bypass the automatic project-file filter."
         (cl-incf skipped)))
     (message "Total Review: added %d file(s); %d non-regular/remote skipped"
              added skipped)))
+
+;;;###autoload
+(defun total-review-untrack-dired ()
+  "Untrack Dired's marked files, or the file at point.
+Ask once before discarding review data for tracked files.  Never
+modify the source files or review data in other profiles."
+  (interactive)
+  (require 'dired)
+  (unless (derived-mode-p 'dired-mode)
+    (user-error "This command must be run in Dired"))
+  (let (tracked seen)
+    (dolist (file (dired-get-marked-files))
+      (when (and (not (file-remote-p file)) (file-regular-p file))
+        (let ((path (file-truename file)))
+          (unless (member path seen)
+            (push path seen)
+            (let* ((directory (total-review--database path))
+                   (state (total-review--load path directory)))
+              (when state
+                (push (list path state directory) tracked)))))))
+    (if (null tracked)
+        (message "Total Review: no marked files are tracked in profile %s"
+                 (total-review--profile-label))
+      (when (yes-or-no-p
+             (format "Discard Total Review progress for %d marked file(s) in profile %s? "
+                     (length tracked) (total-review--profile-label)))
+        (dolist (entry tracked)
+          (pcase-let ((`(,path ,state ,directory) entry))
+            (total-review--forget-state path state directory)))
+        (message "Total Review: stopped tracking %d file(s)" (length tracked))))))
 
 (defconst total-review--binary-extensions
   '("png" "jpg" "jpeg" "gif" "webp" "ico" "bmp" "tif" "tiff"
@@ -587,6 +883,9 @@ Show the skipped file names and reasons in a separate buffer."
   (let* ((project (or (project-current nil)
                       (user-error "Not in a recognized Emacs project")))
          (root (project-root project))
+         (forgotten (plist-get
+                     (total-review--enumerate (total-review--database root))
+                     :forgotten))
          (selection (total-review--project-selection project))
          (eligible (car selection))
          (excluded (cdr selection))
@@ -601,22 +900,26 @@ Show the skipped file names and reasons in a separate buffer."
         (if (total-review--track-path file)
             (cl-incf added)
           (cl-incf existing)))
-      (message "Total Review: %d added, %d already tracked, %d excluded"
-               added existing skipped))
+      (message "Total Review: %d added, %d already tracked, %d excluded%s"
+               added existing skipped
+               (if (zerop forgotten) ""
+                 (format ", %d deleted forgotten" forgotten))))
     (unless eligible
-      (message "Total Review: no eligible files (%d excluded)" skipped))
+      (message "Total Review: no eligible files (%d excluded)%s" skipped
+               (if (zerop forgotten) ""
+                 (format "; %d deleted forgotten" forgotten))))
     (when excluded
       (total-review--show-skipped-project-files root excluded))))
 
 ;;;###autoload
 (defun total-review-refresh ()
-  "Diff the current file against its snapshot and repaint highlights."
+  "Map the current file against its baseline and repaint highlights."
   (interactive)
   (let ((flags (total-review--sync)))
     (total-review--draw flags)
     (when (called-interactively-p 'interactive)
-      (message "Total Review: %d/%d lines reviewed"
-               (cl-count ?1 flags) (length flags)))))
+      (message "Total Review: %s"
+               (total-review--format-progress total-review--base-flags)))))
 
 (defun total-review--line-range (count)
   "Return zero-based (FIRST . LAST) selected line indices within COUNT."
@@ -633,22 +936,40 @@ Show the skipped file names and reasons in a separate buffer."
         (cons line line)))))
 
 (defun total-review--set-lines (value)
-  "Set current or selected lines to VALUE, either ?1 or ?0."
-  (let* ((flags (copy-sequence (total-review--sync)))
+  "Set current or selected reviewable lines to VALUE (?1 or ?0).
+Changed working lines have no committed review bits and cannot be marked."
+  (let* ((working (copy-sequence (total-review--sync)))
          (path (total-review--path))
          (directory (total-review--database path))
          (state (total-review--load path directory))
-         (range (total-review--line-range (length flags))))
+         (range (total-review--line-range (length working)))
+         (baseline (copy-sequence total-review--base-flags))
+         (mapping total-review--mapping))
+    ;; Reject the whole region before writing anything.  A partial mark
+    ;; would be surprising if the selection includes changed Git lines.
     (cl-loop for i from (car range) to (cdr range)
-             do (aset flags i value))
-    (total-review--write-state
-     path (list :version 1 :path path
-                :snapshot (plist-get state :snapshot) :flags flags)
-     directory)
-    (setq total-review--status flags)
-    (total-review--draw flags)
-    (message "Total Review: %d/%d lines reviewed"
-             (cl-count ?1 flags) (length flags))))
+             when (= (aref working i) ?-)
+             do (user-error "Line %d is changed relative to HEAD; commit it first"
+                            (1+ i)))
+    (cl-loop for i from (car range) to (cdr range)
+             do (let ((old (if mapping (aref mapping i) i)))
+                  (aset baseline old value)
+                  (aset working i value)))
+    (if (eq (plist-get state :backend) 'git)
+        (let* ((blob (plist-get state :active))
+               (version (total-review--git-version state blob)))
+          (unless version (error "Active Git review version missing"))
+          (setf (plist-get version :flags) baseline)
+          ;; VERSION is shared with STATE's :versions list.
+          (total-review--write-state path state directory))
+      (total-review--write-state
+       path (list :version 2 :backend 'snapshot :path path
+                  :snapshot (plist-get state :snapshot) :flags baseline)
+       directory))
+    (setq total-review--status working
+          total-review--base-flags baseline)
+    (total-review--draw working)
+    (message "Total Review: %s" (total-review--format-progress baseline))))
 
 ;;;###autoload
 (defun total-review-mark ()
@@ -683,7 +1004,9 @@ Show the skipped file names and reasons in a separate buffer."
         (setq step (1+ step))
         (let ((i (mod (+ line step) n)))
           (when (= (aref flags i) ?0) (setq found i)))))
-    (unless found (user-error "All %d lines reviewed" n))
+    (unless found
+      (user-error "No unchanged pending lines in the buffer (%d pending in baseline)"
+                  (cl-count ?0 total-review--base-flags)))
     (total-review--draw flags)
     (total-review--jump found)))
 
@@ -694,75 +1017,107 @@ Show the skipped file names and reasons in a separate buffer."
   (let* ((flags (total-review--sync))
          (pending (cl-loop for i below (length flags)
                            when (= (aref flags i) ?0) collect i)))
-    (unless pending (user-error "No unreviewed lines remain"))
+    (unless pending
+      (user-error "No unchanged pending lines in the buffer (%d pending in baseline)"
+                  (cl-count ?0 total-review--base-flags)))
     (total-review--draw flags)
     (total-review--jump (nth (random (length pending)) pending))))
 
 ;;;###autoload
 (defun total-review-progress ()
-  "Display review progress for the current tracked file."
+  "Display baseline review progress for the current tracked file."
   (interactive)
-  (let* ((flags (total-review--sync))
-         (reviewed (cl-count ?1 flags))
-         (total (length flags)))
-    (message "Total Review: %d/%d lines reviewed (%.1f%%)"
-             reviewed total
-             (if (zerop total) 100.0 (* 100.0 (/ (float reviewed) total))))))
+  (total-review--sync)
+  (message "Total Review: %s"
+           (total-review--format-progress total-review--base-flags)))
 
 (defun total-review--enumerate (directory)
-  "Return (PATHS . ERRORS) for database DIRECTORY.
-ERRORS contains messages for invalid metadata; never silently count it
-as reviewed."
-  (let (paths errors)
+  "List tracked files in DIRECTORY; forget deleted snapshot-backed files.
+Return :paths, :errors and :forgotten.  Missing Git-backed paths are
+retained to protect review states across branch switches.  An inaccessible
+parent directory is not evidence that a snapshot-backed file was deleted."
+  (let (paths errors (forgotten 0))
     (when (file-directory-p directory)
-      (dolist (file (directory-files directory t "\\.el\\'" t))
+      (dolist (file (directory-files directory t "\\.state\\'" t))
         (condition-case err
-            (push (plist-get (total-review--read-state-file file directory)
-                             :path)
-                  paths)
+            (let* ((state (total-review--read-state-file file directory))
+                   (path (plist-get state :path)))
+              (cond
+               ((file-exists-p path)
+                (push path paths))
+               ((eq (plist-get state :backend) 'git)
+                ;; A branch switch may remove this path.  Never delete its
+                ;; committed review history based on worktree absence.
+                (push (format "%s: missing from worktree; Git review state preserved"
+                              path)
+                      errors))
+               ((file-accessible-directory-p (file-name-directory path))
+                (total-review--forget-state path state directory)
+                (cl-incf forgotten))
+               (t
+                (push (format "%s: parent directory inaccessible; review data preserved"
+                              path)
+                      errors))))
           (error (push (format "%s: %s" file (error-message-string err))
                        errors)))))
-    (cons (nreverse paths) (nreverse errors))))
+    (list :paths (nreverse paths)
+          :errors (nreverse errors)
+          :forgotten forgotten)))
 
 (defun total-review--sync-path (path)
-  "Return synchronized review flags for PATH, including unsaved edits.
-An already visiting buffer is used when possible.  Otherwise a temporary
-buffer loads the file from disk without visiting it permanently."
+  "Return the review summary for PATH, considering visiting buffers.
+The returned baseline flags are independent of uncommitted edits."
   (let ((buffer (find-buffer-visiting path)))
     (if buffer
         (with-current-buffer buffer
-          (let ((flags (total-review--sync)))
-            (when total-review-mode (total-review--draw flags))
-            flags))
+          (let ((working (total-review--sync)))
+            (when total-review-mode (total-review--draw working))
+            (list :working working :baseline total-review--base-flags
+                  :mapping total-review--mapping)))
       (with-temp-buffer
         (insert-file-contents path)
-        ;; `total-review--sync' expects a visiting filename.  Bind it only
-        ;; during the call so cleanup cannot prompt to kill a modified buffer.
-        (let ((buffer-file-name path))
-          (total-review--sync))))))
+        ;; Only dynamically bind the visiting name during synchronization.
+        (let* ((buffer-file-name path)
+               (working (total-review--sync)))
+          (list :working working :baseline total-review--base-flags
+                :mapping total-review--mapping))))))
 
 (defun total-review--collect (directory)
-  "Collect project/global progress information from DIRECTORY.
-Return a plist with :entries, :errors, :reviewed, :total, :pending.
-Synchronize all tracked files first; a failure leaves that file out of
-the totals and is explicitly recorded under :errors."
+  "Collect progress using committed or snapshot baselines in DIRECTORY.
+The review denominator is the full baseline, including committed lines
+that are no longer visible in the working buffer.  :navigable counts
+pending lines currently present and unchanged in the working buffer."
   (let* ((enumeration (total-review--enumerate directory))
-         (paths (car enumeration))
-         (errors (cdr enumeration))
-         entries (reviewed 0) (total 0))
+         (paths (plist-get enumeration :paths))
+         (errors (plist-get enumeration :errors))
+         entries (reviewed 0) (total 0) (navigable 0)
+         (changed 0) (hidden 0))
     (dolist (path paths)
       (condition-case err
-          (let* ((flags (total-review--sync-path path))
-                 (n (length flags))
-                 (r (cl-count ?1 flags)))
-            (push (list path r (- n r) n) entries)
+          (let* ((progress (total-review--sync-path path))
+                 (baseline (plist-get progress :baseline))
+                 (working (plist-get progress :working))
+                 (mapping (plist-get progress :mapping))
+                 (n (length baseline))
+                 (r (cl-count ?1 baseline))
+                 (visible (cl-count ?0 working))
+                 (new (cl-count ?- working))
+                 (old-hidden (if mapping
+                                 (- n (cl-count-if #'identity mapping))
+                               0)))
+            (push (list path r (- n r) n visible new old-hidden) entries)
             (cl-incf reviewed r)
-            (cl-incf total n))
+            (cl-incf total n)
+            (cl-incf navigable visible)
+            (cl-incf changed new)
+            (cl-incf hidden old-hidden))
         (error (push (format "%s: %s" path (error-message-string err))
                      errors))))
     (list :entries (sort entries (lambda (a b) (string-lessp (car a) (car b))))
           :errors (nreverse errors)
-          :reviewed reviewed :total total :pending (- total reviewed))))
+          :forgotten (plist-get enumeration :forgotten)
+          :reviewed reviewed :total total :pending (- total reviewed)
+          :navigable navigable :working-changed changed :baseline-hidden hidden)))
 
 (defun total-review--pending-index (flags ordinal)
   "Return the index of the ORDINAL-th unreviewed line in FLAGS."
@@ -778,28 +1133,29 @@ the totals and is explicitly recorded under :errors."
 
 ;;;###autoload
 (defun total-review-random-project ()
-  "Jump to a random unreviewed line in any tracked file in this scope.
-The scope is the current project's database, or the global fallback if
-outside a project.  Each pending line has the same chance of selection."
+  "Jump to a random visible, unchanged, pending line in this review scope.
+Committed lines absent or modified in the working buffer cannot be visited.
+Every navigable pending line has an equal chance of selection."
   (interactive)
   (let* ((scope (total-review--scope))
          (stats (total-review--collect (plist-get scope :directory)))
-         (pending (plist-get stats :pending))
+         (pending (plist-get stats :navigable))
          (target (and (> pending 0) (random pending)))
          chosen)
     (when (plist-get stats :errors)
       (message "Total Review: %d tracked file(s) could not be read"
                (length (plist-get stats :errors))))
     (unless target
-      (user-error "No unreviewed lines in this %s database"
-                  (plist-get scope :kind)))
+      (user-error "No reviewable pending lines in this %s database (%d pending in baselines)"
+                  (plist-get scope :kind) (plist-get stats :pending)))
     (dolist (entry (plist-get stats :entries))
-      (when (and (not chosen) (< target (nth 2 entry)))
+      (when (and (not chosen) (< target (nth 4 entry)))
         (setq chosen (cons (car entry) target)))
-      (unless chosen (setq target (- target (nth 2 entry)))))
+      (unless chosen (setq target (- target (nth 4 entry)))))
     (let* ((path (car chosen))
-           (flags (total-review--sync-path path))
-           (index (total-review--pending-index flags (cdr chosen))))
+           (progress (total-review--sync-path path))
+           (index (total-review--pending-index
+                   (plist-get progress :working) (cdr chosen))))
       (find-file path)
       (unless total-review-mode (total-review-mode 1))
       (total-review--jump index)
@@ -813,7 +1169,8 @@ outside a project.  Each pending line has the same chance of selection."
 ;;;###autoload
 (defun total-review-report ()
   "Show a report for the current project or global fallback database.
-Synchronizes all tracked files, including live unsaved buffers."
+Progress counts committed baselines for Git files and the current
+snapshot for other files, even when visiting buffers have unsaved edits."
   (interactive)
   (let* ((scope (total-review--scope))
          (dir (plist-get scope :directory))
@@ -834,11 +1191,16 @@ Synchronizes all tracked files, including live unsaved buffers."
         (insert (format "Scope: %s\nDatabase: %s\n\n"
                         (or root "Global (files outside projects)") dir))
         (insert (format "Tracked files: %d\n" (length entries)))
-        (insert (format "Reviewed %d / %d lines (%.1f%%), %d pending\n\n"
-                        reviewed total
-                        (if (zerop total) 100.0
-                          (* 100.0 (/ (float reviewed) total)))
-                        (plist-get stats :pending)))
+        (insert (total-review--format-progress-counts reviewed total) "\n")
+        (when (or (> (or (plist-get stats :working-changed) 0) 0)
+                  (> (or (plist-get stats :baseline-hidden) 0) 0))
+          (insert (format "Working changes: %d new/modified buffer lines, %d committed lines absent/modified\n"
+                          (or (plist-get stats :working-changed) 0)
+                          (or (plist-get stats :baseline-hidden) 0))))
+        (insert "\n")
+        (when (> (or (plist-get stats :forgotten) 0) 0)
+          (insert (format "Forgot %d deleted tracked file(s).\n\n"
+                          (plist-get stats :forgotten))))
         (when errors
           (insert (format "WARNING: %d file(s) could not be processed; totals exclude them.\n\n"
                           (length errors)))

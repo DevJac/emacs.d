@@ -1,94 +1,160 @@
-# Total Review 0.2.7 (experimental)
+# Total Review 0.3.0
 
-Total Review tracks which lines you've examined in source files, without adding annotations or altering the source. It uses a **plain-text snapshot** plus **review flags** for each file. On refresh, Emacs runs a **zero-context unified diff** against the current buffer and carries review status forward across unchanged lines. Inserted or modified lines become unreviewed.
+Total Review is an experimental Emacs package for tracking which lines of a
+text file you have personally reviewed. It leaves source files untouched, uses
+Emacs's diff integration to map unchanged lines across edits, and keeps review
+information in a central directory (not in Git).
 
-Compatible with Emacs 29.1+ (designed for Emacs 31). No third-party Emacs packages or SQLite required. Relies on the `diff` executable used by Emacs's built-in `diff.el` (on Fedora, usually GNU diffutils). Supports local files, not TRAMP.
+**Version 0.3.0 changes the meaning of a review baseline for Git-committed
+files.** A file that exists in `HEAD` is reviewed against its last committed
+contents, rather than an independently stored snapshot. Worktree edits cannot
+silently erase review progress. Files not yet committed to Git (or outside Git)
+continue using the earlier snapshot method.
 
-**This is an experimental release. Keep a backup of your review database.** The accompanying ERT tests have been authored but could not be executed in the build environment because an Emacs executable was not available.
+This version **does not read or migrate version 1 databases** from 0.2.x. It
+uses `.state` metadata files instead of the old `.el` metadata files, leaving
+existing data and snapshots in place but inactive. Back up the database before
+experimentation. There is no automatic migration.
 
 ## Installation
 
-Put `total-review.el` in a directory on `load-path`. With Emacs 31's `user-lisp/` setup, a convenient layout is:
-
-```text
-~/.config/emacs/user-lisp/total-review/
-    total-review.el
-    total-review-tests.el
-```
-
-A minimal `use-package` declaration:
+Put `total-review.el` in your `load-path`, then load it or configure it as a
+local package. This version targets Emacs 29.1 or later and uses external Git
+and a GNU-compatible `diff` command.
 
 ```elisp
-(use-package total-review
-  :ensure nil)
+(add-to-list 'load-path "~/.config/emacs/user-lisp/total-review/")
+(require 'total-review)
+(global-total-review-mode 1)
 ```
 
-To automatically show pending-line highlighting in every **tracked** source buffer, use:
-
-```elisp
-(use-package total-review
-  :ensure nil
-  :demand t
-  :config
-  (global-total-review-mode 1))
-```
-
-The global mode does not track every file; it enables the local display mode only for files that have been added to the active review database.
+The global mode highlights **already tracked** files; it does not
+indiscriminately add every opened file to the review database.
 
 ## Commands
 
-| Command | Function |
+| Command | Purpose |
 |---|---|
-| `total-review-track` | Track current file, initially all pending |
-| `total-review-untrack` | Stop tracking current file, discarding its review data after confirmation |
-| `total-review-track-project` | Discover project files using `project-files`, confirm bulk tracking, and display skipped files and reasons |
-| `total-review-track-dired` | Track files marked in Dired (or file at point) |
-| `total-review-list-skipped-project-files` | Show which project files the automatic filter skips, and why, without tracking anything |
-| `total-review-mode` | Toggle pending-line highlighting in this buffer |
-| `global-total-review-mode` | Automatically enable highlighting in tracked file buffers |
-| `total-review-mark` | Mark current line or selected lines reviewed |
-| `total-review-unmark` | Mark lines pending again |
-| `total-review-next` | Next unreviewed line in the current file |
-| `total-review-random` | Random unreviewed line in the current file |
-| `total-review-random-project` | Random unreviewed line across tracked files in the current project/global fallback |
-| `total-review-progress` | Current-file review percentage |
-| `total-review-report` | Full project/global report, with clickable filenames |
-| `total-review-refresh` | Reconcile snapshot and current source using `diff` |
-| `total-review-switch-profile` | Change to default or a named review profile and refresh open buffers |
+| `total-review-track` | Start tracking the current file |
+| `total-review-untrack` | Discard the current file's review state, with confirmation |
+| `total-review-track-project` | Add eligible project files, with confirmation |
+| `total-review-track-dired` | Add marked Dired files |
+| `total-review-untrack-dired` | Untrack marked Dired files, with confirmation |
+| `total-review-list-skipped-project-files` | View project-filter exclusions and reasons |
+| `total-review-mode` | Toggle pending-line highlighting in the current buffer |
+| `global-total-review-mode` | Highlight files already tracked in the active profile |
+| `total-review-mark` | Mark current/selected unchanged lines as reviewed |
+| `total-review-unmark` | Undo a review mark on current/selected unchanged lines |
+| `total-review-next` | Jump to next visible pending line in this file |
+| `total-review-random` | Jump to a random visible pending line in this file |
+| `total-review-random-project` | Random pending line across eligible visible lines in the scope |
+| `total-review-progress` | Show current file's baseline review percentage |
+| `total-review-report` | Report progress in the project or global scope |
+| `total-review-refresh` | Re-map lines against the baseline and refresh highlighting |
+| `total-review-switch-profile` | Select a profile and refresh open buffers |
 
-### Workflow
+Marking and unmarking **reject a selection containing any changed Git line**;
+no partial mark is written. First commit the change, or restrict the selection
+to unchanged lines.
 
-1. In a project, `M-x total-review-track-project`. Emacs asks for confirmation and shows how many files will be excluded; if any are skipped, `*Total Review Skipped*` lists their names and reasons.
-2. `M-x global-total-review-mode` once (or enable it in your init file). Pending lines receive an underline.
-3. Select lines with Evil Visual mode (or an ordinary active region), then `M-x total-review-mark`.
-4. `M-x total-review-random-project` picks a **pending line**, uniformly over all pending lines across tracked files in the current scope.
-5. `M-x total-review-report` gives an overall progress breakdown, with source-file links, a tracked-file count, and a totals row below the per-file table.
-6. Edit any source. Temporary highlights clear until save, refresh, marking, or navigation. Saving and these commands re-diff the source to carry status across unchanged lines.
+## Git-backed review model
 
-Temporary source buffers used for bulk tracking and project-wide progress
-collection are not treated as visiting modified files, so they do not trigger
-a save/kill confirmation.
+When a file exists as an ordinary file in the current Git `HEAD`, Total Review
+reads the committed version from Git and uses it as the immutable baseline.
+It stores one `0`/`1` bit per **committed line**:
 
-To bulk-track just a selection, mark files in Dired and invoke `M-x total-review-track-dired`. Explicit file tracking does not apply the automatic binary/size filter.
+- `1` — reviewed
+- `0` — pending review
 
-To stop tracking a file, visit it and run `M-x total-review-untrack`. After an explicit confirmation, the active profile's review flags and snapshot for that file are deleted. Pending-line highlighting is turned off. The source file and other profiles' review data are not changed. You can use `total-review-track` later to start over, with every line pending.
+The live working buffer may have added, deleted, or modified lines. A unified
+diff maps unchanged committed lines to their present positions. Working-buffer
+lines that don't correspond to a committed line have an **unpersisted** third
+state, `changed`, and cannot be marked. Deleted committed lines have no display
+position but remain in the baseline and its review denominator.
 
-## Pending-line appearance
+**The Git index/staging area is ignored.** This package always compares the
+committed `HEAD` version with the *current Emacs buffer*, even with unsaved
+edits. It neither stages nor commits source files.
 
-Unreviewed lines are marked with **an underline**;
-reviewed lines are left alone.  By default, the underline color is derived from
-the current theme's `default` background: it is lightened by 20% on dark
-themes, or darkened by 20% on light themes.  This affects the underline only;
-syntax highlighting, the text foreground, and the text background are not
-changed.  If a terminal does not provide a usable background color, the
-underline instead uses the foreground color.  Changing themes recolors existing
-pending overlays without modifying review state.
+After a new commit is detected (including one made while Emacs was closed),
+Total Review checks whether it has stored flags for that committed file
+version. If so, it restores them. Otherwise it selects the closest known
+ancestor commit as its transfer source, or the last used reviewed version
+when no known ancestor exists, then transfers review bits across unchanged
+lines using a diff. New or modified committed lines start pending.
 
-**Optional face override:** If you define the face
-`total-review-pending-face`, Total Review uses it *instead* of generating
-its automatic colors.  The package deliberately does **not** define this
-face itself, so the fallback remains available.  For example, evaluate
-this in your init file **before** loading Total Review:
+Several committed versions of a file may have separate review states in the
+same database. Switching back to a version already seen **restores its own
+saved bits** rather than overwriting them with the last branch's review data.
+Identical committed file contents share the same version within a tracked path,
+even when reached through different commits.
+
+Moved or copied text has no special treatment. Diff's ordinary unchanged-line
+matching applies; moved blocks generally start pending again. Ambiguous or
+repeated text may be matched differently by the diff algorithm.
+
+Git uses immutable object IDs for committed contents. Those IDs are an internal
+storage detail of Total Review; users interact with files and commits normally.
+If Git eventually garbage-collects an old, unreferenced version, an attempted
+transfer from that missing version will conservatively start with all lines
+pending. A previously saved version of the *current* committed file can still
+restore its stored bits.
+
+**For a missing Git-backed path**, the database retains its review history.
+This avoids losing progress when switching branches. Missing files are omitted
+from report totals and reported as unprocessable until they reappear. Use
+`total-review-untrack` or `total-review-untrack-dired` while the file exists to
+explicitly remove its history. There is no dedicated missing-path untrack
+command yet.
+
+### What progress percentages mean
+
+Percentages are based on **the full baseline**, not only lines currently
+visible in the working tree. For example, if a 100-line committed file has 80
+reviewed bits and 20 pending bits, its progress remains 80% even when you
+remove or rewrite several lines without committing. The report separately
+shows changed working lines and committed lines absent/modified in the buffer.
+It counts replacements in both categories, not as a single changed line.
+
+Navigation targets only pending committed lines that remain unchanged in the
+working buffer. This means the number of navigable pending lines can be smaller
+than the pending total shown in progress and reports.
+
+The same progress wording is used in `mark`, `unmark`, `progress`, `refresh`
+(when interactive), and the report summary:
+
+```text
+Reviewed 85 / 120 lines (70.8%), 35 pending
+```
+
+## Snapshot fallback
+
+For a file outside Git or not yet committed in the repository's `HEAD`, Total
+Review uses its original approach: it saves a plain-text snapshot plus review
+bits, updating them when the buffer changes. Unsaved edits also participate
+in this comparison. New or changed lines become unreviewed, and unchanged
+lines inherit their bits. An empty file is still tracked.
+
+When a snapshot-backed file first appears in a Git commit, the next review
+operation transfers its existing bits to that committed baseline, switches its
+backend to Git, and removes the old snapshot after successfully saving the new
+metadata. No explicit conversion command is needed.
+
+Snapshot-backed files confirmed missing are still automatically forgotten when
+`total-review-report`, `total-review-random-project`, or
+`total-review-track-project` scans their database, provided the parent directory
+is accessible. Missing Git-backed files are *not* automatically forgotten.
+
+## Appearance
+
+Unreviewed, unchanged lines have a subtle underline. By default its color is
+derived from the theme's `default` background (20% lighter for dark themes,
+20% darker for light themes). It does not replace syntax highlighting or text
+backgrounds, and theme changes recolor existing overlays. Changed working
+lines have no Total Review overlay.
+
+To override the generated face, define `total-review-pending-face` before
+loading Total Review:
 
 ```elisp
 (defface total-review-pending-face
@@ -96,25 +162,11 @@ this in your init file **before** loading Total Review:
   "Custom appearance of pending Total Review lines.")
 ```
 
-After adding or removing a face override, `M-x total-review-refresh`
-updates the pending overlays.
+## Database and profiles
 
-## Database profiles and location
-
-`total-review-profile` is a plain string, defaulting to `"default"`:
-
-```elisp
-(setq total-review-profile "default")
-(setq total-review-profile "first-pass")
-```
-
-If your configuration previously set the profile using a symbol or a `(named ...)` list, update it to a string. The database directory layout has **not** changed, so existing profile data stays in place.
-
-Use `M-x total-review-switch-profile` for an **interactive, immediate switch** that also updates highlighted open buffers. Existing named profiles are suggested; typing a new name is allowed. Profile names accept letters, numbers, underscores, periods, and hyphens, beginning with a letter or number.
-
-A profile automatically selects the current project database using Emacs `project.el`. Files outside recognized projects share that profile's **global** database. Each tracked file is associated with exactly one database in that profile. Profiles don't merge review flags with one another.
-
-By default, data is stored under `(locate-user-emacs-file "total-review/")`, for example:
+`total-review-profile` is a plain string, defaulting to `"default"`.
+Use `total-review-switch-profile` to change it interactively. The location of
+all databases remains centralized:
 
 ```text
 ~/.config/emacs/total-review/
@@ -127,58 +179,53 @@ By default, data is stored under `(locate-user-emacs-file "total-review/")`, for
             projects/<hash-of-project-root>/
 ```
 
-Each database contains `<hash-of-source-path>.el` metadata files and `<hash-of-source-path>-<random>.snapshot` snapshots. This is usually outside the project being reviewed. If your **Emacs configuration itself is a Git repository**, you may want to add `/total-review/` to its `.gitignore`. Automatic tracking explicitly excludes the Total Review database directory to prevent recursively tracking its own snapshots. To relocate the database root (not the selection strategy), set `total-review-directory`.
+The location is controlled by `total-review-directory`. No files are written
+in `.git/` or inside source repositories by Total Review. Each version 2
+metadata file is named `<hash-of-absolute-file-path>.state` and contains a Lisp
+property list. Git records contain a path, repository root, Git-relative path,
+an active committed object ID, and a list of per-version flags and the commit
+where that version was first encountered. Snapshot records instead contain a
+snapshot filename and the current flags.
 
-## Automatic project tracking filter
+A single tracked Git record may grow as more committed versions are encountered;
+there is currently no automatic pruning of historical review states.
 
-`total-review-track-project` obtains its file list from `project-files`, which usually respects the project's ignore/exclusion rules (depending on the project backend). It skips:
+## Project tracking filter
 
-- Non-regular or remote files, symlinks, and Total Review's own database files.
-- Files larger than **1 MiB**.
-- A small hardcoded collection of common binary extensions.
-- Files with NUL bytes in their first **8 KiB**.
-- Files that can't be read.
+`total-review-track-project` uses `project-files` and respects exclusions from
+the project's backend. It skips remote, symlink, non-regular, oversized
+(above 1 MiB), or likely binary files (by extension or NUL bytes in the first
+8 KiB). It also excludes Total Review's own central database directory.
 
-To inspect skipped files again at any time, run `M-x total-review-list-skipped-project-files`.  It does not change review state.  The skipped list includes only files returned by `project-files`; files hidden by Git ignore rules or other project backend exclusions cannot appear in it.
+When there are exclusions, the minibuffer reports **counts only**. Filenames
+and reasons appear in `*Total Review Skipped*`, also available on demand using
+`total-review-list-skipped-project-files`. Explicit tracking from a file or
+Dired bypasses the binary/size filter.
 
-No external file-classification utility is invoked, and the heuristic is deliberately not customizable. You can explicitly track a file that it would skip with `total-review-track` or `total-review-track-dired`.
+## Limitations
 
-If an explicitly tracked file produces a **binary diff**, the package refuses to synchronize that file instead of risking incorrect review flags. The project report displays files that couldn't be synchronized rather than counting them as reviewed.
-
-## How synchronization works
-
-State is saved as a Lisp property list:
-
-```elisp
-(:version 1
- :path "/home/user/code/example.el"
- :snapshot "<id>-<suffix>.snapshot"
- :flags "110010")
-```
-
-The flags correspond to lines in the snapshot: `1` means reviewed and `0` means pending. A GNU unified diff (`-U0`) identifies old/new line ranges; unchanged ranges preserve their flags, while new and replaced ranges start pending. Newly produced snapshots are committed by atomically replacing the corresponding metadata file. Old snapshots are deleted after the metadata commit; an interrupted write may leave an unused snapshot but should not leave metadata referring to half-written data.
-
-Important caveats:
-
-- **Unsaved changes count**: synchronizing uses the **live buffer**, even if it hasn't been saved. The package never saves the actual source file.
-- Ambiguous duplicate lines and reordered blocks can be matched unexpectedly by `diff`. Diff is not a stable semantic identity scheme.
-- A line changed then later reverted after a synchronization does not automatically get its old review status back.
-- File renames change canonical path identity; a renamed file is not automatically migrated.
-- The report and cross-file random command synchronize all tracked files in scope. Missing/unreadable/unsupported files appear as errors in the report; totals exclude them.
-- No multi-process write coordination. Do not use multiple Emacs instances modifying the same review database at the same time.
+- Files are identified by canonical absolute pathname; source renames are not
+  automatically carried over.
+- Multiple Emacs instances editing one database concurrently are unsupported.
+- Git working-tree filters, alternative encodings, and line-ending conversion
+  can create unexpected diff mappings. Test those workflows before depending
+  on their review coverage.
+- The old 0.2.x `.el` metadata and snapshots are ignored, not deleted or
+  migrated. You can keep a backup or remove them manually later.
+- Git commands and GNU diff run as subprocesses. Reports over very large
+  repositories may be slower than with the snapshot-only backend.
 
 ## Tests
 
+From the extracted package directory:
+
 ```sh
-cd ~/.config/emacs/user-lisp/total-review
 emacs -Q --batch -L . -l total-review-tests.el -f ert-run-tests-batch-and-exit
 ```
 
-Or, in Emacs:
+Or within Emacs:
 
 ```elisp
 (load-library "total-review-tests")
 (ert-run-tests-interactively "^total-review-")
 ```
-
-If an ERT test fails, copy its backtrace and the output to investigate.
