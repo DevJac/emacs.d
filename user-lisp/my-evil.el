@@ -1,5 +1,9 @@
 ;; -*- lexical-binding: t; -*-
 
+(declare-function evil-previous-visual-line "evil-commands")
+(declare-function evil-next-visual-line "evil-commands")
+(declare-function evil-window-delete "evil-commands")
+
 ;;;###autoload
 (defun kill-buffer-and-window-quiet ()
   "Kill current buffer, and kill window if there is more than one."
