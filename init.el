@@ -2,7 +2,8 @@
 
 (defun my/load-init-file (file)
   "Load FILE from `user-emacs-directory'.
-If an error occurs, report it and continue."
+If an error occurs, report it and continue.
+Return t if the FILE loads, nil otherwise."
   (let ((full-file (expand-file-name file user-emacs-directory)))
     (condition-case err
         (load full-file nil 'nomessage)
@@ -15,8 +16,8 @@ If an error occurs, report it and continue."
        nil))))
 
 ;; Store customizations in another file to keep init.el clean.
-;; The custom-file variable is not a variable I created.
-;; See `C-h v custom-file`
+;; The custom-file variable is not a variable I created;
+;; see `C-h v custom-file`
 (setq custom-file (locate-user-emacs-file "custom-set.el"))
 (load custom-file 'noerror 'nomessage)
 
