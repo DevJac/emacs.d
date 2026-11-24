@@ -22,6 +22,9 @@
   (setq evil-want-C-u-scroll t)
   ;; TAB and C-i are the same; this prevents TAB from jumping:
   (setq evil-want-C-i-jump nil)
+  ;; Many things in Emacs assume the cursor can move past the eol;
+  ;; it's not a big deal, let's stop fighting it.
+  (setq evil-move-beyond-eol t)
   :config
   (evil-mode 1))
 (use-package evil-collection
