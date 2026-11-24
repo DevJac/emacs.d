@@ -6,6 +6,8 @@
   ;; C-o moves backward, M-o moves forward.
   ;; This is needed because C-i and TAB are intertwined.
   (kbd "M-o") #'evil-jump-forward
+  (kbd "#") #'my/evil-highlight-word
+  (kbd "*") #'my/evil-highlight-symbol
   (kbd "<leader> u") #'universal-argument
   (kbd "<leader> v") #'expreg-expand
   (kbd "<leader> V") #'expreg-contract

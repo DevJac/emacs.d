@@ -3,6 +3,10 @@
 (declare-function evil-previous-visual-line "evil-commands")
 (declare-function evil-next-visual-line "evil-commands")
 (declare-function evil-window-delete "evil-commands")
+(declare-function evil-ex-search-activate-highlight "evil-search")
+(declare-function evil-push-search-history "evil-search")
+(declare-function evil-ex-make-search-pattern "evil-search")
+(declare-function evil-find-thing "evil-search")
 
 ;;;###autoload
 (defun kill-buffer-and-window-quiet ()
@@ -39,5 +43,31 @@
   (if (my/evil-in-display-overlay-p)
       (evil-previous-visual-line count)
     (funcall original count)))
+
+;;; # and * customizations, highlight words and symbols
+
+(defun my/evil-highlight-word (&optional symbol)
+  "Highlight the word at point without moving.
+If SYMBOL is non-nil, highlight the entire symbol."
+  (interactive)
+  (let* ((text (or (evil-find-thing t (if symbol 'symbol 'word))
+                   (user-error "No word at point")))
+         (regex (format (if symbol "\\_<%s\\_>" "\\<%s\\>")
+                        (regexp-quote text))))
+    (setq evil-ex-search-direction 'forward
+          evil-ex-search-offset nil
+          evil-ex-last-was-search t
+          evil-ex-search-pattern
+          (let (evil-ex-search-vim-style-regexp)
+            (evil-ex-make-search-pattern regex)))
+    (unless (equal regex (car evil-ex-search-history))
+      (push regex evil-ex-search-history))
+    (evil-push-search-history regex t)
+    (evil-ex-search-activate-highlight evil-ex-search-pattern)))
+
+(defun my/evil-highlight-symbol ()
+  "Highlight the symbol at point without moving."
+  (interactive)
+  (my/evil-highlight-word t))
 
 (provide 'my-evil)
