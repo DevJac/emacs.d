@@ -52,11 +52,6 @@
   :ensure t
   :config
   (global-anzu-mode 1))
-(use-package doom-modeline
-  :ensure t
-  :config
-  (setq doom-modeline-enable-word-count t)
-  (doom-modeline-mode 1))
 
 ;; Don't allow evil commands to quit Emacs.
 (evil-ex-define-cmd "q[uit]" #'kill-buffer-and-window-quiet)

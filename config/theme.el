@@ -11,6 +11,14 @@
 (use-package modus-themes
   :ensure t)
 
+;;; Modeline
+
+(use-package doom-modeline
+  :ensure t
+  :config
+  (setq doom-modeline-enable-word-count t)
+  (doom-modeline-mode 1))
+
 ;;; Color packages
 
 (use-package rainbow-mode
@@ -34,4 +42,18 @@
                       :foreground
                       (color-lighten-name
                        (face-attribute 'font-lock-comment-face :foreground)
-                       25)))
+                       25))
+  ;; Circular glyphs from Nerd Fonts are being used by doom-modeline
+  ;; to show the evil mode (normal, insert, etc). There's a bug
+  ;; somewhere that causes the right edge to be visually cut off. We
+  ;; can work around the bug by not using bold fonts when rendering
+  ;; these glyphs.
+  (dolist (face '(doom-modeline-evil-motion-state
+                  doom-modeline-evil-normal-state
+                  doom-modeline-evil-insert-state
+                  doom-modeline-evil-visual-state
+                  doom-modeline-evil-operator-state
+                  doom-modeline-evil-replace-state
+                  doom-modeline-evil-emacs-state
+                  doom-modeline-urgent))
+    (set-face-attribute face nil :weight 'normal)))
