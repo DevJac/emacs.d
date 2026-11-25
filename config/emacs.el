@@ -54,6 +54,9 @@
 ;; Display keybindings
 (which-key-mode 1)
 
+;; Highlight trailing whitespace
+(setq show-trailing-whitespace t)
+
 ;; Scroll customizations: scroll margin and avoid recentering point
 (setq scroll-margin 2)
 (setq scroll-conservatively 101)
