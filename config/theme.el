@@ -33,6 +33,7 @@
 ;;; gruvbox-dark-hard customizations
 
 (when (member 'gruvbox-dark-hard custom-enabled-themes)
+  ;; I want to adjust these faces a bit to increase contrast.
   (set-face-attribute 'highlight nil
                       :background
                       (color-darken-name
@@ -56,4 +57,6 @@
                   doom-modeline-evil-replace-state
                   doom-modeline-evil-emacs-state
                   doom-modeline-urgent))
-    (set-face-attribute face nil :weight 'normal)))
+    (set-face-attribute face nil :weight 'normal))
+  ;; I don't like boxed faces in the modeline, I think they look bad.
+  (set-face-attribute 'mode-line-highlight nil :box 'unspecified))
