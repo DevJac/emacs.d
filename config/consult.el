@@ -17,6 +17,7 @@
    :preview-key '(:debounce 0.4 any)))
 (use-package corfu
   :ensure t
+  :demand t
   :bind
   (:map corfu-map
         ;; By default TAB is bound to corfu-complete, which fully
