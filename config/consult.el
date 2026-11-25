@@ -17,6 +17,12 @@
    :preview-key '(:debounce 0.4 any)))
 (use-package corfu
   :ensure t
+  :bind
+  (:map corfu-map
+        ;; By default TAB is bound to corfu-complete, which fully
+        ;; completes the current selection. I would prefer to only
+        ;; complete the common prefix by using corfu-expand.
+        ("TAB" . corfu-expand))
   :config
   ;; Save completion history and use it to enhance future completions
   (corfu-history-mode 1)
