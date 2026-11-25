@@ -62,7 +62,10 @@
 (setq-default indent-tabs-mode nil)
 
 ;; Highlight trailing whitespace
-(setq-default show-trailing-whitespace t)
+;; This hook will set trailing whitespace to be shown in file buffers
+(add-hook 'find-file-hook
+          (lambda ()
+            (setq-local show-trailing-whitespace t)))
 
 ;; Enable transient repeat-maps; `spc v spc v` becomes `spc v v`
 (repeat-mode 1)
