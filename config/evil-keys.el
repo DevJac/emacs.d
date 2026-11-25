@@ -1,5 +1,18 @@
 ;; -*- lexical-binding: t; -*-
 
+;; ibuffer is a fancier version of the usual Emacs buffer list;
+;; it comes with Emacs.
+(keymap-global-set "C-x C-b" #'ibuffer)
+(with-eval-after-load 'ibuffer
+  (evil-define-key 'normal ibuffer-mode-map
+    ;; V was trying to ibuffer-do-revert before
+    "V" #'evil-visual-line)
+  (evil-define-key 'visual ibuffer-mode-map
+    ;; u was trying to evil-downcase before
+    "u" #'ibuffer-unmark-forward))
+
+;;; evil keys
+
 (evil-set-leader '(motion normal) (kbd "SPC"))
 
 (evil-define-key '(motion normal) 'global

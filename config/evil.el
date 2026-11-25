@@ -32,7 +32,7 @@
   :init
   (setq evil-collection-key-blacklist '("SPC"))
   :config
-  (evil-collection-init '(dired edebug magit)))
+  (evil-collection-init '(dired edebug ibuffer magit)))
 ;; This unusual evil-org config comes from the README.
 ;; See: https://github.com/Somelauw/evil-org-mode
 (use-package evil-org
