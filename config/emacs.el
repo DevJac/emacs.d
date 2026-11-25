@@ -54,15 +54,15 @@
 ;; Display keybindings
 (which-key-mode 1)
 
-;; Highlight trailing whitespace
-(setq show-trailing-whitespace t)
-
 ;; Scroll customizations: scroll margin and avoid recentering point
 (setq scroll-margin 2)
 (setq scroll-conservatively 101)
 
 ;; Don't indent with TABs; this is buffer local so we change the default
 (setq-default indent-tabs-mode nil)
+
+;; Highlight trailing whitespace
+(setq-default show-trailing-whitespace t)
 
 ;; Enable transient repeat-maps; `spc v spc v` becomes `spc v v`
 (repeat-mode 1)
