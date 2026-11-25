@@ -1,4 +1,4 @@
-# Total Review 0.3.0
+# Total Review 0.3.1
 
 Total Review is an experimental Emacs package for tracking which lines of a
 text file you have personally reviewed. It leaves source files untouched, uses
@@ -53,9 +53,10 @@ indiscriminately add every opened file to the review database.
 | `total-review-refresh` | Re-map lines against the baseline and refresh highlighting |
 | `total-review-switch-profile` | Select a profile and refresh open buffers |
 
-Marking and unmarking **reject a selection containing any changed Git line**;
-no partial mark is written. First commit the change, or restrict the selection
-to unchanged lines.
+Marking and unmarking a region **update all unchanged, reviewable lines**,
+while silently skipping new or modified Git lines. A selection containing only
+changed lines does nothing; it does not raise an error or write review state.
+The same behavior applies when operating on just one line.
 
 ## Git-backed review model
 

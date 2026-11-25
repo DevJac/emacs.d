@@ -1,6 +1,6 @@
 ;;; total-review.el --- Track line review coverage against committed or saved text  -*- lexical-binding: t; -*-
 
-;; Version: 0.3.0
+;; Version: 0.3.1
 ;; Package-Requires: ((emacs "29.1"))
 ;; Keywords: tools, convenience
 
@@ -937,49 +937,54 @@ Show the skipped file names and reasons in a separate buffer."
 
 (defun total-review--set-lines (value)
   "Set current or selected reviewable lines to VALUE (?1 or ?0).
-Changed working lines have no committed review bits and cannot be marked."
+Skip changed Git lines, which have no corresponding committed review bits.
+If the selection has no reviewable lines, do nothing silently."
   (let* ((working (copy-sequence (total-review--sync)))
          (path (total-review--path))
          (directory (total-review--database path))
          (state (total-review--load path directory))
-         (range (total-review--line-range (length working)))
          (baseline (copy-sequence total-review--base-flags))
-         (mapping total-review--mapping))
-    ;; Reject the whole region before writing anything.  A partial mark
-    ;; would be surprising if the selection includes changed Git lines.
-    (cl-loop for i from (car range) to (cdr range)
-             when (= (aref working i) ?-)
-             do (user-error "Line %d is changed relative to HEAD; commit it first"
-                            (1+ i)))
-    (cl-loop for i from (car range) to (cdr range)
-             do (let ((old (if mapping (aref mapping i) i)))
-                  (aset baseline old value)
-                  (aset working i value)))
-    (if (eq (plist-get state :backend) 'git)
-        (let* ((blob (plist-get state :active))
-               (version (total-review--git-version state blob)))
-          (unless version (error "Active Git review version missing"))
-          (setf (plist-get version :flags) baseline)
-          ;; VERSION is shared with STATE's :versions list.
-          (total-review--write-state path state directory))
-      (total-review--write-state
-       path (list :version 2 :backend 'snapshot :path path
-                  :snapshot (plist-get state :snapshot) :flags baseline)
-       directory))
+         (mapping total-review--mapping)
+         (range (unless (zerop (length working))
+                  (total-review--line-range (length working))))
+         (reviewable 0))
+    (when range
+      (cl-loop for i from (car range) to (cdr range)
+               for old = (if mapping (aref mapping i) i)
+               when old
+               do (progn
+                    (aset baseline old value)
+                    (aset working i value)
+                    (cl-incf reviewable))))
+    (when (> reviewable 0)
+      (if (eq (plist-get state :backend) 'git)
+          (let* ((blob (plist-get state :active))
+                 (version (total-review--git-version state blob)))
+            (unless version (error "Active Git review version missing"))
+            (setf (plist-get version :flags) baseline)
+            ;; VERSION is shared with STATE's :versions list.
+            (total-review--write-state path state directory))
+        (total-review--write-state
+         path (list :version 2 :backend 'snapshot :path path
+                    :snapshot (plist-get state :snapshot) :flags baseline)
+         directory)))
     (setq total-review--status working
           total-review--base-flags baseline)
     (total-review--draw working)
-    (message "Total Review: %s" (total-review--format-progress baseline))))
+    (when (> reviewable 0)
+      (message "Total Review: %s" (total-review--format-progress baseline)))))
 
 ;;;###autoload
 (defun total-review-mark ()
-  "Mark the current line or the selected lines reviewed."
+  "Mark reviewable lines at point or in the region as reviewed.
+Silently skip lines changed relative to the committed baseline."
   (interactive)
   (total-review--set-lines ?1))
 
 ;;;###autoload
 (defun total-review-unmark ()
-  "Mark the current line or the selected lines unreviewed."
+  "Mark reviewable lines at point or in the region as unreviewed.
+Silently skip lines changed relative to the committed baseline."
   (interactive)
   (total-review--set-lines ?0))
 

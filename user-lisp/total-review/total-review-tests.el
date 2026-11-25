@@ -900,7 +900,9 @@ A modified temp buffer visiting a file triggers a save/kill confirmation."
             (should (equal (append total-review--mapping nil)
                            '(nil 0 1 2)))
             (goto-char (point-min))
-            (should-error (total-review-mark) :type 'user-error)
+            ;; A changed line has no committed review bit: silently skip it.
+            (total-review-mark)
+            (should (equal (total-review--sync) "-100"))
             (should (equal total-review--base-flags "100"))
             (should (equal (plist-get
                             (total-review--git-version
@@ -1132,8 +1134,8 @@ A modified temp buffer visiting a file triggers a save/kill confirmation."
                                 :versions)) 1)))
         (when (buffer-live-p buffer) (kill-buffer buffer))))))
 
-(ert-deftest total-review-git-selection-with-changed-lines-is-atomic ()
-  "Marking a region with changed lines must not modify any committed bits."
+(ert-deftest total-review-git-selection-skips-changed-lines ()
+  "A mixed region updates committed lines and skips changed ones."
   (total-review-tests--sandbox
     (let* ((root (total-review-tests--git-repo))
            (path (total-review-tests--write
@@ -1146,17 +1148,120 @@ A modified temp buffer visiting a file triggers a save/kill confirmation."
             (total-review-track)
             (goto-char (point-min))
             (insert "new\n")
+            (forward-line 2)
+            (insert "modified-")
+            (should (equal (total-review--sync) "-0-0"))
+            (should (equal (append total-review--mapping nil)
+                           '(nil 0 nil 2)))
             (goto-char (point-min))
             (set-mark (point))
             (goto-char (point-max))
             (activate-mark)
-            (should-error (total-review-mark) :type 'user-error)
-            (should (equal total-review--base-flags "000"))
+            (total-review-mark)
+            (should (equal total-review--base-flags "101"))
+            (should (equal (total-review--sync) "-1-1"))
             (should (equal (plist-get
                             (total-review--git-version
                              (total-review--load (total-review--path))
                              (plist-get (total-review--git-info path) :blob))
-                            :flags) "000")))
+                            :flags)
+                           "101")))
+        (when (buffer-live-p buffer)
+          (with-current-buffer buffer (set-buffer-modified-p nil))
+          (kill-buffer buffer))))))
+
+(ert-deftest total-review-git-unmark-skips-changed-lines ()
+  "Unmarking a mixed region leaves changed committed lines' bits alone."
+  (total-review-tests--sandbox
+    (let* ((root (total-review-tests--git-repo))
+           (path (total-review-tests--write
+                  (expand-file-name "sample.el" root) "a\nb\nc\n"))
+           buffer)
+      (total-review-tests--git-commit root "initial")
+      (setq buffer (find-file-noselect path))
+      (unwind-protect
+          (with-current-buffer buffer
+            (total-review-track)
+            (goto-char (point-min))
+            (set-mark (point))
+            (goto-char (point-max))
+            (activate-mark)
+            (total-review-mark)
+            (should (equal total-review--base-flags "111"))
+            (goto-char (point-min))
+            (forward-line 1)
+            (insert "modified-")
+            (should (equal (total-review--sync) "1-1"))
+            (goto-char (point-min))
+            (set-mark (point))
+            (goto-char (point-max))
+            (activate-mark)
+            (total-review-unmark)
+            (should (equal total-review--base-flags "010"))
+            (should (equal (total-review--sync) "0-0"))
+            (should (equal (plist-get
+                            (total-review--git-version
+                             (total-review--load (total-review--path))
+                             (plist-get (total-review--git-info path) :blob))
+                            :flags)
+                           "010")))
+        (when (buffer-live-p buffer)
+          (with-current-buffer buffer (set-buffer-modified-p nil))
+          (kill-buffer buffer))))))
+
+(ert-deftest total-review-git-changed-only-selection-is-silent ()
+  "Neither mark nor unmark writes data or reports progress for changed lines."
+  (total-review-tests--sandbox
+    (let* ((root (total-review-tests--git-repo))
+           (path (total-review-tests--write
+                  (expand-file-name "sample.el" root) "a\nb\n"))
+           buffer)
+      (total-review-tests--git-commit root "initial")
+      (setq buffer (find-file-noselect path))
+      (unwind-protect
+          (with-current-buffer buffer
+            (total-review-track)
+            (goto-char (point-min))
+            (insert "new\n")
+            (should (equal (total-review--sync) "-00"))
+            (goto-char (point-min))
+            (let ((writes 0) (messages 0))
+              (cl-letf (((symbol-function 'total-review--write-state)
+                         (lambda (&rest _) (cl-incf writes)))
+                        ((symbol-function 'message)
+                         (lambda (format-string &rest _)
+                           (when (and (stringp format-string)
+                                      (string-prefix-p "Total Review:" format-string))
+                             (cl-incf messages)))))
+                (total-review-mark)
+                (total-review-unmark))
+              (should (zerop writes))
+              (should (zerop messages)))
+            (should (equal total-review--base-flags "00"))
+            (should (equal (total-review--sync) "-00")))
+        (when (buffer-live-p buffer)
+          (with-current-buffer buffer (set-buffer-modified-p nil))
+          (kill-buffer buffer))))))
+
+(ert-deftest total-review-git-empty-working-buffer-mark-is-silent ()
+  "An empty working buffer has nothing to mark but retains HEAD flags."
+  (total-review-tests--sandbox
+    (let* ((root (total-review-tests--git-repo))
+           (path (total-review-tests--write
+                  (expand-file-name "sample.el" root) "a\nb\n"))
+           buffer)
+      (total-review-tests--git-commit root "initial")
+      (setq buffer (find-file-noselect path))
+      (unwind-protect
+          (with-current-buffer buffer
+            (total-review-track)
+            (total-review-mark)
+            (should (equal total-review--base-flags "10"))
+            (erase-buffer)
+            (total-review-mark)
+            (total-review-unmark)
+            (should (equal total-review--base-flags "10"))
+            (should (equal (total-review--sync) "")))
         (when (buffer-live-p buffer)
           (with-current-buffer buffer (set-buffer-modified-p nil))
           (kill-buffer buffer))))))
